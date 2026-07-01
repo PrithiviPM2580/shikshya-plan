@@ -6,9 +6,17 @@ export const Route = createFileRoute("/(public)/_auth")({
 
 function AuthLayout() {
 	return (
-		<div>
-			Hello "/(public)/_auth"!
-			<Outlet />
-		</div>
+		<main className="screen">
+			<div className="flex min-h-screen flex-col lg:flex-row p-screen">
+				<section className="flex flex-1 items-center justify-center bg-primary rounded-corner">
+					{/* Left */}
+				</section>
+
+				<section className="flex flex-1 items-center justify-center">
+					{/* Right */}
+					<Outlet />
+				</section>
+			</div>
+		</main>
 	);
 }
