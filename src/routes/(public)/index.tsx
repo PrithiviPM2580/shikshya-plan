@@ -4,9 +4,36 @@ export const Route = createFileRoute("/(public)/")({ component: Home });
 
 function Home() {
 	return (
-		<div>
-			<h1>Welcome to the Public Home Page</h1>
-			<p>This is the public section of the application.</p>
-		</div>
+		<section className="hero">
+			{/* Left Beam */}
+			<div className="beam beam-left" />
+
+			{/* Right Beam */}
+			<div className="beam beam-right" />
+
+			{/* Center Glow */}
+			<div className="hero-glow" />
+
+			{/* Dashboard Glow */}
+			<div className="dashboard-glow" />
+
+			{/* Dashboard */}
+			<div className="dashboard">
+				<div className="dashboard-top">
+					<span />
+					<span />
+					<span />
+				</div>
+
+				<div className="dashboard-content">
+					<div className="card" />
+					<div className="card" />
+					<div className="card" />
+					<div className="card" />
+					<div className="card large" />
+					<div className="card large" />
+				</div>
+			</div>
+		</section>
 	);
 }

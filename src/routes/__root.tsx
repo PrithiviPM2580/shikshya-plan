@@ -1,7 +1,7 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { seo } from "#/lib/seo";
+import { seoRoot } from "#/lib/seo";
 import faviconSvg from "../assets/svgs/favicon.svg?url";
 import appCss from "../styles.css?url";
 
@@ -15,7 +15,7 @@ export const Route = createRootRoute({
 				name: "viewport",
 				content: "width=device-width, initial-scale=1",
 			},
-			...seo({
+			...seoRoot({
 				title: "Shikshya Plan - Smart Study Planner",
 				description:
 					"Smart study planner for personalized schedules, task management, revision planning, and academic progress tracking.",
