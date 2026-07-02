@@ -2,7 +2,7 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { seoRoot } from "#/lib/seo";
-import faviconSvg from "../assets/svgs/favicon.svg?url";
+import logoSvg from "../assets/svgs/logo.svg?url";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
@@ -29,7 +29,7 @@ export const Route = createRootRoute({
 			{
 				rel: "icon",
 				type: "image/svg+xml",
-				href: faviconSvg,
+				href: logoSvg,
 			},
 			{
 				rel: "icon",

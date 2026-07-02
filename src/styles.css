@@ -251,7 +251,20 @@ body,
 }
 
 @layer components{
+  .logo{
+    @apply h-8 w-8 sm:h-10 sm:w-10 md:h-11 md:w-11 lg:w-12 lg:h-12;
+  }
+
+  .header{
+    @apply w-full flex items-center justify-between
+  }
  
+  .nav{
+    @apply hidden md:flex items-center justify-center border px-6 py-3 rounded-full;
+  }
+  .btn{
+    @apply px-4! py-3! sm:px-5! sm:py-3! lg:px-10! lg:py-6! rounded-full!;
+  }
 }
 
 @utility flex-center{
