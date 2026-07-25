@@ -1,5 +1,6 @@
 "use client";
 
+import { Link } from "@tanstack/react-router";
 import {
 	Bell,
 	CalendarDays,
@@ -13,24 +14,13 @@ import {
 	Trophy,
 	UserCircle,
 } from "lucide-react";
-import * as React from "react";
-
 import { Avatar, AvatarFallback } from "#/components/ui/avatar.tsx";
 import { Badge } from "#/components/ui/badge.tsx";
 import { Button } from "#/components/ui/button.tsx";
 import { Input } from "#/components/ui/input.tsx";
 import { Separator } from "#/components/ui/separator.tsx";
+import { sidebarItemsOptions } from "#/lib/constants.ts";
 import { cn } from "#/lib/utils.ts";
-
-const sidebarItems = [
-	{ label: "Dashboard", icon: LayoutDashboard },
-	{ label: "Smart Scheduler", icon: CalendarDays, active: true },
-	{ label: "Subjects", icon: ClipboardList },
-	{ label: "Revision Planner", icon: CheckCircle2 },
-	{ label: "Performance", icon: Trophy },
-	{ label: "Tasks", icon: Sparkles },
-	{ label: "Settings", icon: Settings },
-];
 
 export default function StudyShell({
 	children,
@@ -60,23 +50,27 @@ export default function StudyShell({
 					</div>
 
 					<div className="space-y-1">
-						{sidebarItems.map(({ label, icon: Icon, active }) => (
-							<button
+						{sidebarItemsOptions.map(({ label, icon: Icon, ...linkProps }) => (
+							<Link
 								key={label}
-								type="button"
+								{...linkProps}
 								className={cn(
-									"group flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition-colors duration-200 hover:bg-primary/10 hover:text-primary",
-									active ? "bg-primary/10 text-primary" : "text-foreground",
+									"flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition-colors duration-200 hover:bg-primary/10 hover:text-primary",
+									"text-foreground",
 								)}
+								activeProps={{
+									className: "bg-primary/10 text-primary",
+								}}
 							>
 								<Icon className="size-4" />
 								<span className="font-medium">{label}</span>
-								{label === "Tasks" ? (
+
+								{label === "Tasks" && (
 									<Badge variant="secondary" className="ml-auto">
 										4
 									</Badge>
-								) : null}
-							</button>
+								)}
+							</Link>
 						))}
 					</div>
 

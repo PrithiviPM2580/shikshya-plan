@@ -14,6 +14,7 @@ import { Route as publicAuthRouteRouteImport } from './routes/(public)/_auth/rou
 import { Route as privateDashboardRouteRouteImport } from './routes/(private)/_dashboard/route'
 import { Route as publicAuthSignUpIndexRouteImport } from './routes/(public)/_auth/sign-up/index'
 import { Route as publicAuthSignInIndexRouteImport } from './routes/(public)/_auth/sign-in/index'
+import { Route as privateDashboardTasksIndexRouteImport } from './routes/(private)/_dashboard/tasks/index'
 import { Route as privateDashboardSubjectsIndexRouteImport } from './routes/(private)/_dashboard/subjects/index'
 import { Route as privateDashboardSettingsIndexRouteImport } from './routes/(private)/_dashboard/settings/index'
 import { Route as privateDashboardSchedulerIndexRouteImport } from './routes/(private)/_dashboard/scheduler/index'
@@ -44,6 +45,12 @@ const publicAuthSignInIndexRoute = publicAuthSignInIndexRouteImport.update({
   path: '/sign-in/',
   getParentRoute: () => publicAuthRouteRoute,
 } as any)
+const privateDashboardTasksIndexRoute =
+  privateDashboardTasksIndexRouteImport.update({
+    id: '/tasks/',
+    path: '/tasks/',
+    getParentRoute: () => privateDashboardRouteRoute,
+  } as any)
 const privateDashboardSubjectsIndexRoute =
   privateDashboardSubjectsIndexRouteImport.update({
     id: '/subjects/',
@@ -89,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/scheduler/': typeof privateDashboardSchedulerIndexRoute
   '/settings/': typeof privateDashboardSettingsIndexRoute
   '/subjects/': typeof privateDashboardSubjectsIndexRoute
+  '/tasks/': typeof privateDashboardTasksIndexRoute
   '/sign-in/': typeof publicAuthSignInIndexRoute
   '/sign-up/': typeof publicAuthSignUpIndexRoute
 }
@@ -100,6 +108,7 @@ export interface FileRoutesByTo {
   '/scheduler': typeof privateDashboardSchedulerIndexRoute
   '/settings': typeof privateDashboardSettingsIndexRoute
   '/subjects': typeof privateDashboardSubjectsIndexRoute
+  '/tasks': typeof privateDashboardTasksIndexRoute
   '/sign-in': typeof publicAuthSignInIndexRoute
   '/sign-up': typeof publicAuthSignUpIndexRoute
 }
@@ -114,6 +123,7 @@ export interface FileRoutesById {
   '/(private)/_dashboard/scheduler/': typeof privateDashboardSchedulerIndexRoute
   '/(private)/_dashboard/settings/': typeof privateDashboardSettingsIndexRoute
   '/(private)/_dashboard/subjects/': typeof privateDashboardSubjectsIndexRoute
+  '/(private)/_dashboard/tasks/': typeof privateDashboardTasksIndexRoute
   '/(public)/_auth/sign-in/': typeof publicAuthSignInIndexRoute
   '/(public)/_auth/sign-up/': typeof publicAuthSignUpIndexRoute
 }
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/scheduler/'
     | '/settings/'
     | '/subjects/'
+    | '/tasks/'
     | '/sign-in/'
     | '/sign-up/'
   fileRoutesByTo: FileRoutesByTo
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/scheduler'
     | '/settings'
     | '/subjects'
+    | '/tasks'
     | '/sign-in'
     | '/sign-up'
   id:
@@ -151,6 +163,7 @@ export interface FileRouteTypes {
     | '/(private)/_dashboard/scheduler/'
     | '/(private)/_dashboard/settings/'
     | '/(private)/_dashboard/subjects/'
+    | '/(private)/_dashboard/tasks/'
     | '/(public)/_auth/sign-in/'
     | '/(public)/_auth/sign-up/'
   fileRoutesById: FileRoutesById
@@ -197,6 +210,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/sign-in/'
       preLoaderRoute: typeof publicAuthSignInIndexRouteImport
       parentRoute: typeof publicAuthRouteRoute
+    }
+    '/(private)/_dashboard/tasks/': {
+      id: '/(private)/_dashboard/tasks/'
+      path: '/tasks'
+      fullPath: '/tasks/'
+      preLoaderRoute: typeof privateDashboardTasksIndexRouteImport
+      parentRoute: typeof privateDashboardRouteRoute
     }
     '/(private)/_dashboard/subjects/': {
       id: '/(private)/_dashboard/subjects/'
@@ -250,6 +270,7 @@ interface privateDashboardRouteRouteChildren {
   privateDashboardSchedulerIndexRoute: typeof privateDashboardSchedulerIndexRoute
   privateDashboardSettingsIndexRoute: typeof privateDashboardSettingsIndexRoute
   privateDashboardSubjectsIndexRoute: typeof privateDashboardSubjectsIndexRoute
+  privateDashboardTasksIndexRoute: typeof privateDashboardTasksIndexRoute
 }
 
 const privateDashboardRouteRouteChildren: privateDashboardRouteRouteChildren = {
@@ -260,6 +281,7 @@ const privateDashboardRouteRouteChildren: privateDashboardRouteRouteChildren = {
   privateDashboardSchedulerIndexRoute: privateDashboardSchedulerIndexRoute,
   privateDashboardSettingsIndexRoute: privateDashboardSettingsIndexRoute,
   privateDashboardSubjectsIndexRoute: privateDashboardSubjectsIndexRoute,
+  privateDashboardTasksIndexRoute: privateDashboardTasksIndexRoute,
 }
 
 const privateDashboardRouteRouteWithChildren =
