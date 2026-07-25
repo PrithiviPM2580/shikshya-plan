@@ -17,12 +17,12 @@ export default function StudyShell({
 			className={cn("min-h-screen bg-background text-foreground", className)}
 		>
 			<SidebarProvider>
-				<div className="min-h-screen bg-[var(--hero-a)]/10 md:flex md:min-h-screen">
+				<div className="min-h-screen w-full bg-[var(--hero-a)]/10 md:flex md:min-h-screen">
 					<DashboardSidebar />
 
-					<div className="flex min-h-screen flex-1 flex-col">
+					<div className="flex min-h-screen flex-1 w-full flex-col min-w-0">
 						<DashboardHeader />
-						<SidebarInset className="flex-1 overflow-y-auto p-6">
+						<SidebarInset className="flex-1 min-w-0 overflow-y-auto p-6">
 							{children ?? (
 								<div className="rounded-3xl border border-border bg-surface p-10 text-center shadow-sm">
 									<div className="mx-auto max-w-2xl space-y-4">

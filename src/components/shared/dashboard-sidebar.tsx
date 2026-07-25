@@ -1,8 +1,4 @@
-"use client";
-
 import { Link } from "@tanstack/react-router";
-import { Sparkles } from "lucide-react";
-import { Avatar, AvatarFallback } from "#/components/ui/avatar.tsx";
 import { Badge } from "#/components/ui/badge.tsx";
 import {
 	Sidebar,
@@ -11,13 +7,11 @@ import {
 	SidebarGroup,
 	SidebarHeader,
 	SidebarMenu,
-	SidebarMenuButton,
 	SidebarMenuItem,
 	SidebarSeparator,
 } from "#/components/ui/sidebar.tsx";
 import { sidebarItemsOptions } from "#/lib/constants.ts";
 import { Button } from "../ui/button";
-import { Separator } from "../ui/separator";
 import Logo from "./logo";
 import { NavUser } from "./nav-user";
 
