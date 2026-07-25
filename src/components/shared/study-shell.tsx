@@ -1,19 +1,7 @@
 "use client";
 
 import { Link } from "@tanstack/react-router";
-import {
-	Bell,
-	CalendarDays,
-	CheckCircle2,
-	ClipboardList,
-	LayoutDashboard,
-	Lightbulb,
-	Menu,
-	Settings,
-	Sparkles,
-	Trophy,
-	UserCircle,
-} from "lucide-react";
+import { Bell, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback } from "#/components/ui/avatar.tsx";
 import { Badge } from "#/components/ui/badge.tsx";
 import { Button } from "#/components/ui/button.tsx";
@@ -21,6 +9,7 @@ import { Input } from "#/components/ui/input.tsx";
 import { Separator } from "#/components/ui/separator.tsx";
 import { sidebarItemsOptions } from "#/lib/constants.ts";
 import { cn } from "#/lib/utils.ts";
+import Logo from "./logo";
 
 export default function StudyShell({
 	children,
@@ -37,15 +26,13 @@ export default function StudyShell({
 				<aside className="border-r border-border bg-surface px-6 py-8 text-sm text-foreground">
 					<div className="flex items-center gap-3 pb-8">
 						<div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
-							<Menu className="size-5" />
+							<Logo />
 						</div>
 						<div>
 							<p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
-								Study Helper
+								Shikshya Plan
 							</p>
-							<h1 className="mt-1 text-base font-semibold">
-								Academic Momentum
-							</h1>
+							<h1 className="mt-1 text-base font-semibold">s</h1>
 						</div>
 					</div>
 
