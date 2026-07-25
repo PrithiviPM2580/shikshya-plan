@@ -11,8 +11,15 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as publicIndexRouteImport } from './routes/(public)/index'
 import { Route as publicAuthRouteRouteImport } from './routes/(public)/_auth/route'
+import { Route as privateDashboardRouteRouteImport } from './routes/(private)/_dashboard/route'
 import { Route as publicAuthSignUpIndexRouteImport } from './routes/(public)/_auth/sign-up/index'
 import { Route as publicAuthSignInIndexRouteImport } from './routes/(public)/_auth/sign-in/index'
+import { Route as privateDashboardSubjectsIndexRouteImport } from './routes/(private)/_dashboard/subjects/index'
+import { Route as privateDashboardSettingsIndexRouteImport } from './routes/(private)/_dashboard/settings/index'
+import { Route as privateDashboardSchedulerIndexRouteImport } from './routes/(private)/_dashboard/scheduler/index'
+import { Route as privateDashboardRevisionPlannerIndexRouteImport } from './routes/(private)/_dashboard/revision-planner/index'
+import { Route as privateDashboardPerformanceIndexRouteImport } from './routes/(private)/_dashboard/performance/index'
+import { Route as privateDashboardDashboardIndexRouteImport } from './routes/(private)/_dashboard/dashboard/index'
 
 const publicIndexRoute = publicIndexRouteImport.update({
   id: '/(public)/',
@@ -21,6 +28,10 @@ const publicIndexRoute = publicIndexRouteImport.update({
 } as any)
 const publicAuthRouteRoute = publicAuthRouteRouteImport.update({
   id: '/(public)/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const privateDashboardRouteRoute = privateDashboardRouteRouteImport.update({
+  id: '/(private)/_dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const publicAuthSignUpIndexRoute = publicAuthSignUpIndexRouteImport.update({
@@ -33,38 +44,119 @@ const publicAuthSignInIndexRoute = publicAuthSignInIndexRouteImport.update({
   path: '/sign-in/',
   getParentRoute: () => publicAuthRouteRoute,
 } as any)
+const privateDashboardSubjectsIndexRoute =
+  privateDashboardSubjectsIndexRouteImport.update({
+    id: '/subjects/',
+    path: '/subjects/',
+    getParentRoute: () => privateDashboardRouteRoute,
+  } as any)
+const privateDashboardSettingsIndexRoute =
+  privateDashboardSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => privateDashboardRouteRoute,
+  } as any)
+const privateDashboardSchedulerIndexRoute =
+  privateDashboardSchedulerIndexRouteImport.update({
+    id: '/scheduler/',
+    path: '/scheduler/',
+    getParentRoute: () => privateDashboardRouteRoute,
+  } as any)
+const privateDashboardRevisionPlannerIndexRoute =
+  privateDashboardRevisionPlannerIndexRouteImport.update({
+    id: '/revision-planner/',
+    path: '/revision-planner/',
+    getParentRoute: () => privateDashboardRouteRoute,
+  } as any)
+const privateDashboardPerformanceIndexRoute =
+  privateDashboardPerformanceIndexRouteImport.update({
+    id: '/performance/',
+    path: '/performance/',
+    getParentRoute: () => privateDashboardRouteRoute,
+  } as any)
+const privateDashboardDashboardIndexRoute =
+  privateDashboardDashboardIndexRouteImport.update({
+    id: '/dashboard/',
+    path: '/dashboard/',
+    getParentRoute: () => privateDashboardRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof publicIndexRoute
+  '/dashboard/': typeof privateDashboardDashboardIndexRoute
+  '/performance/': typeof privateDashboardPerformanceIndexRoute
+  '/revision-planner/': typeof privateDashboardRevisionPlannerIndexRoute
+  '/scheduler/': typeof privateDashboardSchedulerIndexRoute
+  '/settings/': typeof privateDashboardSettingsIndexRoute
+  '/subjects/': typeof privateDashboardSubjectsIndexRoute
   '/sign-in/': typeof publicAuthSignInIndexRoute
   '/sign-up/': typeof publicAuthSignUpIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof publicIndexRoute
+  '/dashboard': typeof privateDashboardDashboardIndexRoute
+  '/performance': typeof privateDashboardPerformanceIndexRoute
+  '/revision-planner': typeof privateDashboardRevisionPlannerIndexRoute
+  '/scheduler': typeof privateDashboardSchedulerIndexRoute
+  '/settings': typeof privateDashboardSettingsIndexRoute
+  '/subjects': typeof privateDashboardSubjectsIndexRoute
   '/sign-in': typeof publicAuthSignInIndexRoute
   '/sign-up': typeof publicAuthSignUpIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/(private)/_dashboard': typeof privateDashboardRouteRouteWithChildren
   '/(public)/_auth': typeof publicAuthRouteRouteWithChildren
   '/(public)/': typeof publicIndexRoute
+  '/(private)/_dashboard/dashboard/': typeof privateDashboardDashboardIndexRoute
+  '/(private)/_dashboard/performance/': typeof privateDashboardPerformanceIndexRoute
+  '/(private)/_dashboard/revision-planner/': typeof privateDashboardRevisionPlannerIndexRoute
+  '/(private)/_dashboard/scheduler/': typeof privateDashboardSchedulerIndexRoute
+  '/(private)/_dashboard/settings/': typeof privateDashboardSettingsIndexRoute
+  '/(private)/_dashboard/subjects/': typeof privateDashboardSubjectsIndexRoute
   '/(public)/_auth/sign-in/': typeof publicAuthSignInIndexRoute
   '/(public)/_auth/sign-up/': typeof publicAuthSignUpIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sign-in/' | '/sign-up/'
+  fullPaths:
+    | '/'
+    | '/dashboard/'
+    | '/performance/'
+    | '/revision-planner/'
+    | '/scheduler/'
+    | '/settings/'
+    | '/subjects/'
+    | '/sign-in/'
+    | '/sign-up/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sign-in' | '/sign-up'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/performance'
+    | '/revision-planner'
+    | '/scheduler'
+    | '/settings'
+    | '/subjects'
+    | '/sign-in'
+    | '/sign-up'
   id:
     | '__root__'
+    | '/(private)/_dashboard'
     | '/(public)/_auth'
     | '/(public)/'
+    | '/(private)/_dashboard/dashboard/'
+    | '/(private)/_dashboard/performance/'
+    | '/(private)/_dashboard/revision-planner/'
+    | '/(private)/_dashboard/scheduler/'
+    | '/(private)/_dashboard/settings/'
+    | '/(private)/_dashboard/subjects/'
     | '/(public)/_auth/sign-in/'
     | '/(public)/_auth/sign-up/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  privateDashboardRouteRoute: typeof privateDashboardRouteRouteWithChildren
   publicAuthRouteRoute: typeof publicAuthRouteRouteWithChildren
   publicIndexRoute: typeof publicIndexRoute
 }
@@ -85,6 +177,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof publicAuthRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(private)/_dashboard': {
+      id: '/(private)/_dashboard'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof privateDashboardRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(public)/_auth/sign-up/': {
       id: '/(public)/_auth/sign-up/'
       path: '/sign-up'
@@ -99,8 +198,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof publicAuthSignInIndexRouteImport
       parentRoute: typeof publicAuthRouteRoute
     }
+    '/(private)/_dashboard/subjects/': {
+      id: '/(private)/_dashboard/subjects/'
+      path: '/subjects'
+      fullPath: '/subjects/'
+      preLoaderRoute: typeof privateDashboardSubjectsIndexRouteImport
+      parentRoute: typeof privateDashboardRouteRoute
+    }
+    '/(private)/_dashboard/settings/': {
+      id: '/(private)/_dashboard/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof privateDashboardSettingsIndexRouteImport
+      parentRoute: typeof privateDashboardRouteRoute
+    }
+    '/(private)/_dashboard/scheduler/': {
+      id: '/(private)/_dashboard/scheduler/'
+      path: '/scheduler'
+      fullPath: '/scheduler/'
+      preLoaderRoute: typeof privateDashboardSchedulerIndexRouteImport
+      parentRoute: typeof privateDashboardRouteRoute
+    }
+    '/(private)/_dashboard/revision-planner/': {
+      id: '/(private)/_dashboard/revision-planner/'
+      path: '/revision-planner'
+      fullPath: '/revision-planner/'
+      preLoaderRoute: typeof privateDashboardRevisionPlannerIndexRouteImport
+      parentRoute: typeof privateDashboardRouteRoute
+    }
+    '/(private)/_dashboard/performance/': {
+      id: '/(private)/_dashboard/performance/'
+      path: '/performance'
+      fullPath: '/performance/'
+      preLoaderRoute: typeof privateDashboardPerformanceIndexRouteImport
+      parentRoute: typeof privateDashboardRouteRoute
+    }
+    '/(private)/_dashboard/dashboard/': {
+      id: '/(private)/_dashboard/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof privateDashboardDashboardIndexRouteImport
+      parentRoute: typeof privateDashboardRouteRoute
+    }
   }
 }
+
+interface privateDashboardRouteRouteChildren {
+  privateDashboardDashboardIndexRoute: typeof privateDashboardDashboardIndexRoute
+  privateDashboardPerformanceIndexRoute: typeof privateDashboardPerformanceIndexRoute
+  privateDashboardRevisionPlannerIndexRoute: typeof privateDashboardRevisionPlannerIndexRoute
+  privateDashboardSchedulerIndexRoute: typeof privateDashboardSchedulerIndexRoute
+  privateDashboardSettingsIndexRoute: typeof privateDashboardSettingsIndexRoute
+  privateDashboardSubjectsIndexRoute: typeof privateDashboardSubjectsIndexRoute
+}
+
+const privateDashboardRouteRouteChildren: privateDashboardRouteRouteChildren = {
+  privateDashboardDashboardIndexRoute: privateDashboardDashboardIndexRoute,
+  privateDashboardPerformanceIndexRoute: privateDashboardPerformanceIndexRoute,
+  privateDashboardRevisionPlannerIndexRoute:
+    privateDashboardRevisionPlannerIndexRoute,
+  privateDashboardSchedulerIndexRoute: privateDashboardSchedulerIndexRoute,
+  privateDashboardSettingsIndexRoute: privateDashboardSettingsIndexRoute,
+  privateDashboardSubjectsIndexRoute: privateDashboardSubjectsIndexRoute,
+}
+
+const privateDashboardRouteRouteWithChildren =
+  privateDashboardRouteRoute._addFileChildren(
+    privateDashboardRouteRouteChildren,
+  )
 
 interface publicAuthRouteRouteChildren {
   publicAuthSignInIndexRoute: typeof publicAuthSignInIndexRoute
@@ -117,6 +282,7 @@ const publicAuthRouteRouteWithChildren = publicAuthRouteRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
+  privateDashboardRouteRoute: privateDashboardRouteRouteWithChildren,
   publicAuthRouteRoute: publicAuthRouteRouteWithChildren,
   publicIndexRoute: publicIndexRoute,
 }
