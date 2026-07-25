@@ -1,7 +1,10 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <explanation> */
 import { useForm } from "@tanstack/react-form";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Loader2Icon } from "lucide-react";
+import { useTransition } from "react";
 import { toast } from "sonner";
+import { authClient } from "#/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import {
 	Field,
@@ -13,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { type SignInFormValues, signInFormSchema } from "../schemas";
 
 export default function SignInForm() {
+	const navigate = useNavigate();
+	const [isPending, startTransition] = useTransition();
 	const form = useForm({
 		defaultValues: {
 			email: "",
@@ -21,7 +26,25 @@ export default function SignInForm() {
 		validators: {
 			onSubmit: signInFormSchema,
 		},
-		onSubmit: async ({ value }) => {},
+		onSubmit: async ({ value }) => {
+			startTransition(async () => {
+				await authClient.signIn.email(
+					{
+						email: value.email,
+						password: value.password,
+					},
+					{
+						onSuccess: () => {
+							toast.success("Sign in successfully");
+							navigate({ to: "/" });
+						},
+						onError: ({ error }) => {
+							toast.error(error.message || "Failed to sign-up");
+						},
+					},
+				);
+			});
+		},
 	});
 
 	return (
@@ -83,7 +106,8 @@ export default function SignInForm() {
 				</FieldGroup>
 			</form>
 			<div className="w-full flex flex-col gap-2">
-				<Button type="submit" className="w-full">
+				<Button type="submit" className="w-full" disabled={isPending}>
+					{isPending && <Loader2Icon className="size-8 animate-spin" />}
 					Sign In
 				</Button>
 				<p className="text-sm text-muted-foreground w-full text-center">

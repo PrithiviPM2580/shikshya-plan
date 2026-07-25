@@ -1,15 +1,39 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTransition } from "react";
+import { toast } from "sonner";
 import { Button } from "#/components/ui/button";
 import { Separator } from "#/components/ui/separator";
 import Github from "#/features/auth/components/icons/github";
 import Google from "#/features/auth/components/icons/google";
 import SignUpForm from "#/features/auth/components/sign-up-form";
+import { authClient } from "#/lib/auth-client";
 
 export const Route = createFileRoute("/(public)/_auth/sign-up/")({
 	component: SignUp,
 });
 
 function SignUp() {
+	const [isPending, startTransition] = useTransition();
+	async function onSocial(provider: "google" | "github") {
+		startTransition(async () => {
+			await authClient.signIn.social(
+				{
+					provider: provider,
+					callbackURL: "/",
+				},
+				{
+					onSuccess: () => {
+						toast.success(
+							`${provider.toUpperCase()} Account created successfully.`,
+						);
+					},
+					onError: ({ error }) => {
+						toast.error(error.message);
+					},
+				},
+			);
+		});
+	}
 	return (
 		<div className="flex justify-center items-start flex-col gap-4 ">
 			<h2 className="w-full text-center">Start your journey</h2>
@@ -17,11 +41,21 @@ function SignUp() {
 				Build better study habits with intelligent planning.
 			</p>
 			<div className="flex gap-2 w-full">
-				<Button variant="custom" className="flex-1">
+				<Button
+					variant="custom"
+					className="flex-1"
+					disabled={isPending}
+					onClick={() => onSocial("google")}
+				>
 					<Google />
 					Sign up with Google
 				</Button>
-				<Button variant="custom" className="flex-1">
+				<Button
+					variant="custom"
+					className="flex-1"
+					disabled={isPending}
+					onClick={() => onSocial("github")}
+				>
 					<Github />
 					Sign up with GitHub
 				</Button>

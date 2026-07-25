@@ -1,7 +1,10 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <explanation> */
 import { useForm } from "@tanstack/react-form";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Loader2Icon } from "lucide-react";
+import { useTransition } from "react";
 import { toast } from "sonner";
+import { authClient } from "#/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import {
 	Field,
@@ -13,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { type SignUpFormValues, signUpFormSchema } from "../schemas";
 
 export default function SignUpForm() {
+	const [isPending, startTransition] = useTransition();
+	const navigate = useNavigate();
 	const form = useForm({
 		defaultValues: {
 			name: "",
@@ -22,7 +27,26 @@ export default function SignUpForm() {
 		validators: {
 			onSubmit: signUpFormSchema,
 		},
-		onSubmit: async ({ value }) => {},
+		onSubmit: async ({ value }) => {
+			startTransition(async () => {
+				await authClient.signUp.email(
+					{
+						name: value.name,
+						email: value.email,
+						password: value.password,
+					},
+					{
+						onSuccess: () => {
+							toast.success("Sign up successfully");
+							navigate({ to: "/" });
+						},
+						onError: ({ error }) => {
+							toast.error(error.message || "Failed to sign-up");
+						},
+					},
+				);
+			});
+		},
 	});
 
 	return (
@@ -108,7 +132,8 @@ export default function SignUpForm() {
 				</FieldGroup>
 			</form>
 			<div className="w-full flex flex-col gap-2">
-				<Button type="submit" className="w-full">
+				<Button type="submit" className="w-full" disabled={isPending}>
+					{isPending && <Loader2Icon className="size-8 animate-spin" />}
 					Sign Up
 				</Button>
 				<p className="text-sm text-muted-foreground w-full text-center">
