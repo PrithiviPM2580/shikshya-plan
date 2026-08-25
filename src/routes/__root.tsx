@@ -2,6 +2,8 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { seoRoot } from "#/lib/seo";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import logoSvg from "../assets/svgs/logo.svg?url";
 import appCss from "../styles.css?url";
@@ -63,7 +65,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<HeadContent />
 			</head>
 			<body>
-				<TooltipProvider>{children}</TooltipProvider>
+				<ThemeProvider>
+					<TooltipProvider>
+						{children}
+						<Toaster />
+					</TooltipProvider>
+				</ThemeProvider>
 
 				<TanStackDevtools
 					config={{

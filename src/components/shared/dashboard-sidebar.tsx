@@ -79,7 +79,7 @@ export default function DashboardSidebar() {
 	return (
 		<Sidebar className="border-r border-border bg-surface text-foreground">
 			{/* Header */}
-			<SidebarHeader className="border-b border-border/70 px-6 py-2">
+			<SidebarHeader className="border-b border-border/70 px-6 py-[11.5px]">
 				<div className="flex items-center gap-3">
 					<div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
 						<Logo className="h-auto w-7" />
@@ -109,22 +109,17 @@ export default function DashboardSidebar() {
 				{renderGroup("Account", metaSidebarItems)}
 			</SidebarContent>
 
-			{/* Separator */}
-			<div className="px-4">
-				<SidebarSeparator />
-			</div>
-
 			{/* Footer */}
-			<SidebarFooter className="shrink-0 space-y-2 border-t border-border/70 px-3 py-3">
+			<SidebarFooter className="shrink-0 space-y-0.5 border-t border-border/70 px-3 py-3">
 				{/* Today's Goal */}
 				<div className="rounded-xl border border-border bg-background p-3 shadow-sm">
 					<div className="flex items-center justify-between gap-2">
 						<div>
-							<p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
+							<p className="text-[8px] uppercase tracking-[0.12em] text-muted-foreground">
 								Today’s goal
 							</p>
 
-							<p className="mt-0.5 text-sm font-semibold">Finish 2 tasks</p>
+							<p className="mt-0.5 text-xs font-semibold">Finish 2 tasks</p>
 						</div>
 
 						<span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
@@ -132,7 +127,7 @@ export default function DashboardSidebar() {
 						</span>
 					</div>
 
-					<p className="mt-2 text-[11px] leading-tight text-muted-foreground">
+					<p className="mt-1 text-[11px] leading-tight text-muted-foreground">
 						Keep your momentum with short focused sessions.
 					</p>
 				</div>
