@@ -1,12 +1,16 @@
 import { linkOptions } from "@tanstack/react-router";
 import {
-	CalendarDays,
-	CheckCircle2,
-	ClipboardList,
+	BookOpen,
+	Calendar,
+	CheckSquare,
+	GraduationCap,
 	LayoutDashboard,
+	ListTodo,
 	Settings,
-	Sparkles,
-	Trophy,
+	Target,
+	Timer,
+	TrendingUp,
+	User,
 } from "lucide-react";
 
 export const navbarLinkOptions = linkOptions([
@@ -33,7 +37,7 @@ export const navbarLinkOptions = linkOptions([
 	},
 ]);
 
-export const sidebarItemsOptions = linkOptions([
+export const primarySidebarItems = linkOptions([
 	{
 		to: "/dashboard",
 		label: "Dashboard",
@@ -41,29 +45,60 @@ export const sidebarItemsOptions = linkOptions([
 		activeOptions: { exact: true },
 	},
 	{
-		to: "/scheduler",
-		label: "Smart Scheduler",
-		icon: CalendarDays,
-	},
-	{
 		to: "/subjects",
 		label: "Subjects",
-		icon: ClipboardList,
+		icon: BookOpen,
 	},
 	{
-		to: "/revision-planner",
-		label: "Revision Planner",
-		icon: CheckCircle2,
+		to: "/plans",
+		label: "Study Plans",
+		icon: ListTodo,
 	},
 	{
-		to: "/performance",
-		label: "Performance",
-		icon: Trophy,
+		to: "/sessions",
+		label: "Sessions",
+		icon: GraduationCap,
 	},
 	{
 		to: "/tasks",
 		label: "Tasks",
-		icon: Sparkles,
+		icon: CheckSquare,
+	},
+	{
+		to: "/calendar",
+		label: "Calendar",
+		icon: Calendar,
+	},
+]);
+
+export const secondarySidebarItems = linkOptions([
+	{
+		to: "/exams",
+		label: "Exams",
+		icon: GraduationCap,
+	},
+	{
+		to: "/goals",
+		label: "Goals",
+		icon: Target,
+	},
+	{
+		to: "/analytics",
+		label: "Analytics",
+		icon: TrendingUp,
+	},
+	{
+		to: "/pomodoro",
+		label: "Pomodoro",
+		icon: Timer,
+	},
+]);
+
+export const metaSidebarItems = linkOptions([
+	{
+		to: "/profile",
+		label: "Profile",
+		icon: User,
 	},
 	{
 		to: "/settings",

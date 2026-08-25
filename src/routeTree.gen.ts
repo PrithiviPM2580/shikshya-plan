@@ -17,10 +17,18 @@ import { Route as publicAuthSignInIndexRouteImport } from './routes/(public)/_au
 import { Route as privateDashboardTasksIndexRouteImport } from './routes/(private)/_dashboard/tasks/index'
 import { Route as privateDashboardSubjectsIndexRouteImport } from './routes/(private)/_dashboard/subjects/index'
 import { Route as privateDashboardSettingsIndexRouteImport } from './routes/(private)/_dashboard/settings/index'
+import { Route as privateDashboardSessionsIndexRouteImport } from './routes/(private)/_dashboard/sessions/index'
 import { Route as privateDashboardSchedulerIndexRouteImport } from './routes/(private)/_dashboard/scheduler/index'
 import { Route as privateDashboardRevisionPlannerIndexRouteImport } from './routes/(private)/_dashboard/revision-planner/index'
+import { Route as privateDashboardProfileIndexRouteImport } from './routes/(private)/_dashboard/profile/index'
+import { Route as privateDashboardPomodoroIndexRouteImport } from './routes/(private)/_dashboard/pomodoro/index'
+import { Route as privateDashboardPlansIndexRouteImport } from './routes/(private)/_dashboard/plans/index'
 import { Route as privateDashboardPerformanceIndexRouteImport } from './routes/(private)/_dashboard/performance/index'
+import { Route as privateDashboardGoalsIndexRouteImport } from './routes/(private)/_dashboard/goals/index'
+import { Route as privateDashboardExamsIndexRouteImport } from './routes/(private)/_dashboard/exams/index'
 import { Route as privateDashboardDashboardIndexRouteImport } from './routes/(private)/_dashboard/dashboard/index'
+import { Route as privateDashboardCalendarIndexRouteImport } from './routes/(private)/_dashboard/calendar/index'
+import { Route as privateDashboardAnalyticsIndexRouteImport } from './routes/(private)/_dashboard/analytics/index'
 
 const publicIndexRoute = publicIndexRouteImport.update({
   id: '/(public)/',
@@ -63,6 +71,12 @@ const privateDashboardSettingsIndexRoute =
     path: '/settings/',
     getParentRoute: () => privateDashboardRouteRoute,
   } as any)
+const privateDashboardSessionsIndexRoute =
+  privateDashboardSessionsIndexRouteImport.update({
+    id: '/sessions/',
+    path: '/sessions/',
+    getParentRoute: () => privateDashboardRouteRoute,
+  } as any)
 const privateDashboardSchedulerIndexRoute =
   privateDashboardSchedulerIndexRouteImport.update({
     id: '/scheduler/',
@@ -75,10 +89,40 @@ const privateDashboardRevisionPlannerIndexRoute =
     path: '/revision-planner/',
     getParentRoute: () => privateDashboardRouteRoute,
   } as any)
+const privateDashboardProfileIndexRoute =
+  privateDashboardProfileIndexRouteImport.update({
+    id: '/profile/',
+    path: '/profile/',
+    getParentRoute: () => privateDashboardRouteRoute,
+  } as any)
+const privateDashboardPomodoroIndexRoute =
+  privateDashboardPomodoroIndexRouteImport.update({
+    id: '/pomodoro/',
+    path: '/pomodoro/',
+    getParentRoute: () => privateDashboardRouteRoute,
+  } as any)
+const privateDashboardPlansIndexRoute =
+  privateDashboardPlansIndexRouteImport.update({
+    id: '/plans/',
+    path: '/plans/',
+    getParentRoute: () => privateDashboardRouteRoute,
+  } as any)
 const privateDashboardPerformanceIndexRoute =
   privateDashboardPerformanceIndexRouteImport.update({
     id: '/performance/',
     path: '/performance/',
+    getParentRoute: () => privateDashboardRouteRoute,
+  } as any)
+const privateDashboardGoalsIndexRoute =
+  privateDashboardGoalsIndexRouteImport.update({
+    id: '/goals/',
+    path: '/goals/',
+    getParentRoute: () => privateDashboardRouteRoute,
+  } as any)
+const privateDashboardExamsIndexRoute =
+  privateDashboardExamsIndexRouteImport.update({
+    id: '/exams/',
+    path: '/exams/',
     getParentRoute: () => privateDashboardRouteRoute,
   } as any)
 const privateDashboardDashboardIndexRoute =
@@ -87,13 +131,33 @@ const privateDashboardDashboardIndexRoute =
     path: '/dashboard/',
     getParentRoute: () => privateDashboardRouteRoute,
   } as any)
+const privateDashboardCalendarIndexRoute =
+  privateDashboardCalendarIndexRouteImport.update({
+    id: '/calendar/',
+    path: '/calendar/',
+    getParentRoute: () => privateDashboardRouteRoute,
+  } as any)
+const privateDashboardAnalyticsIndexRoute =
+  privateDashboardAnalyticsIndexRouteImport.update({
+    id: '/analytics/',
+    path: '/analytics/',
+    getParentRoute: () => privateDashboardRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof publicIndexRoute
+  '/analytics/': typeof privateDashboardAnalyticsIndexRoute
+  '/calendar/': typeof privateDashboardCalendarIndexRoute
   '/dashboard/': typeof privateDashboardDashboardIndexRoute
+  '/exams/': typeof privateDashboardExamsIndexRoute
+  '/goals/': typeof privateDashboardGoalsIndexRoute
   '/performance/': typeof privateDashboardPerformanceIndexRoute
+  '/plans/': typeof privateDashboardPlansIndexRoute
+  '/pomodoro/': typeof privateDashboardPomodoroIndexRoute
+  '/profile/': typeof privateDashboardProfileIndexRoute
   '/revision-planner/': typeof privateDashboardRevisionPlannerIndexRoute
   '/scheduler/': typeof privateDashboardSchedulerIndexRoute
+  '/sessions/': typeof privateDashboardSessionsIndexRoute
   '/settings/': typeof privateDashboardSettingsIndexRoute
   '/subjects/': typeof privateDashboardSubjectsIndexRoute
   '/tasks/': typeof privateDashboardTasksIndexRoute
@@ -102,10 +166,18 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof publicIndexRoute
+  '/analytics': typeof privateDashboardAnalyticsIndexRoute
+  '/calendar': typeof privateDashboardCalendarIndexRoute
   '/dashboard': typeof privateDashboardDashboardIndexRoute
+  '/exams': typeof privateDashboardExamsIndexRoute
+  '/goals': typeof privateDashboardGoalsIndexRoute
   '/performance': typeof privateDashboardPerformanceIndexRoute
+  '/plans': typeof privateDashboardPlansIndexRoute
+  '/pomodoro': typeof privateDashboardPomodoroIndexRoute
+  '/profile': typeof privateDashboardProfileIndexRoute
   '/revision-planner': typeof privateDashboardRevisionPlannerIndexRoute
   '/scheduler': typeof privateDashboardSchedulerIndexRoute
+  '/sessions': typeof privateDashboardSessionsIndexRoute
   '/settings': typeof privateDashboardSettingsIndexRoute
   '/subjects': typeof privateDashboardSubjectsIndexRoute
   '/tasks': typeof privateDashboardTasksIndexRoute
@@ -117,10 +189,18 @@ export interface FileRoutesById {
   '/(private)/_dashboard': typeof privateDashboardRouteRouteWithChildren
   '/(public)/_auth': typeof publicAuthRouteRouteWithChildren
   '/(public)/': typeof publicIndexRoute
+  '/(private)/_dashboard/analytics/': typeof privateDashboardAnalyticsIndexRoute
+  '/(private)/_dashboard/calendar/': typeof privateDashboardCalendarIndexRoute
   '/(private)/_dashboard/dashboard/': typeof privateDashboardDashboardIndexRoute
+  '/(private)/_dashboard/exams/': typeof privateDashboardExamsIndexRoute
+  '/(private)/_dashboard/goals/': typeof privateDashboardGoalsIndexRoute
   '/(private)/_dashboard/performance/': typeof privateDashboardPerformanceIndexRoute
+  '/(private)/_dashboard/plans/': typeof privateDashboardPlansIndexRoute
+  '/(private)/_dashboard/pomodoro/': typeof privateDashboardPomodoroIndexRoute
+  '/(private)/_dashboard/profile/': typeof privateDashboardProfileIndexRoute
   '/(private)/_dashboard/revision-planner/': typeof privateDashboardRevisionPlannerIndexRoute
   '/(private)/_dashboard/scheduler/': typeof privateDashboardSchedulerIndexRoute
+  '/(private)/_dashboard/sessions/': typeof privateDashboardSessionsIndexRoute
   '/(private)/_dashboard/settings/': typeof privateDashboardSettingsIndexRoute
   '/(private)/_dashboard/subjects/': typeof privateDashboardSubjectsIndexRoute
   '/(private)/_dashboard/tasks/': typeof privateDashboardTasksIndexRoute
@@ -131,10 +211,18 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/analytics/'
+    | '/calendar/'
     | '/dashboard/'
+    | '/exams/'
+    | '/goals/'
     | '/performance/'
+    | '/plans/'
+    | '/pomodoro/'
+    | '/profile/'
     | '/revision-planner/'
     | '/scheduler/'
+    | '/sessions/'
     | '/settings/'
     | '/subjects/'
     | '/tasks/'
@@ -143,10 +231,18 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/analytics'
+    | '/calendar'
     | '/dashboard'
+    | '/exams'
+    | '/goals'
     | '/performance'
+    | '/plans'
+    | '/pomodoro'
+    | '/profile'
     | '/revision-planner'
     | '/scheduler'
+    | '/sessions'
     | '/settings'
     | '/subjects'
     | '/tasks'
@@ -157,10 +253,18 @@ export interface FileRouteTypes {
     | '/(private)/_dashboard'
     | '/(public)/_auth'
     | '/(public)/'
+    | '/(private)/_dashboard/analytics/'
+    | '/(private)/_dashboard/calendar/'
     | '/(private)/_dashboard/dashboard/'
+    | '/(private)/_dashboard/exams/'
+    | '/(private)/_dashboard/goals/'
     | '/(private)/_dashboard/performance/'
+    | '/(private)/_dashboard/plans/'
+    | '/(private)/_dashboard/pomodoro/'
+    | '/(private)/_dashboard/profile/'
     | '/(private)/_dashboard/revision-planner/'
     | '/(private)/_dashboard/scheduler/'
+    | '/(private)/_dashboard/sessions/'
     | '/(private)/_dashboard/settings/'
     | '/(private)/_dashboard/subjects/'
     | '/(private)/_dashboard/tasks/'
@@ -232,6 +336,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof privateDashboardSettingsIndexRouteImport
       parentRoute: typeof privateDashboardRouteRoute
     }
+    '/(private)/_dashboard/sessions/': {
+      id: '/(private)/_dashboard/sessions/'
+      path: '/sessions'
+      fullPath: '/sessions/'
+      preLoaderRoute: typeof privateDashboardSessionsIndexRouteImport
+      parentRoute: typeof privateDashboardRouteRoute
+    }
     '/(private)/_dashboard/scheduler/': {
       id: '/(private)/_dashboard/scheduler/'
       path: '/scheduler'
@@ -246,11 +357,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof privateDashboardRevisionPlannerIndexRouteImport
       parentRoute: typeof privateDashboardRouteRoute
     }
+    '/(private)/_dashboard/profile/': {
+      id: '/(private)/_dashboard/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof privateDashboardProfileIndexRouteImport
+      parentRoute: typeof privateDashboardRouteRoute
+    }
+    '/(private)/_dashboard/pomodoro/': {
+      id: '/(private)/_dashboard/pomodoro/'
+      path: '/pomodoro'
+      fullPath: '/pomodoro/'
+      preLoaderRoute: typeof privateDashboardPomodoroIndexRouteImport
+      parentRoute: typeof privateDashboardRouteRoute
+    }
+    '/(private)/_dashboard/plans/': {
+      id: '/(private)/_dashboard/plans/'
+      path: '/plans'
+      fullPath: '/plans/'
+      preLoaderRoute: typeof privateDashboardPlansIndexRouteImport
+      parentRoute: typeof privateDashboardRouteRoute
+    }
     '/(private)/_dashboard/performance/': {
       id: '/(private)/_dashboard/performance/'
       path: '/performance'
       fullPath: '/performance/'
       preLoaderRoute: typeof privateDashboardPerformanceIndexRouteImport
+      parentRoute: typeof privateDashboardRouteRoute
+    }
+    '/(private)/_dashboard/goals/': {
+      id: '/(private)/_dashboard/goals/'
+      path: '/goals'
+      fullPath: '/goals/'
+      preLoaderRoute: typeof privateDashboardGoalsIndexRouteImport
+      parentRoute: typeof privateDashboardRouteRoute
+    }
+    '/(private)/_dashboard/exams/': {
+      id: '/(private)/_dashboard/exams/'
+      path: '/exams'
+      fullPath: '/exams/'
+      preLoaderRoute: typeof privateDashboardExamsIndexRouteImport
       parentRoute: typeof privateDashboardRouteRoute
     }
     '/(private)/_dashboard/dashboard/': {
@@ -260,25 +406,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof privateDashboardDashboardIndexRouteImport
       parentRoute: typeof privateDashboardRouteRoute
     }
+    '/(private)/_dashboard/calendar/': {
+      id: '/(private)/_dashboard/calendar/'
+      path: '/calendar'
+      fullPath: '/calendar/'
+      preLoaderRoute: typeof privateDashboardCalendarIndexRouteImport
+      parentRoute: typeof privateDashboardRouteRoute
+    }
+    '/(private)/_dashboard/analytics/': {
+      id: '/(private)/_dashboard/analytics/'
+      path: '/analytics'
+      fullPath: '/analytics/'
+      preLoaderRoute: typeof privateDashboardAnalyticsIndexRouteImport
+      parentRoute: typeof privateDashboardRouteRoute
+    }
   }
 }
 
 interface privateDashboardRouteRouteChildren {
+  privateDashboardAnalyticsIndexRoute: typeof privateDashboardAnalyticsIndexRoute
+  privateDashboardCalendarIndexRoute: typeof privateDashboardCalendarIndexRoute
   privateDashboardDashboardIndexRoute: typeof privateDashboardDashboardIndexRoute
+  privateDashboardExamsIndexRoute: typeof privateDashboardExamsIndexRoute
+  privateDashboardGoalsIndexRoute: typeof privateDashboardGoalsIndexRoute
   privateDashboardPerformanceIndexRoute: typeof privateDashboardPerformanceIndexRoute
+  privateDashboardPlansIndexRoute: typeof privateDashboardPlansIndexRoute
+  privateDashboardPomodoroIndexRoute: typeof privateDashboardPomodoroIndexRoute
+  privateDashboardProfileIndexRoute: typeof privateDashboardProfileIndexRoute
   privateDashboardRevisionPlannerIndexRoute: typeof privateDashboardRevisionPlannerIndexRoute
   privateDashboardSchedulerIndexRoute: typeof privateDashboardSchedulerIndexRoute
+  privateDashboardSessionsIndexRoute: typeof privateDashboardSessionsIndexRoute
   privateDashboardSettingsIndexRoute: typeof privateDashboardSettingsIndexRoute
   privateDashboardSubjectsIndexRoute: typeof privateDashboardSubjectsIndexRoute
   privateDashboardTasksIndexRoute: typeof privateDashboardTasksIndexRoute
 }
 
 const privateDashboardRouteRouteChildren: privateDashboardRouteRouteChildren = {
+  privateDashboardAnalyticsIndexRoute: privateDashboardAnalyticsIndexRoute,
+  privateDashboardCalendarIndexRoute: privateDashboardCalendarIndexRoute,
   privateDashboardDashboardIndexRoute: privateDashboardDashboardIndexRoute,
+  privateDashboardExamsIndexRoute: privateDashboardExamsIndexRoute,
+  privateDashboardGoalsIndexRoute: privateDashboardGoalsIndexRoute,
   privateDashboardPerformanceIndexRoute: privateDashboardPerformanceIndexRoute,
+  privateDashboardPlansIndexRoute: privateDashboardPlansIndexRoute,
+  privateDashboardPomodoroIndexRoute: privateDashboardPomodoroIndexRoute,
+  privateDashboardProfileIndexRoute: privateDashboardProfileIndexRoute,
   privateDashboardRevisionPlannerIndexRoute:
     privateDashboardRevisionPlannerIndexRoute,
   privateDashboardSchedulerIndexRoute: privateDashboardSchedulerIndexRoute,
+  privateDashboardSessionsIndexRoute: privateDashboardSessionsIndexRoute,
   privateDashboardSettingsIndexRoute: privateDashboardSettingsIndexRoute,
   privateDashboardSubjectsIndexRoute: privateDashboardSubjectsIndexRoute,
   privateDashboardTasksIndexRoute: privateDashboardTasksIndexRoute,

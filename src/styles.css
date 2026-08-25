@@ -178,6 +178,11 @@ body,
     color: var(--foreground);
   }
 
+  button:not(:disabled),
+  [role="button"]:not(:disabled){
+    cursor: pointer;
+  }
+
  h1 {
     @apply text-4xl md:text-5xl lg:text-6xl font-bold leading-tight;
   }
@@ -251,9 +256,9 @@ body,
 }
 
 @layer components{
-  .logo{
-    @apply h-8 w-8 sm:h-10 sm:w-10 md:h-11 md:w-11 lg:w-12 lg:h-12;
-  }
+ .logo {
+  @apply h-auto w-8 sm:w-10 md:w-11 lg:w-12 object-contain;
+}
 
   .header{
     @apply w-full flex items-center justify-between

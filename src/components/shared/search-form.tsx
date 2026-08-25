@@ -13,7 +13,7 @@ export default function SearchForm({
 }: SearchButtonProps) {
 	return (
 		<Button
-			className="h-9 w-60 justify-start font-normal text-muted-foreground hover:text-muted-foreground"
+			className="h-7 w-60 justify-start font-normal text-muted-foreground hover:text-muted-foreground"
 			variant="outline"
 			size="sm"
 			onClick={() => setCommandOpen((open) => !open)}
