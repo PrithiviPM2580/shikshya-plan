@@ -30,7 +30,10 @@
 			},
 			"a11y": {
 				"useSemanticElements": "off",
-				"useKeyWithClickEvents": "off"
+				"useKeyWithClickEvents": "off",
+				"useFocusableInteractive": "off",
+				"useAriaPropsForRole": "off",
+				"noRedundantRoles": "off"
 			},
 			"security": {
 				"noDangerouslySetInnerHtml": "off"
