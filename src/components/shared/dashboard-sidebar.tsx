@@ -98,7 +98,7 @@ export default function DashboardSidebar() {
 			</SidebarHeader>
 
 			{/* Navigation */}
-			<SidebarContent className="overflow-visible px-2 py-0">
+			<SidebarContent className="overflow-visible px-2 pt-1.5">
 				{/* Plan */}
 				{renderGroup("Plan", primarySidebarItems)}
 

@@ -31,7 +31,7 @@ export default function DashboardHeader() {
 						<PanelLeftCloseIcon />
 					)}
 				</Button>
-				<Breadcrumb>
+				<Breadcrumb className="hidden md:block">
 					<BreadcrumbList>
 						<BreadcrumbItem className="hidden md:block">
 							<BreadcrumbLink href="#">Build Your Application</BreadcrumbLink>

@@ -52,7 +52,7 @@ function Onboarding() {
 				<div className="flex w-full flex-col gap-6 md:flex-row">
 					{/* Sidebar */}
 					<aside className="w-full space-y-5 md:w-72 md:shrink-0 lg:w-80">
-						<div className="rounded-2xl border border-[#173a40]/10 bg-white/70 p-4 shadow-[0_10px_30px_rgba(23,58,64,0.04)] backdrop-blur-sm">
+						<div className="rounded-2xl border border-[#173a40]/10 bg-white/70 dark:bg-sidebar p-4 shadow-[0_10px_30px_rgba(23,58,64,0.04)] backdrop-blur-sm">
 							<h3 className="text-xl font-semibold tracking-[-0.04em]">
 								Academic Profile
 							</h3>
@@ -90,7 +90,7 @@ function Onboarding() {
 							</div>
 						</div>
 
-						<div className="rounded-2xl border border-[#173a40]/10 bg-[#f5f7fb] p-4 shadow-[0_10px_30px_rgba(23,58,64,0.04)]">
+						<div className="rounded-2xl border border-[#173a40]/10 bg-[#f5f7fb] dark:bg-sidebar p-4 shadow-[0_10px_30px_rgba(23,58,64,0.04)]">
 							<div className="mb-3 flex items-center gap-2">
 								<div className="size-2 shrink-0 rounded-full bg-primary" />
 
@@ -107,7 +107,7 @@ function Onboarding() {
 					</aside>
 
 					{/* Main content */}
-					<section className="w-full min-w-0 flex-1 rounded-2xl border border-[#173a40]/10 bg-white/80 p-3 shadow-[0_20px_50px_rgba(23,58,64,0.05)] backdrop-blur-sm sm:p-5 lg:p-6">
+					<section className="w-full min-w-0 flex-1 rounded-2xl border border-[#173a40]/10 bg-white/80 dark:bg-sidebar p-3 shadow-[0_20px_50px_rgba(23,58,64,0.05)] backdrop-blur-sm sm:p-5 lg:p-6">
 						{/* Step indicator */}
 						<div className="mb-5 flex w-fit items-center rounded-full bg-[rgba(99,102,241,0.12)] px-3 py-1.5">
 							<div className="size-2 shrink-0 rounded-full bg-primary" />
@@ -145,7 +145,7 @@ function Onboarding() {
 										type="button"
 										onClick={() => setSelected(level.id)}
 										className={[
-											"group relative w-full min-w-0 rounded-2xl border p-4 text-left transition-all duration-200 sm:p-5",
+											"group relative w-full dark:bg-accent min-w-0 rounded-2xl border p-4 text-left transition-all duration-200 sm:p-5",
 											isSelected
 												? "border-primary bg-[rgba(99,102,241,0.08)] shadow-[0_12px_25px_rgba(99,102,241,0.12)]"
 												: "border-[#173a40]/10 bg-[#f3f5f7] hover:border-[#173a40]/20 hover:bg-[#f9fafb]",
@@ -153,7 +153,7 @@ function Onboarding() {
 									>
 										<div
 											className={[
-												"mb-4 flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold transition-all duration-200",
+												"mb-4 flex size-8 dark:bg-sidebar shrink-0 items-center justify-center rounded-full text-sm font-semibold transition-all duration-200",
 												isSelected
 													? "bg-primary text-white shadow-[0_8px_20px_rgba(99,102,241,0.25)]"
 													: "bg-[#e5e7eb]",
