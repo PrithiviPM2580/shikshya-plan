@@ -1,0 +1,1279 @@
+{
+	"programs": [
+		{
+			"name": "BCA",
+			"label": "Bachelor of Computer Applications",
+			"university": "Tribhuvan University",
+			"curriculum": "2025",
+			"duration": "4 Years",
+			"total_semesters": 8,
+			"total_credits": 130,
+			"semesters": [
+				{
+					"semester": "1st Semester",
+					"courses": [
+						{
+							"code": "BCA101",
+							"name": "Computer Fundamentals & Applications",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA102",
+							"name": "Programming in C",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA103",
+							"name": "Digital Logic",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA104",
+							"name": "Mathematics I",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BCA105",
+							"name": "Professional Communication & Ethics",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BCA106",
+							"name": "Hardware Workshop",
+							"credits": 1,
+							"type": "workshop",
+							"has_practical": true,
+							"has_exam": false
+						}
+					]
+				},
+				{
+					"semester": "2nd Semester",
+					"courses": [
+						{
+							"code": "BCA151",
+							"name": "Discrete Structure",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BCA152",
+							"name": "Microprocessor & Computer Architecture",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA153",
+							"name": "OOP in Java",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA154",
+							"name": "Mathematics II",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BCA155",
+							"name": "UX/UI Design",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA156",
+							"name": "Principles of Management",
+							"credits": 1,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						}
+					]
+				},
+				{
+					"semester": "3rd Semester",
+					"courses": [
+						{
+							"code": "BCA201",
+							"name": "Data Structures & Algorithms",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA202",
+							"name": "Database Management System",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA203",
+							"name": "Web Technology I",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA204",
+							"name": "System Analysis and Design",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BCA205",
+							"name": "Probability and Statistics",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BCA206",
+							"name": "Applied Economics",
+							"credits": 2,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						}
+					]
+				},
+
+				{
+					"semester": "4th Semester",
+					"courses": [
+						{
+							"code": "BCA251",
+							"name": "Operating Systems",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA252",
+							"name": "Software Engineering",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BCA253",
+							"name": "Numerical Methods",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA254",
+							"name": "Python Programming",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA255",
+							"name": "Web Technology II",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA256",
+							"name": "Project I",
+							"credits": 2,
+							"type": "project",
+							"has_practical": true,
+							"has_exam": false
+						}
+					]
+				},
+
+				{
+					"semester": "5th Semester",
+					"courses": [
+						{
+							"code": "BCA301",
+							"name": "Computer Network",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA302",
+							"name": "Artificial Intelligence",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA303",
+							"name": "Advanced Java Programming",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA304",
+							"name": "MIS and e-Business",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BCA305",
+							"name": "Society and Technology",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BCA306",
+							"name": "Project II",
+							"credits": 3,
+							"type": "project",
+							"has_practical": true,
+							"has_exam": false
+						}
+					]
+				},
+
+				{
+					"semester": "6th Semester",
+					"courses": [
+						{
+							"code": "BCA351",
+							"name": "Computer Graphics & Animation",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA352",
+							"name": "Mobile Programming",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA353",
+							"name": "Cryptography & Network Security",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA354",
+							"name": "Technical Writing",
+							"credits": 2,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BCA355",
+							"name": "Distributed System",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA356",
+							"name": "Project III",
+							"credits": 3,
+							"type": "project",
+							"has_practical": true,
+							"has_exam": false
+						}
+					]
+				},
+
+				{
+					"semester": "7th Semester",
+					"courses": [
+						{
+							"code": "BCA401",
+							"name": "Cyber Security & Ethical Hacking",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA402",
+							"name": "Software Project Management",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BCA403",
+							"name": "Financial Accounting",
+							"credits": 2,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BCA404",
+							"name": "Elective I",
+							"credits": 3,
+							"type": "elective",
+							"has_practical": true,
+							"has_exam": true,
+							"elective_options": [
+								"Machine Learning",
+								"E-Commerce",
+								"Database Administration",
+								"Linux"
+							]
+						},
+						{
+							"code": "BCA405",
+							"name": "Elective II",
+							"credits": 3,
+							"type": "elective",
+							"has_practical": true,
+							"has_exam": true,
+							"elective_options": [
+								".NET",
+								"Business Intelligence",
+								"Software Quality Assurance",
+								"Data Visualization"
+							]
+						},
+						{
+							"code": "BCA406",
+							"name": "Project IV",
+							"credits": 3,
+							"type": "project",
+							"has_practical": true,
+							"has_exam": false
+						}
+					]
+				},
+
+				{
+					"semester": "8th Semester",
+					"courses": [
+						{
+							"code": "BCA451",
+							"name": "Cloud Computing",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BCA452",
+							"name": "Internship",
+							"credits": 3,
+							"type": "internship",
+							"has_practical": true,
+							"has_exam": false
+						},
+						{
+							"code": "BCA453",
+							"name": "Elective III",
+							"credits": 3,
+							"type": "elective",
+							"has_practical": true,
+							"has_exam": true,
+							"elective_options": [
+								"Network Administration",
+								"E-Government",
+								"Database Programming",
+								"GIS"
+							]
+						},
+						{
+							"code": "BCA454",
+							"name": "Elective IV",
+							"credits": 3,
+							"type": "elective",
+							"has_practical": true,
+							"has_exam": true,
+							"elective_options": [
+								"Digital Marketing",
+								"Image Processing",
+								"Internet of Things",
+								"Data Mining"
+							]
+						}
+					]
+				}
+			]
+		},
+
+		{
+			"name": "CSIT",
+			"label": "Bachelor of Science in Computer Science and Information Technology",
+			"university": "Tribhuvan University",
+			"curriculum": "2079",
+			"duration": "4 Years",
+			"total_semesters": 8,
+			"total_credits": 126,
+			"semesters": [
+				{
+					"semester": "1st Semester",
+					"courses": [
+						{
+							"code": "CSC109",
+							"name": "Introduction to Information Technology",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC110",
+							"name": "C Programming",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC111",
+							"name": "Digital Logic",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "MTH112",
+							"name": "Mathematics I",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "PHY113",
+							"name": "Physics",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						}
+					]
+				},
+
+				{
+					"semester": "2nd Semester",
+					"courses": [
+						{
+							"code": "CSC160",
+							"name": "Discrete Structure",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "CSC161",
+							"name": "Object-Oriented Programming",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC162",
+							"name": "Microprocessor",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "MTH163",
+							"name": "Mathematics II",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "STA164",
+							"name": "Statistics I",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						}
+					]
+				},
+
+				{
+					"semester": "3rd Semester",
+					"courses": [
+						{
+							"code": "CSC206",
+							"name": "Data Structures and Algorithms",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC207",
+							"name": "Numerical Method",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC208",
+							"name": "Computer Architecture",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC209",
+							"name": "Computer Graphics",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "STA210",
+							"name": "Statistics II",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						}
+					]
+				},
+
+				{
+					"semester": "4th Semester",
+					"courses": [
+						{
+							"code": "CSC257",
+							"name": "Theory of Computation",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "CSC258",
+							"name": "Computer Networks",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC259",
+							"name": "Operating Systems",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC260",
+							"name": "Database Management System",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC261",
+							"name": "Artificial Intelligence",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						}
+					]
+				},
+
+				{
+					"semester": "5th Semester",
+					"courses": [
+						{
+							"code": "CSC314",
+							"name": "Design and Analysis of Algorithms",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC315",
+							"name": "System Analysis and Design",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "CSC316",
+							"name": "Cryptography",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC317",
+							"name": "Simulation and Modeling",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC318",
+							"name": "Web Technology",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC319",
+							"name": "Elective I",
+							"credits": 3,
+							"type": "elective",
+							"has_practical": true,
+							"has_exam": true,
+							"elective_options": [
+								"Multimedia Computing",
+								"Wireless Networking",
+								"Image Processing",
+								"Knowledge Management",
+								"Society and Ethics in Information Technology",
+								"Microprocessor Based Design"
+							]
+						}
+					]
+				},
+
+				{
+					"semester": "6th Semester",
+					"courses": [
+						{
+							"code": "CSC364",
+							"name": "Software Engineering",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC365",
+							"name": "Compiler Design and Construction",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC366",
+							"name": "E-Governance",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "CSC367",
+							"name": "NET Centric Computing",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC368",
+							"name": "Technical Writing",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "CSC369",
+							"name": "Elective II",
+							"credits": 3,
+							"type": "elective",
+							"has_practical": true,
+							"has_exam": true,
+							"elective_options": [
+								"Applied Logic",
+								"E-Commerce",
+								"Automation and Robotics",
+								"Neural Networks",
+								"Computer Hardware Design",
+								"Cognitive Science"
+							]
+						}
+					]
+				},
+
+				{
+					"semester": "7th Semester",
+					"courses": [
+						{
+							"code": "CSC409",
+							"name": "Advanced Java Programming",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC410",
+							"name": "Data Warehousing and Data Mining",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC411",
+							"name": "Principles of Management",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "CSC412",
+							"name": "Project Work",
+							"credits": 3,
+							"type": "project",
+							"has_practical": true,
+							"has_exam": false
+						},
+						{
+							"code": "CSC413",
+							"name": "Elective III",
+							"credits": 3,
+							"type": "elective",
+							"has_practical": true,
+							"has_exam": true,
+							"elective_options": [
+								"Information Retrieval",
+								"Database Administration",
+								"Software Project Management",
+								"Network Security",
+								"Digital System Design",
+								"International Marketing"
+							]
+						}
+					]
+				},
+
+				{
+					"semester": "8th Semester",
+					"courses": [
+						{
+							"code": "CSC461",
+							"name": "Advanced Database",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "CSC462",
+							"name": "Internship",
+							"credits": 6,
+							"type": "internship",
+							"has_practical": true,
+							"has_exam": false
+						},
+						{
+							"code": "CSC463",
+							"name": "Elective IV",
+							"credits": 3,
+							"type": "elective",
+							"has_practical": true,
+							"has_exam": true,
+							"elective_options": [
+								"Advanced Networking with IPV6",
+								"Distributed Networking",
+								"Game Technology",
+								"Distributed and Object-Oriented Database",
+								"Introduction to Cloud Computing",
+								"Geographical Information System",
+								"Mobile Application Development",
+								"Real-Time Systems",
+								"Network and System Administration",
+								"Embedded Systems Programming"
+							]
+						},
+						{
+							"code": "CSC464",
+							"name": "Elective V",
+							"credits": 3,
+							"type": "elective",
+							"has_practical": true,
+							"has_exam": true,
+							"elective_options": [
+								"Advanced Networking with IPV6",
+								"Distributed Networking",
+								"Game Technology",
+								"Distributed and Object-Oriented Database",
+								"Introduction to Cloud Computing",
+								"Geographical Information System",
+								"Mobile Application Development",
+								"Real-Time Systems",
+								"Network and System Administration",
+								"Embedded Systems Programming"
+							]
+						}
+					]
+				}
+			]
+		},
+
+		{
+			"name": "BIT",
+			"label": "Bachelor of Information Technology",
+			"university": "Tribhuvan University",
+			"curriculum": "2075",
+			"duration": "4 Years",
+			"total_semesters": 8,
+			"total_credits": 120,
+			"semesters": [
+				{
+					"semester": "1st Semester",
+					"courses": [
+						{
+							"code": "BIT101",
+							"name": "Introduction to Information Technology",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BIT102",
+							"name": "C Programming",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BIT103",
+							"name": "Digital Logic",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "MTH104",
+							"name": "Basic Mathematics",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "SCO105",
+							"name": "Sociology",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						}
+					]
+				},
+
+				{
+					"semester": "2nd Semester",
+					"courses": [
+						{
+							"code": "BIT151",
+							"name": "Microprocessor and Computer Architecture",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BIT152",
+							"name": "Discrete Structure",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BIT153",
+							"name": "Object Oriented Programming",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "STA154",
+							"name": "Basic Statistics",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "ECO155",
+							"name": "Economics",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						}
+					]
+				},
+
+				{
+					"semester": "3rd Semester",
+					"courses": [
+						{
+							"code": "BIT201",
+							"name": "Data Structures and Algorithms",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BIT202",
+							"name": "Database Management System",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BIT203",
+							"name": "Numerical Methods",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BIT204",
+							"name": "Operating Systems",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "MGT205",
+							"name": "Principles of Management",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						}
+					]
+				},
+
+				{
+					"semester": "4th Semester",
+					"courses": [
+						{
+							"code": "BIT251",
+							"name": "Web Technology I",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BIT252",
+							"name": "Artificial Intelligence",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BIT253",
+							"name": "Systems Analysis and Design",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BIT254",
+							"name": "Network and Data Communications",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "ORS255",
+							"name": "Operations Research",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						}
+					]
+				},
+
+				{
+					"semester": "5th Semester",
+					"courses": [
+						{
+							"code": "BIT301",
+							"name": "Web Technology II",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BIT302",
+							"name": "Software Engineering",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BIT303",
+							"name": "Information Security",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BIT304",
+							"name": "Computer Graphics",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "ENG305",
+							"name": "Technical Writing",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						}
+					]
+				},
+
+				{
+					"semester": "6th Semester",
+					"courses": [
+						{
+							"code": "BIT351",
+							"name": "NET Centric Computing",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BIT352",
+							"name": "Database Administration",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BIT353",
+							"name": "Management Information System",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "RSM354",
+							"name": "Research Methodology",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BIT355",
+							"name": "Elective I",
+							"credits": 3,
+							"type": "elective",
+							"has_practical": true,
+							"has_exam": true,
+							"elective_options": [
+								"Geographical Information System",
+								"Multimedia Computing",
+								"Wireless Networking",
+								"Society and Ethics in IT",
+								"Psychology"
+							]
+						}
+					]
+				},
+
+				{
+					"semester": "7th Semester",
+					"courses": [
+						{
+							"code": "BIT401",
+							"name": "Advanced Java Programming",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BIT402",
+							"name": "Software Project Management",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BIT403",
+							"name": "E-Commerce",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BIT404",
+							"name": "Project Work",
+							"credits": 3,
+							"type": "project",
+							"has_practical": true,
+							"has_exam": false
+						},
+						{
+							"code": "BIT405",
+							"name": "Elective II",
+							"credits": 3,
+							"type": "elective",
+							"has_practical": true,
+							"has_exam": true,
+							"elective_options": [
+								"Decision Support System and Expert System",
+								"Mobile Application Development",
+								"Simulation and Modeling",
+								"Cloud Computing",
+								"Marketing"
+							]
+						}
+					]
+				},
+
+				{
+					"semester": "8th Semester",
+					"courses": [
+						{
+							"code": "BIT451",
+							"name": "Network and System Administration",
+							"credits": 3,
+							"type": "core",
+							"has_practical": true,
+							"has_exam": true
+						},
+						{
+							"code": "BIT452",
+							"name": "E-Governance",
+							"credits": 3,
+							"type": "core",
+							"has_practical": false,
+							"has_exam": true
+						},
+						{
+							"code": "BIT453",
+							"name": "Internship",
+							"credits": 6,
+							"type": "internship",
+							"has_practical": true,
+							"has_exam": false
+						},
+						{
+							"code": "BIT454",
+							"name": "Elective III",
+							"credits": 3,
+							"type": "elective",
+							"has_practical": true,
+							"has_exam": true,
+							"elective_options": [
+								"Data Warehousing and Data Mining",
+								"Knowledge Management",
+								"Image Processing",
+								"Network Security",
+								"Introduction to Telecommunications"
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}

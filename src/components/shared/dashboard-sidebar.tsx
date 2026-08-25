@@ -112,7 +112,7 @@ export default function DashboardSidebar() {
 			{/* Footer */}
 			<SidebarFooter className="shrink-0 space-y-0.5 border-t border-border/70 px-3 py-3">
 				{/* Today's Goal */}
-				<div className="rounded-xl border border-border bg-background p-3 shadow-sm">
+				<div className="rounded-xl border border-border bg-background p-3 shadow-sm hidden sm:block">
 					<div className="flex items-center justify-between gap-2">
 						<div>
 							<p className="text-[8px] uppercase tracking-[0.12em] text-muted-foreground">

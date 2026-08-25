@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as publicIndexRouteImport } from './routes/(public)/index'
 import { Route as publicAuthRouteRouteImport } from './routes/(public)/_auth/route'
 import { Route as privateDashboardRouteRouteImport } from './routes/(private)/_dashboard/route'
+import { Route as publicOnboardingIndexRouteImport } from './routes/(public)/onboarding/index'
 import { Route as publicAuthSignUpIndexRouteImport } from './routes/(public)/_auth/sign-up/index'
 import { Route as publicAuthSignInIndexRouteImport } from './routes/(public)/_auth/sign-in/index'
 import { Route as privateDashboardTasksIndexRouteImport } from './routes/(private)/_dashboard/tasks/index'
@@ -41,6 +42,11 @@ const publicAuthRouteRoute = publicAuthRouteRouteImport.update({
 } as any)
 const privateDashboardRouteRoute = privateDashboardRouteRouteImport.update({
   id: '/(private)/_dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const publicOnboardingIndexRoute = publicOnboardingIndexRouteImport.update({
+  id: '/(public)/onboarding/',
+  path: '/onboarding/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const publicAuthSignUpIndexRoute = publicAuthSignUpIndexRouteImport.update({
@@ -146,6 +152,7 @@ const privateDashboardAnalyticsIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof publicIndexRoute
+  '/onboarding/': typeof publicOnboardingIndexRoute
   '/analytics/': typeof privateDashboardAnalyticsIndexRoute
   '/calendar/': typeof privateDashboardCalendarIndexRoute
   '/dashboard/': typeof privateDashboardDashboardIndexRoute
@@ -166,6 +173,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof publicIndexRoute
+  '/onboarding': typeof publicOnboardingIndexRoute
   '/analytics': typeof privateDashboardAnalyticsIndexRoute
   '/calendar': typeof privateDashboardCalendarIndexRoute
   '/dashboard': typeof privateDashboardDashboardIndexRoute
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   '/(private)/_dashboard': typeof privateDashboardRouteRouteWithChildren
   '/(public)/_auth': typeof publicAuthRouteRouteWithChildren
   '/(public)/': typeof publicIndexRoute
+  '/(public)/onboarding/': typeof publicOnboardingIndexRoute
   '/(private)/_dashboard/analytics/': typeof privateDashboardAnalyticsIndexRoute
   '/(private)/_dashboard/calendar/': typeof privateDashboardCalendarIndexRoute
   '/(private)/_dashboard/dashboard/': typeof privateDashboardDashboardIndexRoute
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/onboarding/'
     | '/analytics/'
     | '/calendar/'
     | '/dashboard/'
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/onboarding'
     | '/analytics'
     | '/calendar'
     | '/dashboard'
@@ -253,6 +264,7 @@ export interface FileRouteTypes {
     | '/(private)/_dashboard'
     | '/(public)/_auth'
     | '/(public)/'
+    | '/(public)/onboarding/'
     | '/(private)/_dashboard/analytics/'
     | '/(private)/_dashboard/calendar/'
     | '/(private)/_dashboard/dashboard/'
@@ -276,6 +288,7 @@ export interface RootRouteChildren {
   privateDashboardRouteRoute: typeof privateDashboardRouteRouteWithChildren
   publicAuthRouteRoute: typeof publicAuthRouteRouteWithChildren
   publicIndexRoute: typeof publicIndexRoute
+  publicOnboardingIndexRoute: typeof publicOnboardingIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -299,6 +312,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof privateDashboardRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(public)/onboarding/': {
+      id: '/(public)/onboarding/'
+      path: '/onboarding'
+      fullPath: '/onboarding/'
+      preLoaderRoute: typeof publicOnboardingIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(public)/_auth/sign-up/': {
@@ -483,6 +503,7 @@ const rootRouteChildren: RootRouteChildren = {
   privateDashboardRouteRoute: privateDashboardRouteRouteWithChildren,
   publicAuthRouteRoute: publicAuthRouteRouteWithChildren,
   publicIndexRoute: publicIndexRoute,
+  publicOnboardingIndexRoute: publicOnboardingIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

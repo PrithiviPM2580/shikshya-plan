@@ -3,6 +3,7 @@ import {
 	BookOpen,
 	Calendar,
 	CheckSquare,
+	ClipboardCheck,
 	GraduationCap,
 	LayoutDashboard,
 	ListTodo,
@@ -75,7 +76,7 @@ export const secondarySidebarItems = linkOptions([
 	{
 		to: "/exams",
 		label: "Exams",
-		icon: GraduationCap,
+		icon: ClipboardCheck,
 	},
 	{
 		to: "/goals",
@@ -106,3 +107,31 @@ export const metaSidebarItems = linkOptions([
 		icon: Settings,
 	},
 ]);
+
+export const studyLevels = [
+	{
+		id: "bca",
+		short: "BC",
+		label: "BCA",
+		subtitle: "Bachelor of Computer Applications",
+	},
+	{
+		id: "csit",
+		short: "C",
+		label: "CSIT",
+		subtitle:
+			" Bachelor of Science in Computer Science and Information Technology",
+	},
+	{
+		id: "bit",
+		short: "BI",
+		label: "BIT",
+		subtitle: "Bachelor of Information Technology",
+	},
+	{
+		id: "other",
+		short: "...",
+		label: "Other",
+		subtitle: "Masters, Diploma, etc.",
+	},
+] as const;
