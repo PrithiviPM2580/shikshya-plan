@@ -186,7 +186,7 @@ function Onboarding() {
 
 					{/* Main content */}
 					<section className="w-full min-w-0 flex-1 rounded-2xl border border-[#173a40]/10 bg-white/80 dark:bg-sidebar p-3 shadow-[0_20px_50px_rgba(23,58,64,0.05)] backdrop-blur-sm sm:p-5 lg:p-6">
-						<div className="mb-5 flex items-center justify-between">
+						<div className="mb-3 flex items-center justify-between">
 							<div>
 								<p className="text-xs font-medium uppercase tracking-[0.18em]">
 									Step 2 of 4
@@ -208,9 +208,9 @@ function Onboarding() {
 							</p>
 						</div>
 
-						<div className="mt-8">
-							<p className="mb-4 text-sm font-medium">
-								Part A&nbsp; Which semester are you in?
+						<div className="mt-4">
+							<p className="mb-2 text-sm font-medium">
+								Part A: Which semester are you in?
 							</p>
 							<div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
 								{selectedProgram.semesters.map((semester) => {
@@ -243,11 +243,11 @@ function Onboarding() {
 							</div>
 						</div>
 
-						<div className="my-8 border-t border-border" />
+						<div className="my-4 border-t border-border" />
 
 						<div>
-							<p className="mb-4 text-sm font-medium">
-								Part B&nbsp; Select your major
+							<p className="mb-2 text-sm font-medium">
+								Part B: Select your major
 							</p>
 							<div className="grid gap-3 sm:grid-cols-2">
 								{academicData.programs.map((program: AcademicProgram) => {
@@ -309,7 +309,7 @@ function Onboarding() {
 								type="button"
 								disabled={!canContinue}
 								onClick={() => setStep(3)}
-								className="gap-2 text-xs uppercase tracking-[0.12em]"
+								className="gap-2 text-xs uppercase tracking-[0.12em] dark:text-white"
 							>
 								Continue
 								<ArrowRight className="size-4" aria-hidden="true" />
@@ -492,9 +492,9 @@ function StepThree({
 						type="button"
 						onClick={onNext}
 						disabled={selectedCourses.length === 0}
-						className="gap-2 text-xs uppercase tracking-[0.12em]"
+						className="gap-2 text-xs uppercase tracking-[0.12em] dark:text-white"
 					>
-						Next Step
+						Next
 						<ArrowRight className="size-4" aria-hidden="true" />
 					</Button>
 				</div>
@@ -758,7 +758,7 @@ function StepFour({
 					<Button
 						onClick={() => navigate({ to: "/dashboard" })}
 						type="button"
-						className="gap-2 text-xs uppercase tracking-[0.12em]"
+						className="gap-2 text-xs uppercase tracking-[0.12em] dark:text-white"
 					>
 						Complete Setup
 						<ArrowRight className="size-4" aria-hidden="true" />
@@ -843,7 +843,7 @@ function StepOne({ selected, onSelect, onNext, progress }: StepOneProps) {
 					<Button
 						type="button"
 						onClick={onNext}
-						className="gap-2 text-xs uppercase tracking-[0.12em]"
+						className="gap-2 text-xs uppercase tracking-[0.12em] dark:text-white"
 					>
 						Next Step <ArrowRight className="size-4" aria-hidden="true" />
 					</Button>

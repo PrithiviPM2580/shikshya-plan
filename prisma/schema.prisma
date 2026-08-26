@@ -151,8 +151,8 @@ model StudyPlan {
 }
 
 model PlanSubject {
-  planId    String
-  subjectId String
+  planId    String @db.Uuid
+  subjectId String @db.Uuid
   userId    String
 
   plan    StudyPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
@@ -165,8 +165,8 @@ model PlanSubject {
 model StudySession {
   id            String    @id @default(uuid()) @db.Uuid
   userId        String
-  planId        String?
-  subjectId     String?
+  planId        String?   @db.Uuid
+  subjectId     String?   @db.Uuid
   title         String
   scheduledDate DateTime  @default(now())
   durationMin   Int       @default(30)
@@ -187,8 +187,8 @@ model StudySession {
 model Task {
   id          String       @id @default(uuid()) @db.Uuid
   userId      String
-  sessionId   String?
-  subjectId   String?
+  sessionId   String?      @db.Uuid
+  subjectId   String?      @db.Uuid
   title       String
   description String?
   priority    TaskPriority @default(MEDIUM)
@@ -207,7 +207,7 @@ model Task {
 model Exam {
   id        String    @id @default(uuid()) @db.Uuid
   userId    String
-  subjectId String?
+  subjectId String?   @db.Uuid
   title     String
   examDate  DateTime
   syllabus  String?
@@ -238,8 +238,8 @@ model Goal {
 model StudyLog {
   id        String    @id @default(uuid()) @db.Uuid
   userId    String
-  sessionId String?
-  subjectId String?
+  sessionId String? @db.Uuid
+  subjectId String? @db.Uuid
   minutes   Int
   loggedAt  DateTime  @default(now())
 
@@ -253,7 +253,7 @@ model StudyLog {
 model PomodoroSession {
   id           String    @id @default(uuid()) @db.Uuid
   userId       String
-  subjectId    String?
+  subjectId    String?   @db.Uuid
   title        String?
   focusMinutes Int       @default(25)
   completed    Boolean   @default(false)
