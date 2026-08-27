@@ -211,3 +211,58 @@ Files prefixed with `demo` can be safely deleted. They are there to provide a st
 You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
 
 For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).
+
+# Study App
+
+## Auth and Route Protection
+
+- Protect `route.tsx`
+- Load the current session with Better Auth
+- Redirect unauthenticated users to sign-in
+
+## Onboarding and Profile
+
+- Create/update Profile
+- Collect initial subjects and preferences
+- Redirect new users through onboarding once
+
+## Subjects CRUD
+
+- Create subjects
+- List subjects
+- Edit subjects
+- Delete subjects
+- Subjects become the dependency for:
+  - Plans
+  - Sessions
+  - Tasks
+  - Exams
+  - Analytics
+
+## Study Plans
+
+- Create plans
+- Attach subjects to plans
+- Add dates
+- Add plan status
+
+## Sessions and Tasks
+
+- Schedule study sessions
+- Add tasks
+- Mark tasks as complete
+- Associate tasks with subjects/plans
+
+## Exams and Goals
+
+- Create and manage exams
+- Set academic goals
+- Connect exams and goals with subjects and plans
+
+## Dashboard, Analytics, Performance, and Revision Planner
+
+- Build dashboard from real data
+- Calculate analytics from existing data
+- Track study performance
+- Generate revision plans from actual subjects, sessions, tasks, plans, and exams
+- Avoid maintaining separate logic or duplicate data for analytics
