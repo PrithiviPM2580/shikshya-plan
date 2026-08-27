@@ -38,7 +38,7 @@ export default function SignUpForm() {
 					{
 						onSuccess: () => {
 							toast.success("Sign up successfully");
-							navigate({ to: "/" });
+							navigate({ to: "/onboarding" });
 						},
 						onError: ({ error }) => {
 							toast.error(error.message || "Failed to sign-up");
@@ -129,13 +129,13 @@ export default function SignUpForm() {
 							);
 						}}
 					/>
+					<Button type="submit" className="w-full" disabled={isPending}>
+						{isPending && <Loader2Icon className="size-8 animate-spin" />}
+						Sign Up
+					</Button>
 				</FieldGroup>
 			</form>
-			<div className="w-full flex flex-col gap-2">
-				<Button type="submit" className="w-full" disabled={isPending}>
-					{isPending && <Loader2Icon className="size-8 animate-spin" />}
-					Sign Up
-				</Button>
+			<div className="w-full -mt-4">
 				<p className="text-sm text-muted-foreground w-full text-center">
 					Already have an account?{" "}
 					<Link to="/sign-in" className="text-primary hover:underline">

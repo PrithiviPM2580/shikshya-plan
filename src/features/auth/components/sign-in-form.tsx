@@ -103,13 +103,13 @@ export default function SignInForm() {
 							);
 						}}
 					/>
+					<Button type="submit" className="w-full" disabled={isPending}>
+						{isPending && <Loader2Icon className="size-8 animate-spin" />}
+						Sign In
+					</Button>
 				</FieldGroup>
 			</form>
-			<div className="w-full flex flex-col gap-2">
-				<Button type="submit" className="w-full" disabled={isPending}>
-					{isPending && <Loader2Icon className="size-8 animate-spin" />}
-					Sign In
-				</Button>
+			<div className="w-full -mt-4">
 				<p className="text-sm text-muted-foreground w-full text-center">
 					Don't have an account?{" "}
 					<Link to="/sign-up" className="text-primary hover:underline">

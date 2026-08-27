@@ -266,3 +266,275 @@ For TanStack Start specific documentation, visit [TanStack Start](https://tansta
 - Track study performance
 - Generate revision plans from actual subjects, sessions, tasks, plans, and exams
 - Avoid maintaining separate logic or duplicate data for analytics
+
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+enum PlanStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ThemeMode {
+  SYSTEM
+  LIGHT
+  DARK
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  studyLogs StudyLog[]
+  goals Goal[]
+  exams Exam[]
+  tasks Task[]
+  studySessions StudySession[]
+  studyPlans StudyPlan[]
+  subjects Subject[]
+  profiles Profile[]
+  pomodoroSessions PomodoroSession[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  issuer                String
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([issuer, accountId], map: "account_issuer_accountId_uidx")
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+
+
+model Profile {
+  userId    String    @id
+  name      String?
+  avatarUrl String?
+  theme     ThemeMode @default(SYSTEM)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Subject {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String
+  name        String
+  color       String    @default("#4F46E5")
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studyPlans   PlanSubject[]
+  studySessions StudySession[]
+  tasks        Task[]
+  exams        Exam[]
+  studyLogs    StudyLog[]
+  pomodoroSessions PomodoroSession[]
+
+  @@index([userId])
+}
+
+model StudyPlan {
+  id          String     @id @default(uuid()) @db.Uuid
+  userId      String
+  title       String
+  description String?
+  goal        String?
+  startDate   DateTime?  @db.Date
+  endDate     DateTime?  @db.Date
+  status      PlanStatus @default(ACTIVE)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjects PlanSubject[]
+  sessions StudySession[]
+
+  @@index([userId])
+}
+
+model PlanSubject {
+  planId    String @db.Uuid
+  subjectId String @db.Uuid
+  userId    String
+
+  plan    StudyPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  subject Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@id([planId, subjectId])
+  @@index([userId])
+}
+
+model StudySession {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String
+  planId        String?   @db.Uuid
+  subjectId     String?   @db.Uuid
+  title         String
+  scheduledDate DateTime  @default(now())
+  durationMin   Int       @default(30)
+  completed     Boolean   @default(false)
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan    StudyPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+  subject Subject?  @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  tasks   Task[]
+  logs    StudyLog[]
+
+  @@index([userId, scheduledDate])
+}
+
+model Task {
+  id          String       @id @default(uuid()) @db.Uuid
+  userId      String
+  sessionId   String?      @db.Uuid
+  subjectId   String?      @db.Uuid
+  title       String
+  description String?
+  priority    TaskPriority @default(MEDIUM)
+  dueDate     DateTime?
+  completed   Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session StudySession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  subject Subject?     @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+
+  @@index([userId, dueDate])
+}
+
+model Exam {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String
+  subjectId String?   @db.Uuid
+  title     String
+  examDate  DateTime
+  syllabus  String?
+  completed Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+
+  @@index([userId, examDate])
+}
+
+model Goal {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String
+  title     String
+  target    Int       @default(100)
+  progress  Int       @default(0)
+  deadline  DateTime? @db.Date
+  completed Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model StudyLog {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String
+  sessionId String? @db.Uuid
+  subjectId String? @db.Uuid
+  minutes   Int
+  loggedAt  DateTime  @default(now())
+
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session StudySession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  subject Subject?     @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+
+  @@index([userId, loggedAt])
+}
+
+model PomodoroSession {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String
+  subjectId    String?   @db.Uuid
+  title        String?
+  focusMinutes Int       @default(25)
+  completed    Boolean   @default(false)
+  startedAt    DateTime  @default(now())
+  endedAt      DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+}

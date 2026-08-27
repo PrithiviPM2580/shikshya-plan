@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "#/components/ui/button";
@@ -13,6 +13,7 @@ export const Route = createFileRoute("/(public)/_auth/sign-up/")({
 });
 
 function SignUp() {
+	const navigate = useNavigate();
 	const [isPending, startTransition] = useTransition();
 	async function onSocial(provider: "google" | "github") {
 		startTransition(async () => {
@@ -26,6 +27,7 @@ function SignUp() {
 						toast.success(
 							`${provider.toUpperCase()} Account created successfully.`,
 						);
+						navigate({ to: "/onboarding" });
 					},
 					onError: ({ error }) => {
 						toast.error(error.message);
@@ -42,7 +44,7 @@ function SignUp() {
 			</p>
 			<div className="flex gap-2 w-full">
 				<Button
-					variant="custom"
+					variant="outline"
 					className="flex-1"
 					disabled={isPending}
 					onClick={() => onSocial("google")}
@@ -51,7 +53,7 @@ function SignUp() {
 					Sign up with Google
 				</Button>
 				<Button
-					variant="custom"
+					variant="outline"
 					className="flex-1"
 					disabled={isPending}
 					onClick={() => onSocial("github")}
