@@ -69,7 +69,7 @@ const steps = [
 	{
 		n: "3",
 		t: "Show up daily",
-		d: "Log your work, stay consistent, and let the momentum grow one focused session at a time.",
+		d: "Log your work, stay consistent, and let the momentum grow one at a time.",
 	},
 ];
 
@@ -129,9 +129,6 @@ export default function Landing() {
 						))}
 					</nav>
 					<div className="flex items-center gap-2">
-						<Button variant="ghost" asChild>
-							<Link to="/sign-in">Sign in</Link>
-						</Button>
 						<Button asChild>
 							<Link to="/sign-in">Get started</Link>
 						</Button>
@@ -235,14 +232,14 @@ export default function Landing() {
 											</div>
 										</div>
 
-										<div className="rounded-2xl border border-border bg-white p-4">
-											<div className="mb-3 flex items-center justify-between text-sm">
+										<div className="h-52 rounded-2xl border border-border bg-white p-3 sm:h-56 md:h-60">
+											<div className="mb-2 flex items-center justify-between text-xs sm:text-sm">
 												<span className="font-medium text-foreground">
 													Weekly workload
 												</span>
 												<span className="text-muted-foreground">This week</span>
 											</div>
-											<div className="flex h-24 items-end gap-2">
+											<div className="flex h-28 items-end gap-2 sm:h-32">
 												{[42, 64, 52, 84, 75, 90, 68].map((height, index) => (
 													<div key={height + index} className="flex-1">
 														<div
@@ -389,13 +386,12 @@ export default function Landing() {
 							A simple system that keeps students consistent
 						</h2>
 					</div>
-					<div className="relative mt-14 grid gap-6 lg:grid-cols-3">
-						<div className="pointer-events-none absolute left-0 right-0 top-10 hidden h-px bg-linear-to-r from-transparent via-border to-transparent lg:block" />
+					<div className="mt-14 grid gap-6 lg:grid-cols-3">
 						{steps.map((step, index) => {
 							const styles = [
-								"border-emerald-200 bg-gradient-to-br from-emerald-50 to-white md:translate-y-3",
-								"border-violet-200 bg-gradient-to-br from-violet-50 to-white md:-translate-y-1",
-								"border-sky-200 bg-gradient-to-br from-sky-50 to-white md:translate-y-5",
+								"border-emerald-200 bg-gradient-to-br from-emerald-50 to-white",
+								"border-violet-200 bg-gradient-to-br from-violet-50 to-white",
+								"border-sky-200 bg-gradient-to-br from-sky-50 to-white",
 							];
 							const badges = [
 								"bg-emerald-100 text-emerald-700",
@@ -411,7 +407,7 @@ export default function Landing() {
 							return (
 								<div
 									key={step.n}
-									className={`group relative rounded-[1.75rem] border p-6 shadow-[0_18px_40px_rgba(15,23,42,0.03)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(79,184,178,0.12)] ${styles[index]}`}
+									className={`relative rounded-[1.75rem] border p-6 shadow-[0_18px_40px_rgba(15,23,42,0.03)] ${styles[index]}`}
 								>
 									<div className="flex items-center justify-between gap-4">
 										<div
@@ -490,10 +486,8 @@ export default function Landing() {
 						Join Shikshya Plan and turn your goals into a realistic, calmer
 						study routine that actually lasts.
 					</p>
-					<div className="mt-8">
-						<Button size="lg" asChild>
-							<Link to="/sign-in">Create your account</Link>
-						</Button>
+					<div className="mt-8 text-sm text-muted-foreground">
+						A calmer way to study, plan, and stay consistent.
 					</div>
 				</div>
 			</section>
