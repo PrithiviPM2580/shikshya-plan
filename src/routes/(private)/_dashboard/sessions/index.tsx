@@ -1,66 +1,123 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { BookOpen, Check, Pencil, Plus, Trash2 } from "lucide-react";
+import { type FormEvent, useState } from "react";
+import { toast } from "sonner";
+import { Badge } from "#/components/ui/badge";
+import { Button } from "#/components/ui/button";
+import { Card, CardContent } from "#/components/ui/card";
+import { Input } from "#/components/ui/input";
+import { getSessionOptions } from "#/features/sessions/server/options";
 import {
-	BookOpen,
-	Check,
-	Clock3,
-	Focus,
-	Pause,
-	Play,
-	Square,
-	TimerReset,
-} from "lucide-react";
-import { Badge } from "#/components/ui/badge.tsx";
-import { Button } from "#/components/ui/button.tsx";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "#/components/ui/card.tsx";
-import { Progress } from "#/components/ui/progress.tsx";
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "#/components/ui/table.tsx";
+	completeSession,
+	createSession,
+	deleteSession,
+	getSessions,
+	updateSession,
+} from "#/features/sessions/server/sessions";
 
 export const Route = createFileRoute("/(private)/_dashboard/sessions/")({
-	component: RouteComponent,
+	loader: async () => ({
+		sessions: await getSessions(),
+		options: await getSessionOptions(),
+	}),
+	component: SessionsPage,
 });
 
-function RouteComponent() {
-	const recentSessions = [
-		{
-			subject: "Linear Algebra",
-			detail: "Eigenvalue practice",
-			duration: "1h 30m",
-			focus: 92,
-			date: "Today",
-			time: "09:00 AM",
-			status: "Completed",
-		},
-		{
-			subject: "Physics Lab",
-			detail: "Report write-up",
-			duration: "45m",
-			focus: 78,
-			date: "Yesterday",
-			time: "02:15 PM",
-			status: "Interrupted",
-		},
-		{
-			subject: "World History",
-			detail: "Chapter 4 Reading",
-			duration: "2h 15m",
-			focus: 88,
-			date: "Yesterday",
-			time: "10:00 AM",
-			status: "Completed",
-		},
-	];
+function SessionsPage() {
+	const { sessions, options } = Route.useLoaderData();
+	const router = useRouter();
+	const [formOpen, setFormOpen] = useState(false);
+	const [editingId, setEditingId] = useState<string | null>(null);
+	const [title, setTitle] = useState("");
+	const [subjectId, setSubjectId] = useState("");
+	const [planId, setPlanId] = useState("");
+	const [scheduledDate, setScheduledDate] = useState(
+		new Date().toISOString().slice(0, 16),
+	);
+	const [durationMin, setDurationMin] = useState(30);
+	const [notes, setNotes] = useState("");
+	const [isSaving, setIsSaving] = useState(false);
+	const completed = sessions.filter((session) => session.completed);
+	const today = new Date().toDateString();
+	const todayMinutes = completed
+		.filter(
+			(session) => new Date(session.scheduledDate).toDateString() === today,
+		)
+		.reduce((total, session) => total + session.durationMin, 0);
+
+	function resetForm() {
+		setFormOpen(false);
+		setEditingId(null);
+		setTitle("");
+		setSubjectId("");
+		setPlanId("");
+		setScheduledDate(new Date().toISOString().slice(0, 16));
+		setDurationMin(30);
+		setNotes("");
+	}
+	function edit(session: (typeof sessions)[number]) {
+		setEditingId(session.id);
+		setFormOpen(true);
+		setTitle(session.title);
+		setSubjectId(session.subjectId ?? "");
+		setPlanId(session.planId ?? "");
+		setScheduledDate(
+			new Date(session.scheduledDate).toISOString().slice(0, 16),
+		);
+		setDurationMin(session.durationMin);
+		setNotes(session.notes ?? "");
+	}
+	async function submit(event: FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		setIsSaving(true);
+		try {
+			const data = {
+				title,
+				subjectId: subjectId || null,
+				planId: planId || null,
+				scheduledDate: new Date(scheduledDate),
+				durationMin,
+				notes,
+			};
+			if (editingId) {
+				await updateSession({ data: { id: editingId, ...data } });
+				toast.success("Session updated");
+			} else {
+				await createSession({ data });
+				toast.success("Session scheduled");
+			}
+			resetForm();
+			await router.invalidate();
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to save session",
+			);
+		} finally {
+			setIsSaving(false);
+		}
+	}
+	async function finish(id: string, minutes: number) {
+		try {
+			await completeSession({ data: { id, minutes } });
+			await router.invalidate();
+			toast.success("Session completed");
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to complete session",
+			);
+		}
+	}
+	async function remove(id: string) {
+		try {
+			await deleteSession({ data: { id } });
+			await router.invalidate();
+			toast.success("Session deleted");
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to delete session",
+			);
+		}
+	}
 
 	return (
 		<div className="w-full space-y-5">
@@ -73,177 +130,176 @@ function RouteComponent() {
 						Study Sessions
 					</h1>
 					<p className="mt-1 text-sm text-muted-foreground">
-						Track your active study time and review past performance.
+						Schedule study time and track completed work.
 					</p>
 				</div>
-				<Button className="w-full sm:w-auto">
-					<Play /> Start New Session
+				<Button
+					onClick={() => {
+						resetForm();
+						setFormOpen(true);
+					}}
+				>
+					<Plus /> New Session
 				</Button>
 			</section>
-
 			<section className="grid gap-4 md:grid-cols-3">
-				<Card className="rounded-xl border bg-card py-0 shadow-sm">
-					<CardContent className="p-4">
-						<div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
-							<span>TOTAL TIME (TODAY)</span>
-							<Clock3 className="size-4 text-primary" />
-						</div>
-						<p className="mt-3 text-lg font-bold">4h 30m</p>
-						<p className="mt-1 text-xs text-emerald-600">
-							↗ +45m from yesterday
-						</p>
-					</CardContent>
-				</Card>
-				<Card className="rounded-xl border bg-card py-0 shadow-sm">
-					<CardContent className="p-4">
-						<div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
-							<span>AVG FOCUS SCORE</span>
-							<Focus className="size-4 text-primary" />
-						</div>
-						<p className="mt-3 text-lg font-bold">88%</p>
-						<p className="mt-1 text-xs text-emerald-600">↗ +2% this week</p>
-					</CardContent>
-				</Card>
-				<Card className="rounded-xl border bg-card py-0 shadow-sm">
-					<CardContent className="p-4">
-						<div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
-							<span>SESSIONS COMPLETED</span>
-							<Check className="size-4 text-primary" />
-						</div>
-						<p className="mt-3 text-lg font-bold">12</p>
-						<p className="mt-1 text-xs text-muted-foreground">This week</p>
-					</CardContent>
-				</Card>
+				<Stat
+					label="Time today"
+					value={`${Math.floor(todayMinutes / 60)}h ${todayMinutes % 60}m`}
+				/>
+				<Stat label="Completed sessions" value={String(completed.length)} />
+				<Stat label="Total sessions" value={String(sessions.length)} />
 			</section>
-
-			<Card className="rounded-xl border-0 bg-primary text-primary-foreground shadow-sm">
-				<CardContent className="p-5 sm:p-7">
-					<div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-						<div>
-							<Badge className="bg-primary-foreground/15 text-primary-foreground hover:bg-primary-foreground/15">
-								<span className="mr-1 size-1.5 rounded-full bg-primary-foreground" />{" "}
-								SESSION ACTIVE
-							</Badge>
-							<p className="mt-5 text-sm font-bold">
-								Data Structures & Algorithms
-							</p>
-							<p className="mt-1 text-xs text-primary-foreground/75">
-								Module 4: Graph Traversals
-							</p>
-						</div>
-						<div className="flex flex-col items-center gap-4 sm:flex-row">
-							<div className="flex size-28 items-center justify-center rounded-full border-10 border-primary-foreground/20 border-t-primary-foreground text-sm font-bold">
-								48:46
+			{formOpen && (
+				<form
+					onSubmit={submit}
+					className="grid gap-3 rounded-xl border bg-card p-4 md:grid-cols-2"
+				>
+					<Input
+						required
+						value={title}
+						onChange={(event) => setTitle(event.target.value)}
+						placeholder="Session title"
+					/>
+					<select
+						value={subjectId}
+						onChange={(event) => setSubjectId(event.target.value)}
+						className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+					>
+						<option value="">No subject</option>
+						{options.subjects.map((subject) => (
+							<option key={subject.id} value={subject.id}>
+								{subject.name}
+							</option>
+						))}
+					</select>
+					<select
+						value={planId}
+						onChange={(event) => setPlanId(event.target.value)}
+						className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+					>
+						<option value="">No study plan</option>
+						{options.plans.map((plan) => (
+							<option key={plan.id} value={plan.id}>
+								{plan.title}
+							</option>
+						))}
+					</select>
+					<Input
+						required
+						type="datetime-local"
+						value={scheduledDate}
+						onChange={(event) => setScheduledDate(event.target.value)}
+					/>
+					<Input
+						required
+						type="number"
+						min="1"
+						max="720"
+						value={durationMin}
+						onChange={(event) => setDurationMin(Number(event.target.value))}
+						placeholder="Duration in minutes"
+					/>
+					<Input
+						value={notes}
+						onChange={(event) => setNotes(event.target.value)}
+						placeholder="Notes (optional)"
+					/>
+					<div className="flex gap-2">
+						<Button type="submit" disabled={isSaving}>
+							{isSaving
+								? "Saving..."
+								: editingId
+									? "Save Session"
+									: "Schedule Session"}
+						</Button>
+						<Button type="button" variant="outline" onClick={resetForm}>
+							Cancel
+						</Button>
+					</div>
+				</form>
+			)}
+			<section className="space-y-3">
+				{sessions.map((session) => (
+					<Card
+						key={session.id}
+						className={`rounded-xl border bg-card py-0 shadow-sm ${session.completed ? "opacity-70" : ""}`}
+					>
+						<CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
+							<div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+								<BookOpen className="size-5" />
 							</div>
-							<div className="flex gap-2">
-								<Button
-									variant="secondary"
-									size="icon"
-									aria-label="Pause session"
+							<div className="min-w-0 flex-1">
+								<div className="flex flex-wrap items-center gap-2">
+									<Badge variant="secondary">
+										{session.subject?.name ?? "General"}
+									</Badge>
+									<Badge variant={session.completed ? "secondary" : "outline"}>
+										{session.completed ? "Completed" : "Scheduled"}
+									</Badge>
+								</div>
+								<h2
+									className={`mt-2 text-sm font-bold ${session.completed ? "line-through" : ""}`}
 								>
-									<Pause />
+									{session.title}
+								</h2>
+								<p className="mt-1 text-xs text-muted-foreground">
+									{new Date(session.scheduledDate).toLocaleString()} ·{" "}
+									{session.durationMin} minutes
+								</p>
+								{session.notes && (
+									<p className="mt-1 text-xs text-muted-foreground">
+										{session.notes}
+									</p>
+								)}
+							</div>
+							<div className="flex gap-1">
+								{!session.completed && (
+									<Button
+										size="icon-sm"
+										variant="ghost"
+										onClick={() => finish(session.id, session.durationMin)}
+										aria-label={`Complete ${session.title}`}
+									>
+										<Check />
+									</Button>
+								)}
+								<Button
+									size="icon-sm"
+									variant="ghost"
+									onClick={() => edit(session)}
+									aria-label={`Edit ${session.title}`}
+								>
+									<Pencil />
 								</Button>
-								<Button variant="destructive">
-									<Square /> End Session
+								<Button
+									size="icon-sm"
+									variant="ghost"
+									onClick={() => remove(session.id)}
+									aria-label={`Delete ${session.title}`}
+								>
+									<Trash2 />
 								</Button>
 							</div>
-						</div>
-					</div>
-					<div className="mt-6">
-						<div className="flex justify-between text-[11px] text-primary-foreground/75">
-							<span>Session progress</span>
-							<span>65%</span>
-						</div>
-						<Progress
-							value={65}
-							className="mt-2 bg-primary-foreground/20 [&>div]:bg-primary-foreground"
-						/>
-					</div>
-				</CardContent>
-			</Card>
-
-			<Card className="rounded-xl border bg-card py-0 shadow-sm">
-				<CardHeader className="flex-row items-center justify-between border-b border-border/60 px-4 py-4">
-					<CardTitle className="text-sm">Recent Sessions</CardTitle>
-					<Button variant="link" size="sm" className="h-auto px-0 text-xs">
-						View all
-					</Button>
-				</CardHeader>
-				<CardContent className="p-0">
-					<div className="overflow-x-auto">
-						<Table>
-							<TableHeader>
-								<TableRow>
-									<TableHead>Subject</TableHead>
-									<TableHead>Duration</TableHead>
-									<TableHead>Focus</TableHead>
-									<TableHead>Date & Time</TableHead>
-									<TableHead>Status</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{recentSessions.map((session) => (
-									<TableRow key={`${session.subject}-${session.time}`}>
-										<TableCell>
-											<div className="flex items-center gap-3">
-												<span className="flex size-8 items-center justify-center rounded-md bg-primary/10 text-primary">
-													<BookOpen className="size-4" />
-												</span>
-												<div>
-													<p className="text-xs font-semibold">
-														{session.subject}
-													</p>
-													<p className="text-[11px] text-muted-foreground">
-														{session.detail}
-													</p>
-												</div>
-											</div>
-										</TableCell>
-										<TableCell className="text-xs">
-											{session.duration}
-										</TableCell>
-										<TableCell>
-											<div className="flex items-center gap-2">
-												<span className="h-1.5 w-7 rounded-full bg-primary/20">
-													<span
-														className="block h-full rounded-full bg-primary"
-														style={{ width: `${session.focus}%` }}
-													/>
-												</span>
-												<span className="text-xs text-primary">
-													{session.focus}%
-												</span>
-											</div>
-										</TableCell>
-										<TableCell>
-											<p className="text-xs">{session.date}</p>
-											<p className="text-[11px] text-muted-foreground">
-												{session.time}
-											</p>
-										</TableCell>
-										<TableCell>
-											<Badge
-												variant={
-													session.status === "Completed"
-														? "secondary"
-														: "destructive"
-												}
-											>
-												{session.status === "Completed" ? (
-													<Check />
-												) : (
-													<TimerReset />
-												)}{" "}
-												{session.status}
-											</Badge>
-										</TableCell>
-									</TableRow>
-								))}
-							</TableBody>
-						</Table>
-					</div>
-				</CardContent>
-			</Card>
+						</CardContent>
+					</Card>
+				))}
+				{sessions.length === 0 && (
+					<p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+						No study sessions yet.
+					</p>
+				)}
+			</section>
 		</div>
+	);
+}
+function Stat({ label, value }: { label: string; value: string }) {
+	return (
+		<Card className="rounded-xl border bg-card py-0 shadow-sm">
+			<CardContent className="p-4">
+				<p className="text-xs text-muted-foreground">{label}</p>
+				<p className="mt-2 text-xl font-bold">{value}</p>
+			</CardContent>
+		</Card>
 	);
 }
