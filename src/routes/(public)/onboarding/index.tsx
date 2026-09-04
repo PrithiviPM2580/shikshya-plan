@@ -64,7 +64,15 @@ function Onboarding() {
 		return (
 			<StepOne
 				selected={selected}
-				onSelect={setSelected}
+				onSelect={(levelId) => {
+					setSelected(levelId);
+					const level = studyLevels.find((item) => item.id === levelId);
+					if (level && level.id !== "other") {
+						setSelectedProgramName(level.label);
+						setSelectedSemester(null);
+						setSelectedCourses([]);
+					}
+				}}
 				onNext={() => setStep(2)}
 				progress={progress}
 			/>

@@ -41,10 +41,7 @@ export function SemesterSelection({
 		return <div>Program not found</div>;
 	}
 
-	const semesters = Array.from(
-		{ length: program.total_semesters },
-		(_, i) => i + 1,
-	);
+	const semesters = program.semesters;
 
 	return (
 		<div className="w-full space-y-6">
@@ -64,24 +61,24 @@ export function SemesterSelection({
 				className="space-y-4"
 			>
 				<div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
-					{semesters.map((semester) => (
+					{semesters.map((semester, index) => (
 						<form.Field
-							key={semester}
+							key={semester.semester}
 							name="semesterNumber"
 							children={(field) => (
 								<Card
 									className="cursor-pointer transition-all hover:border-primary/50"
-									onClick={() => field.handleChange(semester)}
+									onClick={() => field.handleChange(index + 1)}
 									data-selected={
-										field.state.value === semester ? "true" : "false"
+										field.state.value === index + 1 ? "true" : "false"
 									}
 								>
 									<CardHeader className="p-4">
 										<CardTitle className="text-center text-lg">
-											Sem {semester}
+											{semester.semester}
 										</CardTitle>
 									</CardHeader>
-									{field.state.value === semester && (
+									{field.state.value === index + 1 && (
 										<CardContent className="p-4 pt-0">
 											<div className="flex justify-center">
 												<div className="rounded-full bg-primary p-1">

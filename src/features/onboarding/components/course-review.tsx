@@ -33,9 +33,10 @@ export function CourseReview({
 		return <div>Semester not found</div>;
 	}
 
-	const totalCredits = semester.courses.reduce((sum, c) => sum + c.credits, 0);
-	const coreCourses = semester.courses.filter((c) => c.type === "core");
-	const electiveCourses = semester.courses.filter((c) => c.type === "elective");
+	const selectedCourses = courses.length > 0 ? courses : semester.courses;
+	const totalCredits = selectedCourses.reduce((sum, c) => sum + c.credits, 0);
+	const coreCourses = selectedCourses.filter((c) => c.type === "core");
+	const electiveCourses = selectedCourses.filter((c) => c.type === "elective");
 
 	return (
 		<div className="w-full space-y-6">
@@ -64,7 +65,7 @@ export function CourseReview({
 						<div className="grid grid-cols-3 gap-4">
 							<div>
 								<p className="text-sm text-muted-foreground">Total Courses</p>
-								<p className="text-2xl font-bold">{semester.courses.length}</p>
+								<p className="text-2xl font-bold">{selectedCourses.length}</p>
 							</div>
 							<div>
 								<p className="text-sm text-muted-foreground">Total Credits</p>
@@ -75,7 +76,7 @@ export function CourseReview({
 									Practical Courses
 								</p>
 								<p className="text-2xl font-bold">
-									{semester.courses.filter((c) => c.has_practical).length}
+									{selectedCourses.filter((c) => c.has_practical).length}
 								</p>
 							</div>
 						</div>
@@ -142,7 +143,12 @@ export function CourseReview({
 				>
 					Back
 				</Button>
-				<Button type="submit" className="w-full" disabled={isLoading}>
+				<Button
+					type="button"
+					onClick={onNext}
+					className="w-full"
+					disabled={isLoading}
+				>
 					{isLoading ? "Loading..." : "Continue"}
 				</Button>
 			</div>
