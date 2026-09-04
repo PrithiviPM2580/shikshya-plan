@@ -28,6 +28,9 @@
 			"style": {
 				"noNonNullAssertion": "off"
 			},
+			"correctness": {
+				"noChildrenProp": "off"
+			},
 			"a11y": {
 				"useSemanticElements": "off",
 				"useKeyWithClickEvents": "off",

@@ -1,13 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
 import prisma from "#/lib/prisma-client";
 import { requireCurrentUser } from "#/lib/server-auth";
-
-const subjectInput = z.object({
-	name: z.string().trim().min(1).max(120),
-	description: z.string().trim().max(500).optional(),
-	color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
-});
+import {
+	subjectIdSchema,
+	subjectInput,
+	updateSubjectInput,
+} from "../validation";
 
 export const getSubjects = createServerFn({ method: "GET" }).handler(
 	async () => {
@@ -33,8 +31,20 @@ export const createSubject = createServerFn({ method: "POST" })
 		});
 	});
 
+export const updateSubject = createServerFn({ method: "POST" })
+	.validator(updateSubjectInput)
+	.handler(async ({ data }) => {
+		const user = await requireCurrentUser();
+		const { id, ...subject } = data;
+
+		return prisma.subject.updateMany({
+			where: { id, userId: user.id },
+			data: subject,
+		});
+	});
+
 export const deleteSubject = createServerFn({ method: "POST" })
-	.validator(z.object({ id: z.string().uuid() }))
+	.validator(subjectIdSchema)
 	.handler(async ({ data }) => {
 		const user = await requireCurrentUser();
 
