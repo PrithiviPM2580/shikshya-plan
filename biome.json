@@ -29,7 +29,8 @@
 				"noNonNullAssertion": "off"
 			},
 			"correctness": {
-				"noChildrenProp": "off"
+				"noChildrenProp": "off",
+				"useExhaustiveDependencies": "off"
 			},
 			"a11y": {
 				"useSemanticElements": "off",
