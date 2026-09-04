@@ -36,7 +36,8 @@
 				"useKeyWithClickEvents": "off",
 				"useFocusableInteractive": "off",
 				"useAriaPropsForRole": "off",
-				"noRedundantRoles": "off"
+				"noRedundantRoles": "off",
+				"noLabelWithoutControl": "off"
 			},
 			"security": {
 				"noDangerouslySetInnerHtml": "off"
