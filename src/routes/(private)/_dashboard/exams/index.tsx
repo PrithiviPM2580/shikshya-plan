@@ -1,61 +1,115 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { CalendarDays, Check, Pencil, Plus, Trash2 } from "lucide-react";
+import { type FormEvent, useState } from "react";
+import { toast } from "sonner";
+import { Badge } from "#/components/ui/badge";
+import { Button } from "#/components/ui/button";
+import { Card, CardContent } from "#/components/ui/card";
+import { Input } from "#/components/ui/input";
 import {
-	ArrowUpRight,
-	BookOpen,
-	CalendarDays,
-	CheckCircle2,
-	ChevronRight,
-	Clock3,
-	FileText,
-	GraduationCap,
-	MapPin,
-	Plus,
-	TrendingUp,
-} from "lucide-react";
-import { Badge } from "#/components/ui/badge.tsx";
-import { Button } from "#/components/ui/button.tsx";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "#/components/ui/card.tsx";
-import { Progress } from "#/components/ui/progress.tsx";
+	createExam,
+	deleteExam,
+	getExams,
+	toggleExam,
+	updateExam,
+} from "#/features/exams/server/exams";
+import { getExamOptions } from "#/features/exams/server/options";
 
 export const Route = createFileRoute("/(private)/_dashboard/exams/")({
-	component: RouteComponent,
+	loader: async () => ({
+		exams: await getExams(),
+		subjects: await getExamOptions(),
+	}),
+	component: ExamsPage,
 });
 
-function RouteComponent() {
-	const exams = [
-		{
-			type: "MIDTERM",
-			subject: "Organic Chemistry",
-			code: "CHM201",
-			date: "Oct 24, 9:00 AM",
-			location: "Science Hall, Room 302",
-			readiness: 68,
-			tone: "destructive",
-		},
-		{
-			type: "FINAL",
-			subject: "Data Structures",
-			code: "CS300",
-			date: "Nov 12, 1:00 PM",
-			location: "Online Assessment",
-			readiness: 42,
-			tone: "primary",
-		},
-		{
-			type: "QUIZ",
-			subject: "Modern World Literature",
-			code: "ENG305",
-			date: "Nov 05, 10:30 AM",
-			location: "Humanities Bldg, Room 104",
-			readiness: 15,
-			tone: "secondary",
-		},
-	];
+function ExamsPage() {
+	const { exams, subjects } = Route.useLoaderData();
+	const router = useRouter();
+	const [open, setOpen] = useState(false);
+	const [editingId, setEditingId] = useState<string | null>(null);
+	const [title, setTitle] = useState("");
+	const [subjectId, setSubjectId] = useState("");
+	const [examDate, setExamDate] = useState("");
+	const [syllabus, setSyllabus] = useState("");
+	const [saving, setSaving] = useState(false);
+	const upcoming = exams.filter(
+		(exam) => !exam.completed && new Date(exam.examDate) >= new Date(),
+	);
+	const nextExam = upcoming[0];
+
+	function reset() {
+		setOpen(false);
+		setEditingId(null);
+		setTitle("");
+		setSubjectId("");
+		setExamDate("");
+		setSyllabus("");
+	}
+	function edit(exam: (typeof exams)[number]) {
+		setOpen(true);
+		setEditingId(exam.id);
+		setTitle(exam.title);
+		setSubjectId(exam.subjectId ?? "");
+		setExamDate(new Date(exam.examDate).toISOString().slice(0, 16));
+		setSyllabus(exam.syllabus ?? "");
+	}
+	async function submit(event: FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		setSaving(true);
+		try {
+			const data = {
+				title,
+				subjectId: subjectId || null,
+				examDate: new Date(examDate),
+				syllabus,
+			};
+			if (editingId) {
+				await updateExam({ data: { id: editingId, ...data } });
+				toast.success("Exam updated");
+			} else {
+				await createExam({ data });
+				toast.success("Exam scheduled");
+			}
+			reset();
+			await router.invalidate();
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to save exam",
+			);
+		} finally {
+			setSaving(false);
+		}
+	}
+	async function toggle(id: string, completed: boolean) {
+		try {
+			await toggleExam({ data: { id, completed: !completed } });
+			await router.invalidate();
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to update exam",
+			);
+		}
+	}
+	async function remove(id: string) {
+		try {
+			await deleteExam({ data: { id } });
+			await router.invalidate();
+			toast.success("Exam deleted");
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to delete exam",
+			);
+		}
+	}
+	const countdown = nextExam
+		? Math.max(
+				0,
+				Math.ceil(
+					(new Date(nextExam.examDate).getTime() - Date.now()) / 86400000,
+				),
+			)
+		: 0;
 
 	return (
 		<div className="w-full space-y-5">
@@ -68,182 +122,158 @@ function RouteComponent() {
 						Exams & readiness
 					</h1>
 				</div>
-				<Button>
+				<Button
+					onClick={() => {
+						reset();
+						setOpen(true);
+					}}
+				>
 					<Plus /> Add Exam
 				</Button>
 			</section>
-
-			<Card className="overflow-hidden rounded-xl border-0 bg-primary text-primary-foreground shadow-sm">
-				<CardContent className="p-5 sm:p-7">
-					<div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-						<div>
-							<Badge className="bg-primary-foreground/15 text-primary-foreground hover:bg-primary-foreground/15">
-								Next big challenge
-							</Badge>
-							<h2 className="mt-4 text-lg font-bold">
-								Organic Chemistry Midterm
-							</h2>
-							<p className="mt-2 max-w-xl text-xs leading-5 text-primary-foreground/75">
-								Reaction mechanisms, stereochemistry, and spectroscopy. You're
-								currently at 68% readiness based on completed study tasks.
-							</p>
-							<div className="mt-5 flex flex-wrap gap-2">
-								<Button variant="secondary">
-									<BookOpen /> Launch Study Plan
-								</Button>
-								<Button
-									variant="outline"
-									className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-								>
-									View Syllabus
-								</Button>
-							</div>
-						</div>
-						<div className="grid grid-cols-3 divide-x divide-border/60 rounded-lg bg-primary-foreground/90 text-center text-primary shadow-sm">
-							<div className="px-4 py-3">
-								<p className="text-lg font-bold">12</p>
-								<p className="text-[9px] uppercase text-muted-foreground">
-									Days
-								</p>
-							</div>
-							<div className="px-4 py-3">
-								<p className="text-lg font-bold">08</p>
-								<p className="text-[9px] uppercase text-muted-foreground">
-									Hours
-								</p>
-							</div>
-							<div className="px-4 py-3">
-								<p className="text-lg font-bold">44</p>
-								<p className="text-[9px] uppercase text-muted-foreground">
-									Mins
-								</p>
-							</div>
-						</div>
-					</div>
+			<Card className="rounded-xl border-0 bg-primary text-primary-foreground shadow-sm">
+				<CardContent className="p-5">
+					<p className="text-xs uppercase tracking-widest text-primary-foreground/70">
+						Next exam
+					</p>
+					<h2 className="mt-3 text-lg font-bold">
+						{nextExam?.title ?? "No upcoming exams"}
+					</h2>
+					<p className="mt-1 text-sm text-primary-foreground/75">
+						{nextExam
+							? `${nextExam.subject?.name ?? "General"} · ${countdown} day${countdown === 1 ? "" : "s"} remaining`
+							: "Add an exam to start tracking readiness."}
+					</p>
 				</CardContent>
 			</Card>
-
-			<div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_280px]">
-				<main>
-					<Card className="rounded-xl border bg-card py-0 shadow-sm">
-						<CardHeader className="flex-row items-center justify-between border-b border-border/60 px-4 py-4">
-							<CardTitle className="text-sm">Scheduled Exams</CardTitle>
-							<Button variant="link" size="sm" className="h-auto px-0 text-xs">
-								Filter <ChevronRight />
-							</Button>
-						</CardHeader>
-						<CardContent className="space-y-1 px-0 pb-2">
-							{exams.map((exam) => (
-								<div
-									key={exam.code}
-									className={`grid gap-4 border-l-3 px-4 py-4 sm:grid-cols-[minmax(0,1fr)_120px] sm:items-center ${exam.tone === "destructive" ? "border-l-destructive" : exam.tone === "secondary" ? "border-l-secondary" : "border-l-primary"}`}
-								>
-									<div>
-										<div className="flex flex-wrap items-center gap-2">
-											<Badge variant="secondary" className="text-[9px]">
-												{exam.type}
-											</Badge>
-											<span className="text-[10px] text-muted-foreground">
-												<CalendarDays className="mr-1 inline size-3" />
-												{exam.date}
-											</span>
-										</div>
-										<p className="mt-2 text-xs font-bold">
-											{exam.subject} ({exam.code})
-										</p>
-										<p className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
-											<MapPin className="size-3" />
-											{exam.location}
-										</p>
-									</div>
-									<div className="rounded-lg bg-muted/60 p-3">
-										<div className="flex items-center justify-between text-[10px]">
-											<span className="text-muted-foreground">Readiness</span>
-											<span className="font-bold">{exam.readiness}%</span>
-										</div>
-										<Progress value={exam.readiness} className="mt-2 h-1.5" />
-									</div>
-								</div>
-							))}
-						</CardContent>
-					</Card>
-				</main>
-
-				<aside className="space-y-4">
-					<Card className="rounded-xl border bg-card py-0 shadow-sm">
-						<CardHeader className="flex-row items-center justify-between px-4 pb-2 pt-4">
-							<CardTitle className="text-sm">Performance Trend</CardTitle>
-							<TrendingUp className="size-4 text-primary" />
-						</CardHeader>
-						<CardContent className="px-4 pb-4">
-							<p className="text-xs text-muted-foreground">Projected GPA</p>
-							<p className="mt-1 text-xl font-bold text-primary">
-								3.8{" "}
-								<span className="text-xs font-medium text-emerald-600">
-									↗ +0.2
-								</span>
-							</p>
-							<div className="mt-5 flex h-20 items-end gap-2 border-b border-border/60 px-1">
-								{[28, 36, 31, 58, 50, 74].map((height, index) => (
-									<div
-										key={index}
-										className="flex-1 rounded-t-sm bg-primary/20"
-										style={{ height: `${height}%` }}
-									>
-										<div
-											className="h-full rounded-t-sm bg-primary"
-											style={{
-												height:
-													index === 5 ? "100%" : index === 3 ? "60%" : "25%",
-											}}
-										/>
-									</div>
-								))}
-							</div>
-						</CardContent>
-					</Card>
-					<Card className="rounded-xl border-0 bg-primary text-primary-foreground py-0 shadow-sm">
-						<CardHeader className="px-4 pb-2 pt-4">
-							<CardTitle className="flex items-center gap-2 text-sm">
-								<GraduationCap className="size-4" /> Prep Resources
-							</CardTitle>
-						</CardHeader>
-						<CardContent className="space-y-1 px-4 pb-4">
-							{[
-								[FileText, "Past Papers Repository"],
-								[BookOpen, "Flashcard Decks"],
-								[CheckCircle2, "Study Groups"],
-							].map(([Icon, label]) => {
-								const ResourceIcon = Icon as typeof FileText;
-								return (
-									<Button
-										key={label as string}
-										variant="ghost"
-										className="h-9 w-full justify-start gap-3 px-2 text-xs text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-									>
-										<ResourceIcon className="size-4" />
-										{label as string}
-										<ArrowUpRight className="ml-auto size-3" />
-									</Button>
-								);
-							})}
-						</CardContent>
-					</Card>
-					<Card className="rounded-xl border bg-card py-0 shadow-sm">
+			<section className="grid gap-3 sm:grid-cols-3">
+				<Stat label="Upcoming" value={String(upcoming.length)} />
+				<Stat
+					label="Completed"
+					value={String(exams.filter((exam) => exam.completed).length)}
+				/>
+				<Stat label="Total exams" value={String(exams.length)} />
+			</section>
+			{open && (
+				<form
+					onSubmit={submit}
+					className="grid gap-3 rounded-xl border bg-card p-4 md:grid-cols-2"
+				>
+					<Input
+						required
+						value={title}
+						onChange={(event) => setTitle(event.target.value)}
+						placeholder="Exam title"
+					/>
+					<select
+						value={subjectId}
+						onChange={(event) => setSubjectId(event.target.value)}
+						className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+					>
+						<option value="">No subject</option>
+						{subjects.map((subject) => (
+							<option key={subject.id} value={subject.id}>
+								{subject.name}
+							</option>
+						))}
+					</select>
+					<Input
+						required
+						type="datetime-local"
+						value={examDate}
+						onChange={(event) => setExamDate(event.target.value)}
+					/>
+					<Input
+						value={syllabus}
+						onChange={(event) => setSyllabus(event.target.value)}
+						placeholder="Syllabus or topics (optional)"
+					/>
+					<div className="flex gap-2">
+						<Button type="submit" disabled={saving}>
+							{saving ? "Saving..." : editingId ? "Save Exam" : "Schedule Exam"}
+						</Button>
+						<Button type="button" variant="outline" onClick={reset}>
+							Cancel
+						</Button>
+					</div>
+				</form>
+			)}
+			<section className="space-y-3">
+				{exams.map((exam) => (
+					<Card
+						key={exam.id}
+						className={`rounded-xl border bg-card py-0 shadow-sm ${exam.completed ? "opacity-70" : ""}`}
+					>
 						<CardContent className="flex items-center gap-3 p-4">
-							<div className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary">
-								<Clock3 className="size-4" />
-							</div>
-							<div>
-								<p className="text-xs font-semibold">Your exam week</p>
-								<p className="text-[11px] text-muted-foreground">
-									Keep two focused sessions per day.
+							<button
+								type="button"
+								onClick={() => toggle(exam.id, exam.completed)}
+								className={`flex size-5 shrink-0 items-center justify-center rounded-full border ${exam.completed ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/40"}`}
+								aria-label={`${exam.completed ? "Reopen" : "Complete"} ${exam.title}`}
+							>
+								{exam.completed && <Check className="size-3" />}
+							</button>
+							<div className="min-w-0 flex-1">
+								<div className="flex flex-wrap gap-2">
+									<Badge variant="secondary">
+										{exam.subject?.name ?? "General"}
+									</Badge>
+									<Badge variant={exam.completed ? "secondary" : "outline"}>
+										{exam.completed ? "Completed" : "Scheduled"}
+									</Badge>
+								</div>
+								<h2
+									className={`mt-2 text-sm font-bold ${exam.completed ? "line-through" : ""}`}
+								>
+									{exam.title}
+								</h2>
+								<p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+									<CalendarDays className="size-3.5" />
+									{new Date(exam.examDate).toLocaleString()}
 								</p>
+								{exam.syllabus && (
+									<p className="mt-1 text-xs text-muted-foreground">
+										{exam.syllabus}
+									</p>
+								)}
+							</div>
+							<div className="flex gap-1">
+								<Button
+									variant="ghost"
+									size="icon-sm"
+									onClick={() => edit(exam)}
+									aria-label={`Edit ${exam.title}`}
+								>
+									<Pencil />
+								</Button>
+								<Button
+									variant="ghost"
+									size="icon-sm"
+									onClick={() => remove(exam.id)}
+									aria-label={`Delete ${exam.title}`}
+								>
+									<Trash2 />
+								</Button>
 							</div>
 						</CardContent>
 					</Card>
-				</aside>
-			</div>
+				))}
+				{exams.length === 0 && (
+					<p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+						No exams scheduled yet.
+					</p>
+				)}
+			</section>
 		</div>
+	);
+}
+function Stat({ label, value }: { label: string; value: string }) {
+	return (
+		<Card className="rounded-xl border bg-card py-0 shadow-sm">
+			<CardContent className="p-4">
+				<p className="text-xs text-muted-foreground">{label}</p>
+				<p className="mt-2 text-xl font-bold">{value}</p>
+			</CardContent>
+		</Card>
 	);
 }
