@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import {
 	ArrowLeft,
 	ArrowRight,
@@ -11,11 +11,14 @@ import {
 	Star,
 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import Logo from "#/components/shared/logo";
 import { Button } from "#/components/ui/button";
 import { studyLevels } from "#/lib/constants";
 import { Progress } from "@/components/ui/progress";
 import academicData from "@/data/academic-programs.json";
+import { completeOnboarding } from "@/features/onboarding/server/complete-onboarding";
+import { getOnboardingStatus } from "@/lib/server-auth";
 
 type AcademicProgram = (typeof academicData.programs)[number];
 
@@ -26,6 +29,15 @@ const programIcons = {
 } as const;
 
 export const Route = createFileRoute("/(public)/onboarding/")({
+	beforeLoad: async () => {
+		const status = await getOnboardingStatus();
+		if (!status.user) {
+			throw redirect({ to: "/sign-in" });
+		}
+		if (status.isComplete) {
+			throw redirect({ to: "/dashboard" });
+		}
+	},
 	component: Onboarding,
 });
 
@@ -570,6 +582,7 @@ function StepFour({
 	progress,
 }: StepFourProps) {
 	const navigate = useNavigate();
+	const [isCompleting, setIsCompleting] = useState(false);
 	const [weeklyHours, setWeeklyHours] = useState(15);
 	const [targetGpa, setTargetGpa] = useState(3.8);
 	const semesterIndex = program.semesters.findIndex(
@@ -585,6 +598,28 @@ function StepFour({
 		100,
 		Math.round(70 + weeklyHours / 2 + targetGpa * 3 + courses.length),
 	);
+
+	async function handleComplete() {
+		setIsCompleting(true);
+		try {
+			await completeOnboarding({
+				data: {
+					programName: program.name,
+					semester: semester.semester,
+					courses,
+					weeklyHours,
+					targetGpa,
+				},
+			});
+			navigate({ to: "/dashboard" });
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to complete setup",
+			);
+		} finally {
+			setIsCompleting(false);
+		}
+	}
 
 	return (
 		<div className="min-h-screen w-full px-2 sm:px-8 md:px-16">
@@ -756,8 +791,9 @@ function StepFour({
 						Back
 					</Button>
 					<Button
-						onClick={() => navigate({ to: "/dashboard" })}
+						onClick={handleComplete}
 						type="button"
+						disabled={isCompleting}
 						className="gap-2 text-xs uppercase tracking-[0.12em] dark:text-white"
 					>
 						Complete Setup

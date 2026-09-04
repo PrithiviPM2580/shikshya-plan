@@ -26,8 +26,10 @@ import {
 	CardTitle,
 } from "#/components/ui/card.tsx";
 import { Progress } from "#/components/ui/progress.tsx";
+import { getDashboardData } from "#/features/home/server/get-dashboard-data";
 
 export const Route = createFileRoute("/(private)/_dashboard/dashboard/")({
+	loader: () => getDashboardData(),
 	component: RouteComponent,
 });
 
@@ -110,6 +112,11 @@ function StatCard({
 }
 
 function RouteComponent() {
+	const dashboard = Route.useLoaderData();
+	const taskSummary = dashboard.taskCount
+		? `${dashboard.tasksDone} of ${dashboard.taskCount} tasks`
+		: "No tasks yet";
+
 	return (
 		<div className="w-full space-y-4">
 			<div>
@@ -117,7 +124,8 @@ function RouteComponent() {
 					Overview
 				</p>
 				<p className="mt-1 text-sm text-muted-foreground">
-					Welcome back, Alex. You're 85% towards your daily goal.
+					Welcome back, {dashboard.userName}. Start planning your next focused
+					session.
 				</p>
 			</div>
 			<div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
@@ -129,8 +137,8 @@ function RouteComponent() {
 				/>
 				<StatCard
 					title="Tasks Done"
-					value="12"
-					note="12 of 16 tasks"
+					value={String(dashboard.tasksDone)}
+					note={taskSummary}
 					icon={CheckCircle2}
 					tone="green"
 				/>
@@ -142,8 +150,8 @@ function RouteComponent() {
 				/>
 				<StatCard
 					title="Exams"
-					value="2"
-					note="△ Next: Physics (3 days)"
+					value={String(dashboard.examCount)}
+					note="Upcoming exams"
 					icon={CircleAlert}
 					tone="red"
 				/>
@@ -157,7 +165,7 @@ function RouteComponent() {
 									Today's Schedule
 								</CardTitle>
 								<p className="mt-1 text-[11px] text-muted-foreground">
-									12 of 16 tasks completed
+									{taskSummary}
 								</p>
 							</div>
 							<Button size="sm" className="h-7 px-3 text-[11px]">
