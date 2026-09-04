@@ -1,191 +1,234 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { BookOpen, Check, Pause, Play, RotateCcw, Square } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Badge } from "#/components/ui/badge";
+import { Button } from "#/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
+import { Input } from "#/components/ui/input";
+import { getPomodoroOptions } from "#/features/pomodoro/server/options";
 import {
-	BookOpen,
-	ChevronRight,
-	CirclePause,
-	Coffee,
-	Flame,
-	Headphones,
-	Play,
-	RotateCcw,
-	SkipForward,
-	Volume2,
-} from "lucide-react";
-import { Badge } from "#/components/ui/badge.tsx";
-import { Button } from "#/components/ui/button.tsx";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "#/components/ui/card.tsx";
+	completePomodoro,
+	getPomodoroSessions,
+	startPomodoro,
+} from "#/features/pomodoro/server/pomodoro";
 
 export const Route = createFileRoute("/(private)/_dashboard/pomodoro/")({
-	component: RouteComponent,
+	loader: async () => ({
+		sessions: await getPomodoroSessions(),
+		subjects: await getPomodoroOptions(),
+	}),
+	component: PomodoroPage,
 });
 
-function RouteComponent() {
-	const sessions = [
-		{
-			title: "Advanced Calculus Ch. 4",
-			time: "09:00 AM - 09:25 AM",
-			duration: "25m",
-			icon: BookOpen,
-			tone: "primary",
-		},
-		{
-			title: "Data Structures Project",
-			time: "10:00 AM - 10:25 AM",
-			duration: "25m",
-			icon: ChevronRight,
-			tone: "secondary",
-		},
-		{
-			title: "Data Structures Project",
-			time: "10:30 AM - 10:55 AM",
-			duration: "25m",
-			icon: ChevronRight,
-			tone: "secondary",
-		},
-		{
-			title: "Literature Review",
-			time: "11:15 AM (Interrupted)",
-			duration: "12m",
-			icon: CirclePause,
-			tone: "destructive",
-		},
-	];
-	const atmospheres = [
-		{ name: "Rainy Library", icon: Headphones },
-		{ name: "Cafe Focus", icon: Coffee, active: true },
-		{ name: "Deep Woods", icon: Flame },
-		{ name: "Cozy Fire", icon: Flame },
-	];
+function PomodoroPage() {
+	const { sessions, subjects } = Route.useLoaderData();
+	const router = useRouter();
+	const [minutes, setMinutes] = useState(25);
+	const [remaining, setRemaining] = useState(25 * 60);
+	const [title, setTitle] = useState("");
+	const [subjectId, setSubjectId] = useState("");
+	const [activeId, setActiveId] = useState<string | null>(null);
+	const [running, setRunning] = useState(false);
+	const [saving, setSaving] = useState(false);
+	const today = new Date().toDateString();
+	const todaySessions = sessions.filter(
+		(session) => new Date(session.startedAt).toDateString() === today,
+	);
+	const completedToday = todaySessions.filter((session) => session.completed);
+
+	useEffect(() => {
+		if (!running) return;
+		const timer = window.setInterval(
+			() => setRemaining((value) => Math.max(0, value - 1)),
+			1000,
+		);
+		return () => window.clearInterval(timer);
+	}, [running]);
+
+	useEffect(() => {
+		if (running && remaining === 0 && activeId) void finish();
+	}, [remaining, running, activeId]);
+
+	function reset() {
+		setRunning(false);
+		setActiveId(null);
+		setRemaining(minutes * 60);
+	}
+	function changeMinutes(value: number) {
+		setMinutes(value);
+		if (!running) setRemaining(value * 60);
+	}
+	async function begin() {
+		setSaving(true);
+		try {
+			const session = await startPomodoro({
+				data: {
+					title: title || undefined,
+					subjectId: subjectId || null,
+					focusMinutes: minutes,
+				},
+			});
+			setActiveId(session.id);
+			setRemaining(minutes * 60);
+			setRunning(true);
+			toast.success("Focus session started");
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to start session",
+			);
+		} finally {
+			setSaving(false);
+		}
+	}
+	async function finish() {
+		if (!activeId) return;
+		setRunning(false);
+		try {
+			await completePomodoro({ data: { id: activeId } });
+			setActiveId(null);
+			await router.invalidate();
+			toast.success("Focus session completed");
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to complete session",
+			);
+		}
+	}
+	const displayMinutes = String(Math.floor(remaining / 60)).padStart(2, "0");
+	const displaySeconds = String(remaining % 60).padStart(2, "0");
 
 	return (
 		<div className="w-full">
 			<div className="grid min-h-[calc(100vh-7rem)] gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
 				<section className="flex flex-col items-center justify-center rounded-xl bg-muted/30 px-4 py-8">
-					<div className="flex rounded-full bg-background p-1 shadow-sm">
-						<Button variant="default" size="sm" className="rounded-full">
-							Study Block
-						</Button>
-						<Button variant="ghost" size="sm" className="rounded-full">
-							Short Break
-						</Button>
-						<Button variant="ghost" size="sm" className="rounded-full">
-							Long Break
-						</Button>
-					</div>
-					<div className="mt-10 flex size-64 items-center justify-center rounded-full border-8 border-primary/20 border-t-primary sm:size-72">
+					<div className="flex size-64 items-center justify-center rounded-full border-8 border-primary/20 border-t-primary sm:size-72">
 						<div className="text-center">
 							<p className="text-6xl font-bold tracking-tight sm:text-7xl">
-								25:00
+								{displayMinutes}:{displaySeconds}
 							</p>
 							<p className="mt-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
 								<span className="mr-1 inline-block size-1.5 rounded-full bg-primary" />
-								Focusing
+								{running ? "Focusing" : "Ready"}
 							</p>
 						</div>
 					</div>
 					<div className="mt-8 flex items-center gap-5">
-						<Button variant="ghost" size="icon-lg" aria-label="Reset timer">
+						<Button
+							variant="ghost"
+							size="icon-lg"
+							onClick={reset}
+							aria-label="Reset timer"
+						>
 							<RotateCcw />
 						</Button>
-						<Button size="icon-lg" className="size-14 rounded-full">
-							<Play className="size-6" />
-						</Button>
-						<Button variant="ghost" size="icon-lg" aria-label="Skip session">
-							<SkipForward />
+						{running ? (
+							<Button
+								variant="secondary"
+								size="icon-lg"
+								className="size-14 rounded-full"
+								onClick={() => setRunning(false)}
+								aria-label="Pause timer"
+							>
+								<Pause />
+							</Button>
+						) : (
+							<Button
+								size="icon-lg"
+								className="size-14 rounded-full"
+								onClick={begin}
+								disabled={saving || remaining === 0}
+								aria-label="Start timer"
+							>
+								<Play className="size-6" />
+							</Button>
+						)}
+						<Button
+							variant="destructive"
+							size="icon-lg"
+							onClick={finish}
+							disabled={!activeId}
+							aria-label="End session"
+						>
+							<Square />
 						</Button>
 					</div>
-					<p className="mt-5 text-xs text-muted-foreground">
-						Session 1 of 4 <span className="mx-2">·</span> Advanced Calculus Ch.
-						4
-					</p>
+					<div className="mt-6 grid w-full max-w-md gap-3 sm:grid-cols-3">
+						<label className="space-y-1 text-sm">
+							<span className="font-medium">Focus minutes</span>
+							<Input
+								type="number"
+								min="1"
+								max="120"
+								value={minutes}
+								onChange={(event) => changeMinutes(Number(event.target.value))}
+								disabled={running}
+							/>
+						</label>
+						<label className="space-y-1 text-sm sm:col-span-2">
+							<span className="font-medium">Session title (optional)</span>
+							<Input
+								value={title}
+								onChange={(event) => setTitle(event.target.value)}
+								placeholder="What are you working on?"
+								disabled={running}
+							/>
+						</label>
+						<label className="space-y-1 text-sm sm:col-span-3">
+							<span className="font-medium">Subject (optional)</span>
+							<select
+								value={subjectId}
+								onChange={(event) => setSubjectId(event.target.value)}
+								disabled={running}
+								className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+							>
+								<option value="">No subject</option>
+								{subjects.map((subject) => (
+									<option key={subject.id} value={subject.id}>
+										{subject.name}
+									</option>
+								))}
+							</select>
+						</label>
+					</div>
 				</section>
-
-				<aside className="space-y-5">
+				<aside>
 					<Card className="rounded-xl border bg-card py-0 shadow-sm">
 						<CardHeader className="flex-row items-center justify-between px-4 pb-3 pt-4">
-							<CardTitle className="text-sm">Atmosphere</CardTitle>
-							<Headphones className="size-4 text-muted-foreground" />
-						</CardHeader>
-						<CardContent className="px-4 pb-5">
-							<div className="grid grid-cols-2 gap-2">
-								{atmospheres.map((atmosphere) => {
-									const AtmosphereIcon = atmosphere.icon;
-									return (
-										<Button
-											key={atmosphere.name}
-											variant="ghost"
-											className={`h-16 flex-col items-start justify-between rounded-lg border p-3 text-left ${atmosphere.active ? "border-primary bg-primary/10" : "bg-muted/60"}`}
-										>
-											<span className="flex w-full items-center justify-between">
-												<AtmosphereIcon className="size-4 text-primary" />
-												{atmosphere.active && (
-													<span className="size-1.5 rounded-full bg-primary" />
-												)}
-											</span>
-											<span className="text-xs">{atmosphere.name}</span>
-										</Button>
-									);
-								})}
-							</div>
-							<div className="mt-5 flex items-center gap-3">
-								<Volume2 className="size-4 text-muted-foreground" />
-								<div className="h-1.5 flex-1 rounded-full bg-muted">
-									<div className="h-full w-2/3 rounded-full bg-primary" />
-								</div>
-								<Volume2 className="size-4 text-muted-foreground" />
-							</div>
-						</CardContent>
-					</Card>
-					<Card className="rounded-xl border bg-card py-0 shadow-sm">
-						<CardHeader className="flex-row items-center justify-between px-4 pb-3 pt-4">
-							<CardTitle className="text-sm">Today's Sessions</CardTitle>
-							<Badge variant="secondary">4 completed</Badge>
+							<CardTitle className="text-sm">Today’s Sessions</CardTitle>
+							<Badge variant="secondary">
+								{completedToday.length} completed
+							</Badge>
 						</CardHeader>
 						<CardContent className="space-y-2 px-4 pb-5">
-							{sessions.map((session) => {
-								const SessionIcon = session.icon;
-								return (
-									<div
-										key={`${session.title}-${session.time}`}
-										className="flex items-center gap-3 rounded-lg bg-muted/50 p-3"
-									>
-										<div
-											className={`flex size-8 shrink-0 items-center justify-center rounded-full ${session.tone === "destructive" ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"}`}
-										>
-											<SessionIcon className="size-4" />
-										</div>
-										<div className="min-w-0 flex-1">
-											<p className="truncate text-xs font-semibold">
-												{session.title}
-											</p>
-											<p className="mt-1 text-[10px] text-muted-foreground">
-												{session.time}
-											</p>
-										</div>
-										<span className="whitespace-nowrap text-xs font-bold text-muted-foreground">
-											{session.duration}
-										</span>
+							{todaySessions.map((session) => (
+								<div
+									key={session.id}
+									className="flex items-center gap-3 rounded-lg bg-muted/50 p-3"
+								>
+									<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+										<BookOpen className="size-4" />
 									</div>
-								);
-							})}
-						</CardContent>
-					</Card>
-					<Card className="rounded-xl border-0 bg-primary/10 py-0 shadow-sm">
-						<CardContent className="flex gap-3 p-4">
-							<Flame className="mt-0.5 size-4 shrink-0 text-primary" />
-							<div>
-								<p className="text-xs font-semibold text-primary">
-									Focus streak
+									<div className="min-w-0 flex-1">
+										<p className="truncate text-xs font-semibold">
+											{session.title ||
+												session.subject?.name ||
+												"Focus session"}
+										</p>
+										<p className="mt-1 text-[10px] text-muted-foreground">
+											{session.focusMinutes} minutes
+										</p>
+									</div>
+									{session.completed && (
+										<Check className="size-4 text-primary" />
+									)}
+								</div>
+							))}
+							{todaySessions.length === 0 && (
+								<p className="py-6 text-center text-xs text-muted-foreground">
+									No focus sessions today.
 								</p>
-								<p className="mt-1 text-[11px] leading-4 text-muted-foreground">
-									Keep going. You are on a 14-day study streak.
-								</p>
-							</div>
+							)}
 						</CardContent>
 					</Card>
 				</aside>

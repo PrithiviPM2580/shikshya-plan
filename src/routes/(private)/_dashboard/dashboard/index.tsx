@@ -47,7 +47,7 @@ function StatCard({
 }) {
 	const noteClass = tone === "red" ? "text-red-500" : "text-muted-foreground";
 	return (
-		<Card className="gap-3 rounded-xl border-0 bg-card/85 py-4 shadow-sm">
+		<Card className="gap-3 rounded-xl border border-[#173a40]/10 bg-white/85 py-4 shadow-sm dark:border-white/10 dark:bg-[#18262b]">
 			<CardHeader className="flex-row items-center justify-between gap-2 px-4 pb-0">
 				<CardTitle className="text-xs font-semibold text-muted-foreground">
 					{title}
