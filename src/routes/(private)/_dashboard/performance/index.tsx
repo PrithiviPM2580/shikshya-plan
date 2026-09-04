@@ -1,9 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Brain, CheckCircle2, Clock3, Flame, TrendingUp } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
+import { Progress } from "#/components/ui/progress";
+import { getAnalytics } from "#/features/analytics/server/analytics";
 
 export const Route = createFileRoute("/(private)/_dashboard/performance/")({
-	component: RouteComponent,
+	loader: () => getAnalytics({ data: { range: "week" } }),
+	component: PerformancePage,
 });
 
-function RouteComponent() {
-	return <div>Hello "/(private)/_dashboard/performance/"!</div>;
+function PerformancePage() {
+	const performance = Route.useLoaderData();
+	const averageHours = performance.consistency.length ? performance.consistency.reduce((total, day) => total + day.hours, 0) / performance.consistency.length : 0;
+	const bestDay = performance.consistency.reduce((best, day) => day.hours > best.hours ? day : best, { day: "-", hours: 0 });
+	return <div className="w-full space-y-5"><section className="border-b border-border pb-5"><p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">Performance</p><h1 className="mt-1 text-2xl font-bold tracking-tight">Your study performance</h1><p className="mt-1 text-sm text-muted-foreground">A clear view of your progress over the last seven days.</p></section><section className="grid grid-cols-2 gap-3 xl:grid-cols-4"><Metric icon={Clock3} label="Study hours" value={`${performance.totalHours}h`} /><Metric icon={CheckCircle2} label="Task completion" value={`${performance.taskRate}%`} /><Metric icon={Brain} label="Pomodoro completion" value={`${performance.pomodoroRate}%`} /><Metric icon={Flame} label="Current streak" value={`${performance.streak} days`} /></section><div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]"><Card className="rounded-xl border bg-card py-0 shadow-sm"><CardHeader className="px-5 pb-2 pt-5"><CardTitle className="text-sm">Daily breakdown</CardTitle><p className="text-xs text-muted-foreground">Completed study time by day.</p></CardHeader><CardContent className="space-y-4 p-5">{performance.consistency.map((day) => <div key={day.day} className="flex items-center gap-3"><span className="w-8 text-xs font-medium text-muted-foreground">{day.day}</span><Progress value={performance.totalHours ? (day.hours / Math.max(...performance.consistency.map((item) => item.hours), 1)) * 100 : 0} className="h-2 flex-1" /><span className="w-12 text-right text-xs font-semibold">{day.hours}h</span></div>)}</CardContent></Card><div className="space-y-5"><Card className="rounded-xl border bg-primary text-primary-foreground py-0 shadow-sm"><CardContent className="p-5"><TrendingUp className="size-5" /><p className="mt-4 text-xs uppercase tracking-widest text-primary-foreground/70">Strongest day</p><p className="mt-1 text-xl font-bold">{bestDay.day}</p><p className="mt-1 text-xs text-primary-foreground/75">{bestDay.hours} hours completed</p></CardContent></Card><Card className="rounded-xl border bg-card py-0 shadow-sm"><CardHeader className="px-5 pb-2 pt-5"><CardTitle className="text-sm">Average daily focus</CardTitle></CardHeader><CardContent className="px-5 pb-5"><p className="text-2xl font-bold text-primary">{Math.round(averageHours * 10) / 10}h</p><p className="mt-1 text-xs text-muted-foreground">Based on completed study logs.</p></CardContent></Card></div></div></div>;
 }
+function Metric({ icon: Icon, label, value }: { icon: typeof Clock3; label: string; value: string }) { return <Card className="rounded-xl border bg-card py-0 shadow-sm"><CardContent className="p-4"><Icon className="size-4 text-primary" /><p className="mt-3 text-lg font-bold">{value}</p><p className="text-[10px] uppercase text-muted-foreground">{label}</p></CardContent></Card>; }
