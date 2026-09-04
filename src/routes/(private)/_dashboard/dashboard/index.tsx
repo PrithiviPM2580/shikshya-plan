@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
 	BookOpen,
-	Check,
 	CheckCircle2,
 	CircleAlert,
 	Clock3,
@@ -32,52 +31,6 @@ export const Route = createFileRoute("/(private)/_dashboard/dashboard/")({
 	loader: () => getDashboardData(),
 	component: RouteComponent,
 });
-
-const studyData = [
-	{ day: "Mon", hours: 2.2 },
-	{ day: "Tue", hours: 1.8 },
-	{ day: "Wed", hours: 1.4 },
-	{ day: "Thu", hours: 3.2 },
-	{ day: "Fri", hours: 4.1 },
-	{ day: "Sat", hours: 1.2 },
-	{ day: "Sun", hours: 3.8 },
-];
-
-const schedule = [
-	{
-		time: "09:00",
-		title: "Advanced Calculus Lecture",
-		detail: "Room 302 - Dr. Smith",
-	},
-	{
-		time: "11:00",
-		title: "Physics Problem Set",
-		detail: "Library Study Room B",
-		active: true,
-	},
-	{ time: "14:30", title: "Literature Review", detail: "Read chapters 4-6" },
-];
-
-const planSubjects = [
-	{ name: "Mathematics", progress: 72 },
-	{ name: "Physics", progress: 48 },
-	{ name: "Biology", progress: 64 },
-];
-
-const upcomingExams = [
-	{
-		subject: "Physics",
-		title: "Mechanics midterm",
-		date: "Aug 29",
-		days: "3 days",
-	},
-	{
-		subject: "Mathematics",
-		title: "Calculus assessment",
-		date: "Sep 05",
-		days: "10 days",
-	},
-];
 
 function StatCard({
 	title,
@@ -113,6 +66,42 @@ function StatCard({
 
 function RouteComponent() {
 	const dashboard = Route.useLoaderData();
+	const schedule = [
+		...dashboard.todaySessions.map((session) => ({
+			time: new Date(session.scheduledDate).toLocaleTimeString([], {
+				hour: "2-digit",
+				minute: "2-digit",
+			}),
+			title: session.title,
+			detail: session.subject?.name ?? "General study",
+			active: !session.completed,
+		})),
+		...dashboard.todayTasks.map((task) => ({
+			time: task.dueDate
+				? new Date(task.dueDate).toLocaleTimeString([], {
+						hour: "2-digit",
+						minute: "2-digit",
+					})
+				: "Today",
+			title: task.title,
+			detail: task.subject?.name ?? "General task",
+			active: !task.completed,
+		})),
+	].slice(0, 5);
+	const planSubjects =
+		dashboard.plan?.subjects.map(({ subject }) => {
+			const completed = subject.tasks.filter((task) => task.completed).length;
+			return {
+				name: subject.name,
+				progress: subject.tasks.length
+					? Math.round((completed / subject.tasks.length) * 100)
+					: 0,
+			};
+		}) ?? [];
+	const completedGoal = dashboard.goals[0];
+	const todayMinutes = dashboard.todaySessions
+		.filter((session) => session.completed)
+		.reduce((total, session) => total + session.durationMin, 0);
 	const taskSummary = dashboard.taskCount
 		? `${dashboard.tasksDone} of ${dashboard.taskCount} tasks`
 		: "No tasks yet";
@@ -131,8 +120,8 @@ function RouteComponent() {
 			<div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
 				<StatCard
 					title="Daily Focus"
-					value="4.5h"
-					note="↑ 1.2h vs yesterday"
+					value={`${Math.floor(todayMinutes / 60)}h ${todayMinutes % 60}m`}
+					note="Completed study sessions today"
 					icon={Clock3}
 				/>
 				<StatCard
@@ -144,8 +133,12 @@ function RouteComponent() {
 				/>
 				<StatCard
 					title="Goal Progress"
-					value="85%"
-					note="◎ On track for weekly goal"
+					value={
+						completedGoal
+							? `${Math.min(100, Math.round((completedGoal.progress / completedGoal.target) * 100))}%`
+							: "0%"
+					}
+					note={completedGoal ? completedGoal.title : "No active goals"}
 					icon={LineChart}
 				/>
 				<StatCard
@@ -173,7 +166,14 @@ function RouteComponent() {
 							</Button>
 						</CardHeader>
 						<CardContent className="space-y-3 px-4">
-							<Progress value={75} className="h-1.5" />
+							<Progress
+								value={
+									dashboard.taskCount
+										? (dashboard.tasksDone / dashboard.taskCount) * 100
+										: 0
+								}
+								className="h-1.5"
+							/>
 							{schedule.map((item) => (
 								<div
 									key={item.time}
@@ -211,7 +211,7 @@ function RouteComponent() {
 						<CardContent className="h-52 px-2 pt-4">
 							<ResponsiveContainer width="100%" height="100%">
 								<AreaChart
-									data={studyData}
+									data={dashboard.studyData}
 									margin={{ top: 8, right: 4, left: 4, bottom: 0 }}
 								>
 									<defs>
@@ -271,9 +271,29 @@ function RouteComponent() {
 						<CardContent className="space-y-3 px-4">
 							<div className="flex items-center justify-between text-xs">
 								<span className="font-semibold">Overall progress</span>
-								<span className="font-bold text-primary">62%</span>
+								<span className="font-bold text-primary">
+									{planSubjects.length
+										? Math.round(
+												planSubjects.reduce(
+													(total, subject) => total + subject.progress,
+													0,
+												) / planSubjects.length,
+											)
+										: 0}
+									%
+								</span>
 							</div>
-							<Progress value={62} className="h-2" />
+							<Progress
+								value={
+									planSubjects.length
+										? planSubjects.reduce(
+												(total, subject) => total + subject.progress,
+												0,
+											) / planSubjects.length
+										: 0
+								}
+								className="h-2"
+							/>
 							{planSubjects.map((subject) => (
 								<div key={subject.name} className="space-y-1.5">
 									<div className="flex justify-between text-[11px]">
@@ -294,7 +314,7 @@ function RouteComponent() {
 							</CardTitle>
 						</CardHeader>
 						<CardContent className="space-y-1 px-4">
-							{upcomingExams.map((exam) => (
+							{dashboard.upcomingExams.map((exam) => (
 								<div
 									key={exam.title}
 									className="flex items-center gap-3 border-b border-border/60 py-2.5 last:border-0"
@@ -307,11 +327,19 @@ function RouteComponent() {
 											{exam.title}
 										</p>
 										<p className="text-[11px] text-muted-foreground">
-											{exam.subject} · {exam.date}
+											{exam.subject?.name ?? "General"} ·{" "}
+											{new Date(exam.examDate).toLocaleDateString()}
 										</p>
 									</div>
 									<span className="whitespace-nowrap text-[10px] font-semibold text-destructive">
-										{exam.days}
+										{Math.max(
+											0,
+											Math.ceil(
+												(new Date(exam.examDate).getTime() - Date.now()) /
+													86400000,
+											),
+										)}
+										d
 									</span>
 								</div>
 							))}
@@ -329,9 +357,15 @@ function RouteComponent() {
 								Complete 50 study hours this month.
 							</p>
 							<div className="mt-4 flex items-end justify-between">
-								<span className="text-xs font-semibold">32/50</span>
+								<span className="text-xs font-semibold">
+									{completedGoal
+										? `${completedGoal.progress}/${completedGoal.target}`
+										: "0/0"}
+								</span>
 								<div className="flex size-11 items-center justify-center rounded-full border-2 border-primary-foreground/40 text-xs font-bold">
-									64%
+									{completedGoal
+										? `${Math.min(100, Math.round((completedGoal.progress / completedGoal.target) * 100))}%`
+										: "0%"}
 								</div>
 							</div>
 						</CardContent>
@@ -343,39 +377,24 @@ function RouteComponent() {
 							</CardTitle>
 						</CardHeader>
 						<CardContent className="space-y-3 px-4">
-							{[
-								[
-									BookOpen,
-									"Chapter 2",
-									"Completed notes for Biology 101.",
-									"2h ago",
-								],
-								[Check, "Math", "Scored 95% on Algebra weekly quiz.", "5h ago"],
-								[
-									Clock3,
-									"Deep Work",
-									"2 hours of uninterrupted programming.",
-									"Yesterday",
-								],
-							].map(([Icon, title, detail, time]) => {
-								const ActivityIcon = Icon as typeof BookOpen;
+							{dashboard.recentActivity.map((activity) => {
 								return (
 									<div
-										key={title as string}
+										key={activity.id}
 										className="flex gap-3 border-l border-primary/40 pl-3"
 									>
 										<div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
-											<ActivityIcon className="size-3.5" />
+											<BookOpen className="size-3.5" />
 										</div>
 										<div className="min-w-0">
 											<p className="text-xs font-bold">
-												{title as string}
+												{activity.subject?.name ?? "Study session"}
 												<span className="ml-1 font-normal text-muted-foreground">
-													{time as string}
+													{new Date(activity.loggedAt).toLocaleDateString()}
 												</span>
 											</p>
 											<p className="mt-0.5 text-[11px] leading-4 text-muted-foreground">
-												{detail as string}
+												Completed {activity.minutes} minutes of study.
 											</p>
 										</div>
 									</div>

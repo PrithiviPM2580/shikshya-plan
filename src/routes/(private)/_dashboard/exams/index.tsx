@@ -159,35 +159,45 @@ function ExamsPage() {
 					onSubmit={submit}
 					className="grid gap-3 rounded-xl border bg-card p-4 md:grid-cols-2"
 				>
-					<Input
-						required
-						value={title}
-						onChange={(event) => setTitle(event.target.value)}
-						placeholder="Exam title"
-					/>
-					<select
-						value={subjectId}
-						onChange={(event) => setSubjectId(event.target.value)}
-						className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-					>
-						<option value="">No subject</option>
-						{subjects.map((subject) => (
-							<option key={subject.id} value={subject.id}>
-								{subject.name}
-							</option>
-						))}
-					</select>
-					<Input
-						required
-						type="datetime-local"
-						value={examDate}
-						onChange={(event) => setExamDate(event.target.value)}
-					/>
-					<Input
-						value={syllabus}
-						onChange={(event) => setSyllabus(event.target.value)}
-						placeholder="Syllabus or topics (optional)"
-					/>
+					<label className="space-y-1 text-sm">
+						<span className="font-medium">Exam title</span>
+						<Input
+							required
+							value={title}
+							onChange={(event) => setTitle(event.target.value)}
+						/>
+					</label>
+					<label className="space-y-1 text-sm">
+						<span className="font-medium">Subject</span>
+						<select
+							value={subjectId}
+							onChange={(event) => setSubjectId(event.target.value)}
+							className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+						>
+							<option value="">No subject</option>
+							{subjects.map((subject) => (
+								<option key={subject.id} value={subject.id}>
+									{subject.name}
+								</option>
+							))}
+						</select>
+					</label>
+					<label className="space-y-1 text-sm">
+						<span className="font-medium">Exam date and time</span>
+						<Input
+							required
+							type="datetime-local"
+							value={examDate}
+							onChange={(event) => setExamDate(event.target.value)}
+						/>
+					</label>
+					<label className="space-y-1 text-sm">
+						<span className="font-medium">Syllabus or topics (optional)</span>
+						<Input
+							value={syllabus}
+							onChange={(event) => setSyllabus(event.target.value)}
+						/>
+					</label>
 					<div className="flex gap-2">
 						<Button type="submit" disabled={saving}>
 							{saving ? "Saving..." : editingId ? "Save Exam" : "Schedule Exam"}
