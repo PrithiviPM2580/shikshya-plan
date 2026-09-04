@@ -1,16 +1,13 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import StudyShell from "#/components/shared/study-shell";
-import { authClient } from "#/lib/auth-client";
+import { requireCurrentUser } from "#/lib/server-auth";
 
 export const Route = createFileRoute("/(private)/_dashboard")({
-	beforeLoad: async ({ location }) => {
-		const { data: session } = await authClient.getSession();
-
-		if (!session) {
-			throw redirect({
-				to: "/sign-in",
-				search: { redirect: location.href },
-			});
+	beforeLoad: async () => {
+		try {
+			await requireCurrentUser();
+		} catch {
+			throw redirect({ to: "/sign-in" });
 		}
 	},
 	component: RouteComponent,

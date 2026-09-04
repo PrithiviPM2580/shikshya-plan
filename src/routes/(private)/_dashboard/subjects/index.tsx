@@ -1,77 +1,66 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import {
 	BookOpen,
-	Calculator,
 	CheckCircle2,
-	Code2,
 	Ellipsis,
 	FileCheck2,
-	FlaskConical,
 	Grid2X2,
 	List,
 	Plus,
 	Search,
 	SlidersHorizontal,
 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { Badge } from "#/components/ui/badge.tsx";
 import { Button } from "#/components/ui/button.tsx";
 import { Card, CardContent } from "#/components/ui/card.tsx";
 import { Input } from "#/components/ui/input.tsx";
 import { Progress } from "#/components/ui/progress.tsx";
 import { Tabs, TabsList, TabsTrigger } from "#/components/ui/tabs.tsx";
+import {
+	createSubject,
+	deleteSubject,
+	getSubjects,
+} from "#/features/subjects/server/subjects";
 
 export const Route = createFileRoute("/(private)/_dashboard/subjects/")({
+	loader: () => getSubjects(),
 	component: RouteComponent,
 });
 
 function RouteComponent() {
-	const subjects = [
-		{
-			name: "Computer Fundamentals & Applications",
-			code: "BCA101",
-			credits: 3,
-			tasks: 12,
-			exams: 1,
-			progress: 68,
-			icon: BookOpen,
-		},
-		{
-			name: "Programming in C",
-			code: "BCA102",
-			credits: 3,
-			tasks: 8,
-			exams: 1,
-			progress: 85,
-			icon: Code2,
-		},
-		{
-			name: "Digital Logic",
-			code: "BCA103",
-			credits: 3,
-			tasks: 5,
-			exams: 1,
-			progress: 42,
-			icon: FlaskConical,
-		},
-		{
-			name: "Mathematics I",
-			code: "BCA104",
-			credits: 3,
-			tasks: 9,
-			exams: 1,
-			progress: 92,
-			icon: Calculator,
-		},
-		{
-			name: "Professional Communication & Ethics",
-			code: "BCA105",
-			credits: 3,
-			tasks: 6,
-			exams: 1,
-			progress: 55,
-			icon: FileCheck2,
-		},
-	];
+	const subjects = Route.useLoaderData();
+	const router = useRouter();
+	const [isAdding, setIsAdding] = useState(false);
+	const [name, setName] = useState("");
+	const [description, setDescription] = useState("");
+	const [isSaving, setIsSaving] = useState(false);
+
+	async function handleCreate(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		setIsSaving(true);
+		try {
+			await createSubject({ data: { name, description, color: "#4F46E5" } });
+			setName("");
+			setDescription("");
+			setIsAdding(false);
+			await router.invalidate();
+			toast.success("Subject added");
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to add subject",
+			);
+		} finally {
+			setIsSaving(false);
+		}
+	}
+
+	async function handleDelete(id: string) {
+		await deleteSubject({ data: { id } });
+		await router.invalidate();
+		toast.success("Subject removed");
+	}
 
 	return (
 		<div className="w-full space-y-6">
@@ -84,10 +73,35 @@ function RouteComponent() {
 						Your Subjects
 					</h1>
 				</div>
-				<Button className="w-full sm:w-auto">
+				<Button
+					className="w-full sm:w-auto"
+					onClick={() => setIsAdding((value) => !value)}
+				>
 					<Plus /> New Subject
 				</Button>
 			</section>
+
+			{isAdding && (
+				<form
+					onSubmit={handleCreate}
+					className="grid gap-3 rounded-xl border bg-card p-4 sm:grid-cols-[1fr_1fr_auto]"
+				>
+					<Input
+						required
+						value={name}
+						onChange={(event) => setName(event.target.value)}
+						placeholder="Subject name"
+					/>
+					<Input
+						value={description}
+						onChange={(event) => setDescription(event.target.value)}
+						placeholder="Description (optional)"
+					/>
+					<Button type="submit" disabled={isSaving}>
+						{isSaving ? "Adding..." : "Add"}
+					</Button>
+				</form>
+			)}
 
 			<section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 				<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -127,18 +141,18 @@ function RouteComponent() {
 
 			<section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
 				{subjects.map((subject) => {
-					const SubjectIcon = subject.icon;
 					return (
 						<Card
-							key={subject.code}
+							key={subject.id}
 							className="group rounded-xl border bg-card py-0 shadow-sm transition-shadow hover:shadow-md"
 						>
 							<CardContent className="flex h-full flex-col p-4">
 								<div className="flex items-start justify-between gap-3">
 									<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-										<SubjectIcon className="size-5" />
+										<BookOpen className="size-5" />
 									</div>
 									<Button
+										onClick={() => handleDelete(subject.id)}
 										variant="ghost"
 										size="icon-sm"
 										aria-label={`More options for ${subject.name}`}
@@ -151,8 +165,7 @@ function RouteComponent() {
 										{subject.name}
 									</h2>
 									<p className="mt-1 text-xs text-muted-foreground">
-										{subject.code} <span className="px-1">·</span>{" "}
-										{subject.credits} credits
+										{subject.description || "No description yet"}
 									</p>
 								</div>
 								<div className="mt-4 grid grid-cols-2 gap-2">
@@ -161,14 +174,18 @@ function RouteComponent() {
 											<CheckCircle2 className="size-3.5" />
 											<span className="text-[11px]">Tasks</span>
 										</div>
-										<p className="mt-1 text-sm font-bold">{subject.tasks}</p>
+										<p className="mt-1 text-sm font-bold">
+											{subject._count.tasks}
+										</p>
 									</div>
 									<div className="rounded-lg bg-muted/60 px-3 py-2">
 										<div className="flex items-center gap-1.5 text-muted-foreground">
 											<FileCheck2 className="size-3.5" />
 											<span className="text-[11px]">Exams</span>
 										</div>
-										<p className="mt-1 text-sm font-bold">{subject.exams}</p>
+										<p className="mt-1 text-sm font-bold">
+											{subject._count.exams}
+										</p>
 									</div>
 								</div>
 								<div className="mt-auto pt-5">
@@ -176,11 +193,9 @@ function RouteComponent() {
 										<span className="text-muted-foreground">
 											Syllabus mastery
 										</span>
-										<span className="font-bold text-primary">
-											{subject.progress}%
-										</span>
+										<span className="font-bold text-primary">0%</span>
 									</div>
-									<Progress value={subject.progress} className="h-1.5" />
+									<Progress value={0} className="h-1.5" />
 								</div>
 							</CardContent>
 						</Card>
