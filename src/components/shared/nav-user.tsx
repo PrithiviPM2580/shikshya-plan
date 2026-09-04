@@ -1,23 +1,19 @@
 "use client";
 
+import { useNavigate } from "@tanstack/react-router";
 import { ChevronsUpDown, LogOutIcon } from "lucide-react";
-
+import { toast } from "sonner";
+import { authClient } from "#/lib/auth-client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
-	useSidebar,
-} from "@/components/ui/sidebar";
+import { useSidebar } from "@/components/ui/sidebar";
 
 export function NavUser({
 	user,
@@ -29,6 +25,20 @@ export function NavUser({
 	};
 }) {
 	const { isMobile } = useSidebar();
+	const navigate = useNavigate();
+	async function handleLogout() {
+		await authClient.signOut({
+			fetchOptions: {
+				onSuccess: () => {
+					toast.success("Signed out");
+					navigate({ to: "/" });
+				},
+				onError: (context) => {
+					toast.error(context.error.message);
+				},
+			},
+		});
+	}
 
 	return (
 		<div className="overflow-hidden rounded-lg bg-background border border-border">
@@ -73,7 +83,7 @@ export function NavUser({
 					</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 
-					<DropdownMenuItem>
+					<DropdownMenuItem onClick={handleLogout}>
 						<LogOutIcon />
 						Log out
 					</DropdownMenuItem>

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import {
 	BookOpen,
 	CalendarDays,
@@ -14,6 +14,9 @@ import {
 	Timer,
 	UserRound,
 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useTheme } from "#/components/theme-provider";
 import { Badge } from "#/components/ui/badge.tsx";
 import { Button } from "#/components/ui/button.tsx";
 import {
@@ -22,12 +25,50 @@ import {
 	CardHeader,
 	CardTitle,
 } from "#/components/ui/card.tsx";
+import { Input } from "#/components/ui/input.tsx";
+import { getProfile, updateProfile } from "#/features/profile/server/profile";
 
 export const Route = createFileRoute("/(private)/_dashboard/profile/")({
+	loader: () => getProfile(),
 	component: RouteComponent,
 });
 
 function RouteComponent() {
+	const profileData = Route.useLoaderData();
+	const router = useRouter();
+	const { setTheme } = useTheme();
+	const [editing, setEditing] = useState(false);
+	const [name, setName] = useState(
+		profileData.profile?.name ?? profileData.user.name,
+	);
+	const [theme, setThemeValue] = useState(
+		profileData.profile?.theme ?? "SYSTEM",
+	);
+	const [saving, setSaving] = useState(false);
+	const displayName = profileData.profile?.name ?? profileData.user.name;
+	const initials = displayName
+		.split(" ")
+		.map((part) => part[0])
+		.join("")
+		.slice(0, 2)
+		.toUpperCase();
+	async function saveProfile(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		setSaving(true);
+		try {
+			await updateProfile({ data: { name, theme } });
+			setTheme(theme.toLowerCase() as "system" | "light" | "dark");
+			setEditing(false);
+			await router.invalidate();
+			toast.success("Profile updated");
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to update profile",
+			);
+		} finally {
+			setSaving(false);
+		}
+	}
 	const preferences = [
 		["Preferred time", "Morning", CalendarDays],
 		["Pomodoro length", "25m / 5m", Timer],
@@ -47,21 +88,53 @@ function RouteComponent() {
 						Your learning identity and study preferences.
 					</p>
 				</div>
-				<Button>
+				<Button onClick={() => setEditing((value) => !value)}>
 					<PenLine /> Edit Profile
 				</Button>
 			</section>
+			{editing && (
+				<form
+					onSubmit={saveProfile}
+					className="grid gap-3 rounded-xl border bg-card p-4 sm:grid-cols-[1fr_180px_auto]"
+				>
+					<label className="space-y-1 text-sm">
+						<span className="font-medium">Display name</span>
+						<Input
+							required
+							value={name}
+							onChange={(event) => setName(event.target.value)}
+						/>
+					</label>
+					<label className="space-y-1 text-sm">
+						<span className="font-medium">Theme</span>
+						<select
+							value={theme}
+							onChange={(event) =>
+								setThemeValue(event.target.value as typeof theme)
+							}
+							className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+						>
+							<option value="SYSTEM">System</option>
+							<option value="LIGHT">Light</option>
+							<option value="DARK">Dark</option>
+						</select>
+					</label>
+					<Button type="submit" disabled={saving}>
+						{saving ? "Saving..." : "Save"}
+					</Button>
+				</form>
+			)}
 
 			<Card className="overflow-hidden rounded-xl border bg-card py-0 shadow-sm">
 				<CardContent className="grid gap-6 p-5 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-center lg:p-7">
 					<div className="flex items-center gap-4 lg:border-r lg:border-border/60 lg:pr-6">
 						<div className="flex size-20 shrink-0 items-center justify-center rounded-full bg-primary text-2xl font-bold text-primary-foreground ring-4 ring-primary/10">
-							AM
+							{initials}
 						</div>
 						<div>
-							<p className="text-sm font-bold">Alex Mercer</p>
+							<p className="text-sm font-bold">{displayName}</p>
 							<p className="mt-1 text-xs text-muted-foreground">
-								Junior · Computer Science & Chemistry
+								{profileData.user.email}
 							</p>
 							<p className="mt-2 flex items-center gap-1 text-[11px] text-muted-foreground">
 								<MapPin className="size-3" /> Kathmandu, Nepal
@@ -71,28 +144,32 @@ function RouteComponent() {
 					<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
 						<div className="rounded-lg bg-muted/60 p-3 text-center">
 							<GraduationCap className="mx-auto size-4 text-primary" />
-							<p className="mt-2 text-lg font-bold">3.8</p>
+							<p className="mt-2 text-lg font-bold">-</p>
 							<p className="text-[10px] uppercase text-muted-foreground">
 								Overall GPA
 							</p>
 						</div>
 						<div className="rounded-lg bg-muted/60 p-3 text-center">
 							<Timer className="mx-auto size-4 text-primary" />
-							<p className="mt-2 text-lg font-bold">450h</p>
+							<p className="mt-2 text-lg font-bold">
+								{Math.round((profileData.studyMinutes / 60) * 10) / 10}h
+							</p>
 							<p className="text-[10px] uppercase text-muted-foreground">
 								Study hours
 							</p>
 						</div>
 						<div className="rounded-lg bg-muted/60 p-3 text-center">
 							<CheckCircle2 className="mx-auto size-4 text-primary" />
-							<p className="mt-2 text-lg font-bold">12</p>
+							<p className="mt-2 text-lg font-bold">
+								{profileData.masteredSubjects}
+							</p>
 							<p className="text-[10px] uppercase text-muted-foreground">
 								Mastered
 							</p>
 						</div>
 						<div className="rounded-lg bg-muted/60 p-3 text-center">
 							<Flame className="mx-auto size-4 text-primary" />
-							<p className="mt-2 text-lg font-bold">7d</p>
+							<p className="mt-2 text-lg font-bold">{profileData.streak}d</p>
 							<p className="text-[10px] uppercase text-muted-foreground">
 								Current streak
 							</p>
@@ -207,22 +284,24 @@ function RouteComponent() {
 						</CardHeader>
 						<CardContent className="space-y-2 px-4 pb-5">
 							{[
-								["LinkedIn", "/in/alex-mercer"],
-								["GitHub", "@amercer_code"],
-								["Personal site", "alexmercer.space"],
-							].map(([name, handle]) => (
-								<Button
+								["LinkedIn", "https://www.linkedin.com", "LinkedIn"],
+								["GitHub", "https://github.com", "GitHub"],
+								["Personal site", "https://example.com", "Personal site"],
+							].map(([name, url, label]) => (
+								<a
 									key={name}
-									variant="outline"
-									className="h-10 w-full justify-between text-xs"
+									href={url}
+									target="_blank"
+									rel="noreferrer"
+									className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-xs shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground"
 								>
 									<span className="flex items-center gap-2">
 										<Code2 className="size-3.5 text-primary" />
 										{name}
-										<span className="text-muted-foreground">{handle}</span>
+										<span className="text-muted-foreground">{label}</span>
 									</span>
 									<ExternalLink className="size-3" />
-								</Button>
+								</a>
 							))}
 						</CardContent>
 					</Card>

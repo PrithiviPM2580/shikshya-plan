@@ -6,8 +6,8 @@ import {
 	Clock3,
 	Flame,
 	Info,
-	TrendingUp,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import {
 	Area,
 	AreaChart,
@@ -17,7 +17,6 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
-import { Button } from "#/components/ui/button.tsx";
 import {
 	Card,
 	CardContent,
@@ -33,7 +32,36 @@ export const Route = createFileRoute("/(private)/_dashboard/analytics/")({
 });
 
 function RouteComponent() {
-	const analytics = Route.useLoaderData();
+	const initialAnalytics = Route.useLoaderData();
+	const [range, setRange] = useState<
+		"today" | "week" | "fifteenDays" | "month"
+	>("week");
+	const [analytics, setAnalytics] = useState(initialAnalytics);
+	const [isLoading, setIsLoading] = useState(false);
+
+	useEffect(() => {
+		if (range === "week") return;
+		let cancelled = false;
+		setIsLoading(true);
+		getAnalytics({ data: { range } })
+			.then((nextAnalytics) => {
+				if (!cancelled) setAnalytics(nextAnalytics);
+			})
+			.catch(() => undefined)
+			.finally(() => {
+				if (!cancelled) setIsLoading(false);
+			});
+		return () => {
+			cancelled = true;
+		};
+	}, [range]);
+
+	const rangeLabels = {
+		today: "Today",
+		week: "Last 7 Days",
+		fifteenDays: "Last 15 Days",
+		month: "Last 30 Days",
+	} as const;
 
 	return (
 		<div className="w-full space-y-5">
@@ -49,9 +77,19 @@ function RouteComponent() {
 						Insights and progress over time.
 					</p>
 				</div>
-				<Button variant="outline">
-					Last 7 Days <TrendingUp />
-				</Button>
+				<select
+					value={range}
+					onChange={(event) => setRange(event.target.value as typeof range)}
+					disabled={isLoading}
+					aria-label="Analytics date range"
+					className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+				>
+					{Object.entries(rangeLabels).map(([value, label]) => (
+						<option key={value} value={value}>
+							{label}
+						</option>
+					))}
+				</select>
 			</section>
 			<section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
 				<Card className="rounded-xl border bg-card py-0 shadow-sm">

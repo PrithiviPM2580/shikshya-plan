@@ -1,14 +1,26 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import prisma from "#/lib/prisma-client";
 import { requireCurrentUser } from "#/lib/server-auth";
 
-export const getAnalytics = createServerFn({ method: "GET" }).handler(
-	async () => {
+const analyticsRange = z.enum(["today", "week", "fifteenDays", "month"]);
+
+export const getAnalytics = createServerFn({ method: "GET" })
+	.validator(z.object({ range: analyticsRange }).default({ range: "week" }))
+	.handler(async ({ data }) => {
 		const user = await requireCurrentUser();
 		const now = new Date();
 		const start = new Date(now);
-		start.setDate(start.getDate() - 6);
 		start.setHours(0, 0, 0, 0);
+		const days =
+			data.range === "today"
+				? 1
+				: data.range === "fifteenDays"
+					? 15
+					: data.range === "month"
+						? 30
+						: 7;
+		start.setDate(start.getDate() - days + 1);
 		const [logs, pomodoros, tasks, subjects] = await Promise.all([
 			prisma.studyLog.findMany({
 				where: { userId: user.id, loggedAt: { gte: start } },
@@ -27,7 +39,7 @@ export const getAnalytics = createServerFn({ method: "GET" }).handler(
 				select: { name: true },
 			}),
 		]);
-		const consistency = Array.from({ length: 7 }, (_, index) => {
+		const consistency = Array.from({ length: days }, (_, index) => {
 			const date = new Date(start);
 			date.setDate(start.getDate() + index);
 			const minutes = logs
@@ -56,9 +68,9 @@ export const getAnalytics = createServerFn({ method: "GET" }).handler(
 					: 0,
 			}));
 		const heatmap = Array.from({ length: 4 }, (_, row) =>
-			Array.from({ length: 7 }, (_, column) => {
-				const date = new Date(start);
-				date.setDate(start.getDate() + column);
+			Array.from({ length: Math.min(days, 7) }, (_, column) => {
+				const date = new Date(now);
+				date.setDate(now.getDate() - Math.min(days, 7) + column + 1);
 				const lower = row * 6;
 				const upper = lower + 6;
 				return Math.min(
@@ -77,7 +89,7 @@ export const getAnalytics = createServerFn({ method: "GET" }).handler(
 			}),
 		);
 		let streak = 0;
-		for (let index = 6; index >= 0; index -= 1)
+		for (let index = consistency.length - 1; index >= 0; index -= 1)
 			if (consistency[index].hours > 0) streak += 1;
 			else break;
 		return {
@@ -101,5 +113,4 @@ export const getAnalytics = createServerFn({ method: "GET" }).handler(
 			streak,
 			subjectCount: subjects.length,
 		};
-	},
-);
+	});
