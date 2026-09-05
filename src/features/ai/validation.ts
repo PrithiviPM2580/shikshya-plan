@@ -68,6 +68,18 @@ export const quizRequest = z.object({
 	questionCount: z.coerce.number().int().min(3).max(10).default(5),
 });
 
+export const smartTaskRequest = z.object({
+	request: z.string().trim().min(5).max(500),
+});
+
+export const generatedSmartTask = z.object({
+	title: z.string().trim().min(1).max(160),
+	description: z.string().trim().max(1000),
+	priority: z.enum(["LOW", "MEDIUM", "HIGH"]),
+	dueDate: z.string().nullable(),
+	subjectName: z.string().nullable(),
+});
+
 export const generatedQuiz = z.object({
 	title: z.string(),
 	questions: z

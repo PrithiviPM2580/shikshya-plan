@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
 import { generateExamInsight } from "#/features/ai/server/exam-insight";
 import { generateQuiz } from "#/features/ai/server/quiz";
+import { createSmartTask } from "#/features/ai/server/smart-task";
 import {
 	generateStudyPlan,
 	saveGeneratedStudyPlan,
@@ -56,6 +57,8 @@ function AiPage() {
 		null,
 	);
 	const [examInsightLoading, setExamInsightLoading] = useState(false);
+	const [smartTaskRequest, setSmartTaskRequest] = useState("");
+	const [smartTaskLoading, setSmartTaskLoading] = useState(false);
 
 	async function createPlan(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -209,6 +212,26 @@ function AiPage() {
 		}
 	}
 
+	async function createSmartTaskFromText(
+		event: React.FormEvent<HTMLFormElement>,
+	) {
+		event.preventDefault();
+		setSmartTaskLoading(true);
+		try {
+			const task = await createSmartTask({
+				data: { request: smartTaskRequest },
+			});
+			toast.success(`Task created: ${task.title}`);
+			setSmartTaskRequest("");
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to create smart task",
+			);
+		} finally {
+			setSmartTaskLoading(false);
+		}
+	}
+
 	return (
 		<div className="w-full space-y-5">
 			<section className="border-b border-border pb-5">
@@ -253,6 +276,36 @@ function AiPage() {
 						<Button type="submit" disabled={loading}>
 							{loading ? <Loader2 className="animate-spin" /> : <Sparkles />}
 							{loading ? "Planning..." : "Generate plan"}
+						</Button>
+					</form>
+				</CardContent>
+			</Card>
+			<Card className="rounded-xl border bg-card py-0 shadow-sm">
+				<CardHeader className="px-5 pb-2 pt-5">
+					<CardTitle className="text-sm">Create a task with AI</CardTitle>
+					<p className="text-xs text-muted-foreground">
+						Describe a task naturally and AI will set its title, date, priority,
+						and subject.
+					</p>
+				</CardHeader>
+				<CardContent className="px-5 pb-5">
+					<form
+						onSubmit={createSmartTaskFromText}
+						className="flex flex-col gap-3 sm:flex-row"
+					>
+						<Input
+							required
+							value={smartTaskRequest}
+							onChange={(event) => setSmartTaskRequest(event.target.value)}
+							placeholder="e.g. Finish chapter 3 of DBMS tomorrow, high priority"
+						/>
+						<Button type="submit" disabled={smartTaskLoading}>
+							{smartTaskLoading ? (
+								<Loader2 className="animate-spin" />
+							) : (
+								<Brain />
+							)}
+							{smartTaskLoading ? "Creating..." : "Create task"}
 						</Button>
 					</form>
 				</CardContent>
