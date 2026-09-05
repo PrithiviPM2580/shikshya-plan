@@ -84,6 +84,33 @@ export const generatedTutorResponse = z.object({
 	followUpQuestions: z.array(z.string()).min(1).max(4),
 });
 
+export const scheduleAdjustmentRequest = z.object({
+	days: z.coerce.number().int().min(3).max(7).default(5),
+});
+
+export const generatedScheduleAdjustment = z.object({
+	summary: z.string().min(1),
+	days: z
+		.array(
+			z.object({
+				date: z.string().min(1),
+				focus: z.string().min(1),
+				tasks: z
+					.array(
+						z.object({
+							title: z.string().min(1),
+							durationMinutes: z.number().int().min(15).max(240),
+							priority: z.enum(["LOW", "MEDIUM", "HIGH"]),
+						}),
+					)
+					.min(1)
+					.max(6),
+			}),
+		)
+		.min(1)
+		.max(7),
+});
+
 export const generatedSmartTask = z.object({
 	title: z.string().trim().min(1).max(160),
 	description: z.string().trim().max(1000),
@@ -110,5 +137,8 @@ export type GeneratedTaskBreakdown = z.infer<typeof generatedTaskBreakdown>;
 export type GeneratedExamInsight = z.infer<typeof generatedExamInsight>;
 export type GeneratedQuiz = z.infer<typeof generatedQuiz>;
 export type GeneratedTutorResponse = z.infer<typeof generatedTutorResponse>;
+export type GeneratedScheduleAdjustment = z.infer<
+	typeof generatedScheduleAdjustment
+>;
 
 export type GeneratedStudyPlan = z.infer<typeof generatedStudyPlan>;

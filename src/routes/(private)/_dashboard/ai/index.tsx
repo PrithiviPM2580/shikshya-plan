@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
 import { generateExamInsight } from "#/features/ai/server/exam-insight";
 import { generateQuiz } from "#/features/ai/server/quiz";
+import { generateScheduleAdjustment } from "#/features/ai/server/schedule-adjustment";
 import { createSmartTask } from "#/features/ai/server/smart-task";
 import {
 	generateStudyPlan,
@@ -18,6 +19,7 @@ import { askTutor } from "#/features/ai/server/tutor";
 import type {
 	GeneratedExamInsight,
 	GeneratedQuiz,
+	GeneratedScheduleAdjustment,
 	GeneratedStudyPlan,
 	GeneratedTaskBreakdown,
 	GeneratedTutorResponse,
@@ -66,6 +68,11 @@ function AiPage() {
 	const [tutorResponse, setTutorResponse] =
 		useState<GeneratedTutorResponse | null>(null);
 	const [tutorLoading, setTutorLoading] = useState(false);
+	const [adjustmentDays, setAdjustmentDays] = useState("5");
+	const [scheduleAdjustment, setScheduleAdjustment] =
+		useState<GeneratedScheduleAdjustment | null>(null);
+	const [scheduleAdjustmentLoading, setScheduleAdjustmentLoading] =
+		useState(false);
 
 	async function createPlan(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -260,6 +267,26 @@ function AiPage() {
 		}
 	}
 
+	async function adjustSchedule(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		setScheduleAdjustmentLoading(true);
+		try {
+			const result = await generateScheduleAdjustment({
+				data: { days: Number(adjustmentDays) },
+			});
+			setScheduleAdjustment(result);
+			toast.success("Schedule adjustment generated");
+		} catch (error) {
+			toast.error(
+				error instanceof Error
+					? error.message
+					: "Unable to adjust your schedule",
+			);
+		} finally {
+			setScheduleAdjustmentLoading(false);
+		}
+	}
+
 	return (
 		<div className="w-full space-y-5">
 			<section className="border-b border-border pb-5">
@@ -386,6 +413,84 @@ function AiPage() {
 							{loading ? "Planning..." : "Generate plan"}
 						</Button>
 					</form>
+				</CardContent>
+			</Card>
+			<Card className="rounded-xl border bg-card py-0 shadow-sm">
+				<CardHeader className="px-5 pb-2 pt-5">
+					<CardTitle className="text-sm">Adjust a missed schedule</CardTitle>
+					<p className="text-xs text-muted-foreground">
+						Use unfinished tasks and sessions to build a manageable recovery
+						plan.
+					</p>
+				</CardHeader>
+				<CardContent className="space-y-4 px-5 pb-5">
+					<form
+						onSubmit={adjustSchedule}
+						className="flex flex-col gap-3 sm:flex-row sm:items-end"
+					>
+						<label className="space-y-2 text-xs font-medium">
+							Recovery plan length
+							<select
+								value={adjustmentDays}
+								onChange={(event) => setAdjustmentDays(event.target.value)}
+								className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm sm:w-40"
+							>
+								<option value="3">3 days</option>
+								<option value="5">5 days</option>
+								<option value="7">7 days</option>
+							</select>
+						</label>
+						<Button type="submit" disabled={scheduleAdjustmentLoading}>
+							{scheduleAdjustmentLoading ? (
+								<Loader2 className="animate-spin" />
+							) : (
+								<Brain />
+							)}
+							{scheduleAdjustmentLoading ? "Adjusting..." : "Adjust schedule"}
+						</Button>
+					</form>
+					{scheduleAdjustment && (
+						<div className="space-y-4 rounded-lg bg-muted/50 p-4">
+							<p className="text-sm font-medium">
+								{scheduleAdjustment.summary}
+							</p>
+							<div className="grid gap-3 md:grid-cols-2">
+								{scheduleAdjustment.days.map((day) => (
+									<div
+										key={day.date}
+										className="space-y-2 rounded-lg bg-background p-3"
+									>
+										<div>
+											<p className="text-xs font-semibold">{day.date}</p>
+											<p className="text-[11px] text-muted-foreground">
+												{day.focus}
+											</p>
+										</div>
+										{day.tasks.map((task) => (
+											<div
+												key={`${day.date}-${task.title}`}
+												className="flex items-center gap-2 rounded-md border p-2"
+											>
+												<div className="min-w-0 flex-1">
+													<p className="text-xs font-medium">{task.title}</p>
+													<p className="text-[11px] text-muted-foreground">
+														{task.durationMinutes} minutes
+													</p>
+												</div>
+												<Badge
+													variant={
+														task.priority === "HIGH" ? "destructive" : "outline"
+													}
+												>
+													{task.priority}
+												</Badge>
+											</div>
+										))}
+									</div>
+								))}
+							</div>
+						</div>
+					)}
 				</CardContent>
 			</Card>
 			<Card className="rounded-xl border bg-card py-0 shadow-sm">
