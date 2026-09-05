@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import {
 	Calculator,
 	Calendar,
@@ -29,6 +30,12 @@ export default function SearchForm({
 	commandOpen,
 	setCommandOpen,
 }: SearchButtonProps) {
+	const navigate = useNavigate();
+	function goTo(to: "/calendar" | "/profile" | "/settings") {
+		setCommandOpen(false);
+		navigate({ to });
+	}
+
 	return (
 		<>
 			<Button
@@ -51,12 +58,12 @@ export default function SearchForm({
 						<CommandEmpty>No results found.</CommandEmpty>
 
 						<CommandGroup heading="Suggestions">
-							<CommandItem>
+							<CommandItem onSelect={() => goTo("/calendar")}>
 								<Calendar />
 								Calendar
 							</CommandItem>
 
-							<CommandItem>
+							<CommandItem onSelect={() => goTo("/profile")}>
 								<Smile />
 								Search Emoji
 							</CommandItem>
@@ -70,7 +77,7 @@ export default function SearchForm({
 						<CommandSeparator />
 
 						<CommandGroup heading="Settings">
-							<CommandItem>
+							<CommandItem onSelect={() => goTo("/settings")}>
 								<User />
 								Profile
 								<CommandShortcut>⌘P</CommandShortcut>

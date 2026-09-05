@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
 	BookOpen,
 	CheckCircle2,
@@ -66,6 +66,7 @@ function StatCard({
 
 function RouteComponent() {
 	const dashboard = Route.useLoaderData();
+	const navigate = useNavigate();
 	const schedule = [
 		...dashboard.todaySessions.map((session) => ({
 			time: new Date(session.scheduledDate).toLocaleTimeString([], {
@@ -161,7 +162,11 @@ function RouteComponent() {
 									{taskSummary}
 								</p>
 							</div>
-							<Button size="sm" className="h-7 px-3 text-[11px]">
+							<Button
+								size="sm"
+								className="h-7 px-3 text-[11px]"
+								onClick={() => navigate({ to: "/tasks" })}
+							>
 								<Plus /> Add Task
 							</Button>
 						</CardHeader>

@@ -1,4 +1,8 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	useNavigate,
+	useRouter,
+} from "@tanstack/react-router";
 import {
 	Bell,
 	BookOpen,
@@ -35,6 +39,7 @@ export const Route = createFileRoute("/(private)/_dashboard/settings/")({
 function RouteComponent() {
 	const profileData = Route.useLoaderData();
 	const router = useRouter();
+	const navigate = useNavigate();
 	const { setTheme } = useTheme();
 	const [name, setName] = useState(
 		profileData.profile?.name ?? profileData.user.name,
@@ -52,9 +57,15 @@ function RouteComponent() {
 	);
 	const [reminders, setReminders] = useState(true);
 	const [saving, setSaving] = useState(false);
+	const [pomodoroLength, setPomodoroLength] = useState("25");
+	const [studyView, setStudyView] = useState("weekly");
+	const [showCompleted, setShowCompleted] = useState(true);
 
 	useEffect(() => {
 		setReminders(localStorage.getItem("study-reminders") !== "off");
+		setPomodoroLength(localStorage.getItem("pomodoro-length") ?? "25");
+		setStudyView(localStorage.getItem("study-view") ?? "weekly");
+		setShowCompleted(localStorage.getItem("show-completed-tasks") !== "off");
 	}, []);
 
 	async function saveSettings() {
@@ -63,6 +74,12 @@ function RouteComponent() {
 			await updateProfile({ data: { name, theme, avatarUrl } });
 			setTheme(theme.toLowerCase() as "system" | "light" | "dark");
 			localStorage.setItem("study-reminders", reminders ? "on" : "off");
+			localStorage.setItem("pomodoro-length", pomodoroLength);
+			localStorage.setItem("study-view", studyView);
+			localStorage.setItem(
+				"show-completed-tasks",
+				showCompleted ? "on" : "off",
+			);
 			await router.invalidate();
 			toast.success("Settings saved");
 		} catch (error) {
@@ -125,12 +142,6 @@ function RouteComponent() {
 		[Palette, "Appearance"],
 		[ShieldCheck, "Data & Privacy"],
 	];
-	const preferences = [
-		[Timer, "Pomodoro length", "25 minutes"],
-		[BookOpen, "Default study view", "Weekly plan"],
-		[Eye, "Show completed tasks", "Visible"],
-	];
-
 	return (
 		<div className="w-full space-y-5">
 			<section className="border-b border-border pb-5">
@@ -314,24 +325,46 @@ function RouteComponent() {
 							</p>
 						</CardHeader>
 						<CardContent className="space-y-2 px-5 pb-5">
-							{preferences.map(([Icon, label, value]) => {
-								const PreferenceIcon = Icon as typeof Timer;
-								return (
-									<div
-										key={label as string}
-										className="flex items-center gap-3 rounded-lg bg-muted/60 p-3"
-									>
-										<PreferenceIcon className="size-4 text-primary" />
-										<span className="flex-1 text-xs font-medium">
-											{label as string}
-										</span>
-										<span className="text-xs text-muted-foreground">
-											{value as string}
-										</span>
-										<ChevronRight className="size-3 text-muted-foreground" />
-									</div>
-								);
-							})}
+							<label className="flex items-center gap-3 rounded-lg bg-muted/60 p-3">
+								<Timer className="size-4 text-primary" />
+								<span className="flex-1 text-xs font-medium">
+									Pomodoro length
+								</span>
+								<select
+									value={pomodoroLength}
+									onChange={(event) => setPomodoroLength(event.target.value)}
+									className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+								>
+									<option value="15">15 minutes</option>
+									<option value="25">25 minutes</option>
+									<option value="50">50 minutes</option>
+								</select>
+							</label>
+							<label className="flex items-center gap-3 rounded-lg bg-muted/60 p-3">
+								<BookOpen className="size-4 text-primary" />
+								<span className="flex-1 text-xs font-medium">
+									Default study view
+								</span>
+								<select
+									value={studyView}
+									onChange={(event) => setStudyView(event.target.value)}
+									className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+								>
+									<option value="weekly">Weekly plan</option>
+									<option value="calendar">Calendar</option>
+									<option value="sessions">Sessions</option>
+								</select>
+							</label>
+							<div className="flex items-center gap-3 rounded-lg bg-muted/60 p-3">
+								<Eye className="size-4 text-primary" />
+								<span className="flex-1 text-xs font-medium">
+									Show completed tasks
+								</span>
+								<Switch
+									checked={showCompleted}
+									onCheckedChange={setShowCompleted}
+								/>
+							</div>
 							<div
 								id="notifications"
 								className="scroll-mt-5 flex items-center gap-3 rounded-lg bg-muted/60 p-3"
@@ -357,7 +390,11 @@ function RouteComponent() {
 								<p className="mt-1 text-xs text-muted-foreground">
 									Billed annually · Next cycle: Oct 14, 2026
 								</p>
-								<Button className="mt-4" size="sm">
+								<Button
+									className="mt-4"
+									size="sm"
+									onClick={() => navigate({ to: "/plans" })}
+								>
 									Manage plan
 								</Button>
 							</CardContent>
