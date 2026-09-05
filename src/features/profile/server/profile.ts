@@ -98,6 +98,9 @@ export const updateProfile = createServerFn({ method: "POST" })
 					studyView: data.studyView,
 					showCompletedTasks: data.showCompletedTasks,
 					reminders: data.reminders,
+					taskReminders: data.taskReminders,
+					examReminders: data.examReminders,
+					sessionReminders: data.sessionReminders,
 				},
 				update: {
 					name: data.name,
@@ -107,6 +110,9 @@ export const updateProfile = createServerFn({ method: "POST" })
 					studyView: data.studyView,
 					showCompletedTasks: data.showCompletedTasks,
 					reminders: data.reminders,
+					taskReminders: data.taskReminders,
+					examReminders: data.examReminders,
+					sessionReminders: data.sessionReminders,
 				},
 			}),
 		]);

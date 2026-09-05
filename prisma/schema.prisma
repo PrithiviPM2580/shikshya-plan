@@ -109,6 +109,9 @@ model Profile {
   studyView          String    @default("weekly")
   showCompletedTasks Boolean   @default(true)
   reminders          Boolean   @default(true)
+  taskReminders      Boolean   @default(true)
+  examReminders      Boolean   @default(true)
+  sessionReminders   Boolean   @default(true)
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 

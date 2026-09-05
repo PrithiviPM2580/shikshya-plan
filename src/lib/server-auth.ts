@@ -51,7 +51,7 @@ export const getShellData = createServerFn({ method: "GET" }).handler(
 		start.setHours(0, 0, 0, 0);
 		const end = new Date(start);
 		end.setDate(end.getDate() + 1);
-		const [tasks, goal, profile] = await Promise.all([
+		const [tasks, goal, profile, reminders] = await Promise.all([
 			prisma.task.findMany({
 				where: { userId: user.id, dueDate: { gte: start, lt: end } },
 				select: { completed: true },
@@ -63,8 +63,46 @@ export const getShellData = createServerFn({ method: "GET" }).handler(
 			}),
 			prisma.profile.findUnique({
 				where: { userId: user.id },
-				select: { avatarUrl: true },
+				select: {
+					avatarUrl: true,
+					reminders: true,
+					taskReminders: true,
+					examReminders: true,
+					sessionReminders: true,
+				},
 			}),
+			prisma.$transaction([
+				prisma.task.findMany({
+					where: {
+						userId: user.id,
+						completed: false,
+						dueDate: { gte: new Date() },
+					},
+					select: { id: true, title: true, dueDate: true },
+					orderBy: { dueDate: "asc" },
+					take: 20,
+				}),
+				prisma.exam.findMany({
+					where: {
+						userId: user.id,
+						completed: false,
+						examDate: { gte: new Date() },
+					},
+					select: { id: true, title: true, examDate: true },
+					orderBy: { examDate: "asc" },
+					take: 20,
+				}),
+				prisma.studySession.findMany({
+					where: {
+						userId: user.id,
+						completed: false,
+						scheduledDate: { gte: new Date() },
+					},
+					select: { id: true, title: true, scheduledDate: true },
+					orderBy: { scheduledDate: "asc" },
+					take: 20,
+				}),
+			]),
 		]);
 		return {
 			user: {
@@ -75,6 +113,17 @@ export const getShellData = createServerFn({ method: "GET" }).handler(
 			tasksDone: tasks.filter((task) => task.completed).length,
 			taskCount: tasks.length,
 			goal,
+			notificationPreferences: {
+				daily: profile?.reminders ?? true,
+				tasks: profile?.taskReminders ?? true,
+				exams: profile?.examReminders ?? true,
+				sessions: profile?.sessionReminders ?? true,
+			},
+			reminders: {
+				tasks: reminders[0],
+				exams: reminders[1],
+				sessions: reminders[2],
+			},
 		};
 	},
 );

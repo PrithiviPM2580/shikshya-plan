@@ -4,6 +4,7 @@ import { SidebarInset, SidebarProvider } from "#/components/ui/sidebar.tsx";
 import { cn } from "#/lib/utils.ts";
 import DashboardHeader from "./dashboard-header";
 import DashboardSidebar from "./dashboard-sidebar";
+import NotificationReminders from "./notification-reminders";
 
 export default function StudyShell({
 	children,
@@ -17,6 +18,16 @@ export default function StudyShell({
 		tasksDone: number;
 		taskCount: number;
 		goal: { title: string; progress: number; target: number } | null;
+		notificationPreferences: {
+			tasks: boolean;
+			exams: boolean;
+			sessions: boolean;
+		};
+		reminders: {
+			tasks: { id: string; title: string; dueDate: Date | null }[];
+			exams: { id: string; title: string; examDate: Date }[];
+			sessions: { id: string; title: string; scheduledDate: Date }[];
+		};
 	};
 }) {
 	return (
@@ -25,6 +36,26 @@ export default function StudyShell({
 		>
 			<SidebarProvider>
 				<div className="min-h-screen w-full bg-[var(--hero-a)]/10 md:flex md:min-h-screen">
+					<NotificationReminders
+						preferences={shellData.notificationPreferences}
+						reminders={{
+							tasks: shellData.reminders.tasks.map((task) => ({
+								id: task.id,
+								title: task.title,
+								dueAt: task.dueDate,
+							})),
+							exams: shellData.reminders.exams.map((exam) => ({
+								id: exam.id,
+								title: exam.title,
+								dueAt: exam.examDate,
+							})),
+							sessions: shellData.reminders.sessions.map((session) => ({
+								id: session.id,
+								title: session.title,
+								dueAt: session.scheduledDate,
+							})),
+						}}
+					/>
 					<DashboardSidebar shellData={shellData} />
 
 					<div className="flex min-h-screen flex-1 w-full flex-col min-w-0">

@@ -63,14 +63,25 @@ function RouteComponent() {
 	const [reminders, setReminders] = useState(
 		profileData.profile?.reminders ?? true,
 	);
+	const [taskReminders, setTaskReminders] = useState(
+		profileData.profile?.taskReminders ?? true,
+	);
+	const [examReminders, setExamReminders] = useState(
+		profileData.profile?.examReminders ?? true,
+	);
+	const [sessionReminders, setSessionReminders] = useState(
+		profileData.profile?.sessionReminders ?? true,
+	);
 	const [saving, setSaving] = useState(false);
 	const [avatarUploading, setAvatarUploading] = useState(false);
 	const [pomodoroLength, setPomodoroLength] = useState(
 		String(profileData.profile?.pomodoroLength ?? 25),
 	);
-	const [studyView, setStudyView] = useState<"daily" | "weekly" | "monthly">(
-		persistedStudyView === "daily" ||
-			persistedStudyView === "monthly" ||
+	const [studyView, setStudyView] = useState<
+		"weekly" | "calendar" | "sessions"
+	>(
+		persistedStudyView === "calendar" ||
+			persistedStudyView === "sessions" ||
 			persistedStudyView === "weekly"
 			? persistedStudyView
 			: "weekly",
@@ -91,6 +102,9 @@ function RouteComponent() {
 					studyView,
 					showCompletedTasks: showCompleted,
 					reminders,
+					taskReminders,
+					examReminders,
+					sessionReminders,
 				},
 			});
 			setTheme(theme.toLowerCase() as "system" | "light" | "dark");
@@ -103,6 +117,19 @@ function RouteComponent() {
 		} finally {
 			setSaving(false);
 		}
+	}
+
+	async function enableBrowserNotifications() {
+		if (!("Notification" in window)) {
+			toast.error("This browser does not support notifications");
+			return;
+		}
+		const permission = await Notification.requestPermission();
+		toast[permission === "granted" ? "success" : "error"](
+			permission === "granted"
+				? "Browser reminders enabled"
+				: "Browser reminders were not enabled",
+		);
 	}
 
 	async function handleAvatar(event: React.ChangeEvent<HTMLInputElement>) {
@@ -401,16 +428,41 @@ function RouteComponent() {
 							</div>
 							<div
 								id="notifications"
-								className="scroll-mt-5 flex items-center gap-3 rounded-lg bg-muted/60 p-3"
+								className="scroll-mt-5 space-y-3 rounded-lg bg-muted/60 p-3"
 							>
-								<Bell className="size-4 text-primary" />
-								<div className="flex-1">
-									<p className="text-xs font-medium">Daily study reminder</p>
-									<p className="text-[11px] text-muted-foreground">
-										Notify me at 8:00 AM
-									</p>
+								<div className="flex items-center gap-3">
+									<Bell className="size-4 text-primary" />
+									<div className="flex-1">
+										<p className="text-xs font-medium">Daily study reminder</p>
+										<p className="text-[11px] text-muted-foreground">
+											Notify me at 8:00 AM
+										</p>
+									</div>
+									<Switch checked={reminders} onCheckedChange={setReminders} />
 								</div>
-								<Switch checked={reminders} onCheckedChange={setReminders} />
+								<NotificationSwitch
+									label="Task reminders"
+									checked={taskReminders}
+									onCheckedChange={setTaskReminders}
+								/>
+								<NotificationSwitch
+									label="Exam reminders"
+									checked={examReminders}
+									onCheckedChange={setExamReminders}
+								/>
+								<NotificationSwitch
+									label="Study session reminders"
+									checked={sessionReminders}
+									onCheckedChange={setSessionReminders}
+								/>
+								<Button
+									variant="outline"
+									size="sm"
+									onClick={enableBrowserNotifications}
+									className="w-full"
+								>
+									Enable browser reminders
+								</Button>
 							</div>
 						</CardContent>
 					</Card>
@@ -497,6 +549,23 @@ function RouteComponent() {
 					</div>
 				</main>
 			</div>
+		</div>
+	);
+}
+
+function NotificationSwitch({
+	label,
+	checked,
+	onCheckedChange,
+}: {
+	label: string;
+	checked: boolean;
+	onCheckedChange: (checked: boolean) => void;
+}) {
+	return (
+		<div className="flex items-center justify-between border-t border-border/60 pt-2">
+			<span className="text-xs text-muted-foreground">{label}</span>
+			<Switch checked={checked} onCheckedChange={onCheckedChange} />
 		</div>
 	);
 }

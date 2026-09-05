@@ -66,12 +66,15 @@ function RouteComponent() {
 					avatarUrl,
 					pomodoroLength: profileData.profile?.pomodoroLength ?? 25,
 					studyView:
-						profileData.profile?.studyView === "daily" ||
-						profileData.profile?.studyView === "monthly"
+						profileData.profile?.studyView === "calendar" ||
+						profileData.profile?.studyView === "sessions"
 							? profileData.profile.studyView
 							: "weekly",
 					showCompletedTasks: profileData.profile?.showCompletedTasks ?? true,
 					reminders: profileData.profile?.reminders ?? true,
+					taskReminders: profileData.profile?.taskReminders ?? true,
+					examReminders: profileData.profile?.examReminders ?? true,
+					sessionReminders: profileData.profile?.sessionReminders ?? true,
 				},
 			});
 			setTheme(theme.toLowerCase() as "system" | "light" | "dark");
