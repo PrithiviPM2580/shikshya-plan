@@ -27,4 +27,10 @@ export const generatedStudyPlan = z.object({
 		.min(1),
 });
 
+export const saveGeneratedStudyPlanInput = z.object({
+	plan: generatedStudyPlan,
+	selectedTaskKeys: z.array(z.string().min(1)).min(1),
+	subjectId: z.string().uuid().nullable(),
+});
+
 export type GeneratedStudyPlan = z.infer<typeof generatedStudyPlan>;

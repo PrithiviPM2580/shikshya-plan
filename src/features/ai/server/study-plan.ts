@@ -2,7 +2,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { generateObject } from "ai";
 import prisma from "#/lib/prisma-client";
 import { requireCurrentUser } from "#/lib/server-auth";
-import { generatedStudyPlan, studyPlanRequest } from "../validation";
+import {
+	generatedStudyPlan,
+	saveGeneratedStudyPlanInput,
+	studyPlanRequest,
+} from "../validation";
 import { getAiModel, getAiModelIds } from "./provider";
 
 export const generateStudyPlan = createServerFn({ method: "POST" })
@@ -82,4 +86,40 @@ export const generateStudyPlan = createServerFn({ method: "POST" })
 				? `All AI models are currently unavailable: ${lastError.message}`
 				: "All AI models are currently unavailable. Please retry shortly.",
 		);
+	});
+
+export const saveGeneratedStudyPlan = createServerFn({ method: "POST" })
+	.validator(saveGeneratedStudyPlanInput)
+	.handler(async ({ data }) => {
+		const user = await requireCurrentUser();
+		if (data.subjectId) {
+			const subject = await prisma.subject.findFirst({
+				where: { id: data.subjectId, userId: user.id },
+				select: { id: true },
+			});
+			if (!subject) throw new Error("Subject not found");
+		}
+
+		const selectedKeys = new Set(data.selectedTaskKeys);
+		const startDate = new Date();
+		startDate.setHours(23, 59, 59, 999);
+		const tasks = data.plan.days.flatMap((day, dayIndex) =>
+			day.tasks.flatMap((task, taskIndex) => {
+				if (!selectedKeys.has(`${dayIndex}-${taskIndex}`)) return [];
+				const dueDate = new Date(startDate);
+				dueDate.setDate(startDate.getDate() + dayIndex);
+				return {
+					userId: user.id,
+					subjectId: data.subjectId,
+					title: task.title,
+					description: `${data.plan.title}: ${day.focus}`.slice(0, 1000),
+					priority: task.priority,
+					dueDate,
+				};
+			}),
+		);
+
+		if (!tasks.length) throw new Error("Select at least one task to save");
+		const result = await prisma.task.createMany({ data: tasks });
+		return { count: result.count };
 	});
