@@ -72,6 +72,18 @@ export const smartTaskRequest = z.object({
 	request: z.string().trim().min(5).max(500),
 });
 
+export const tutorRequest = z.object({
+	question: z.string().trim().min(5).max(1000),
+	subject: z.string().trim().max(120).optional(),
+});
+
+export const generatedTutorResponse = z.object({
+	answer: z.string().min(1),
+	keyPoints: z.array(z.string()).min(1).max(6),
+	example: z.string().min(1),
+	followUpQuestions: z.array(z.string()).min(1).max(4),
+});
+
 export const generatedSmartTask = z.object({
 	title: z.string().trim().min(1).max(160),
 	description: z.string().trim().max(1000),
@@ -97,5 +109,6 @@ export const generatedQuiz = z.object({
 export type GeneratedTaskBreakdown = z.infer<typeof generatedTaskBreakdown>;
 export type GeneratedExamInsight = z.infer<typeof generatedExamInsight>;
 export type GeneratedQuiz = z.infer<typeof generatedQuiz>;
+export type GeneratedTutorResponse = z.infer<typeof generatedTutorResponse>;
 
 export type GeneratedStudyPlan = z.infer<typeof generatedStudyPlan>;

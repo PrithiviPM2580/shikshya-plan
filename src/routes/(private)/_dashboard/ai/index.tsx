@@ -14,11 +14,13 @@ import {
 	saveGeneratedStudyPlan,
 } from "#/features/ai/server/study-plan";
 import { generateTaskBreakdown } from "#/features/ai/server/task-breakdown";
+import { askTutor } from "#/features/ai/server/tutor";
 import type {
 	GeneratedExamInsight,
 	GeneratedQuiz,
 	GeneratedStudyPlan,
 	GeneratedTaskBreakdown,
+	GeneratedTutorResponse,
 } from "#/features/ai/validation";
 import { getExams } from "#/features/exams/server/exams";
 import { getSubjects } from "#/features/subjects/server/subjects";
@@ -59,6 +61,11 @@ function AiPage() {
 	const [examInsightLoading, setExamInsightLoading] = useState(false);
 	const [smartTaskRequest, setSmartTaskRequest] = useState("");
 	const [smartTaskLoading, setSmartTaskLoading] = useState(false);
+	const [tutorQuestion, setTutorQuestion] = useState("");
+	const [tutorSubject, setTutorSubject] = useState("");
+	const [tutorResponse, setTutorResponse] =
+		useState<GeneratedTutorResponse | null>(null);
+	const [tutorLoading, setTutorLoading] = useState(false);
 
 	async function createPlan(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -232,6 +239,27 @@ function AiPage() {
 		}
 	}
 
+	async function askAiTutor(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		setTutorLoading(true);
+		try {
+			const result = await askTutor({
+				data: {
+					question: tutorQuestion,
+					subject: tutorSubject || undefined,
+				},
+			});
+			setTutorResponse(result);
+			toast.success("Tutor explanation generated");
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to answer question",
+			);
+		} finally {
+			setTutorLoading(false);
+		}
+	}
+
 	return (
 		<div className="w-full space-y-5">
 			<section className="border-b border-border pb-5">
@@ -247,6 +275,86 @@ function AiPage() {
 				</p>
 			</section>
 
+			<Card className="rounded-xl border bg-card py-0 shadow-sm">
+				<CardHeader className="px-5 pb-2 pt-5">
+					<CardTitle className="text-sm">Ask your AI tutor</CardTitle>
+					<p className="text-xs text-muted-foreground">
+						Get a clear explanation, example, and follow-up questions for any
+						study topic.
+					</p>
+				</CardHeader>
+				<CardContent className="space-y-4 px-5 pb-5">
+					<form
+						onSubmit={askAiTutor}
+						className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_180px_auto] sm:items-end"
+					>
+						<label className="space-y-2 text-xs font-medium">
+							Question
+							<Input
+								required
+								value={tutorQuestion}
+								onChange={(event) => setTutorQuestion(event.target.value)}
+								placeholder="e.g. Why does database normalization reduce redundancy?"
+							/>
+						</label>
+						<label className="space-y-2 text-xs font-medium">
+							Subject (optional)
+							<select
+								value={tutorSubject}
+								onChange={(event) => setTutorSubject(event.target.value)}
+								className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+							>
+								<option value="">General</option>
+								{subjects.map((subject) => (
+									<option key={subject.id} value={subject.name}>
+										{subject.name}
+									</option>
+								))}
+							</select>
+						</label>
+						<Button type="submit" disabled={tutorLoading}>
+							{tutorLoading ? <Loader2 className="animate-spin" /> : <Brain />}
+							{tutorLoading ? "Thinking..." : "Ask tutor"}
+						</Button>
+					</form>
+					{tutorResponse && (
+						<div className="grid gap-4 rounded-lg bg-muted/50 p-4 md:grid-cols-[minmax(0,1.4fr)_minmax(220px,1fr)]">
+							<div className="space-y-3">
+								<div>
+									<p className="text-xs font-semibold">Explanation</p>
+									<p className="mt-1 text-sm leading-6">
+										{tutorResponse.answer}
+									</p>
+								</div>
+								<div>
+									<p className="text-xs font-semibold">Example</p>
+									<p className="mt-1 text-xs leading-5 text-muted-foreground">
+										{tutorResponse.example}
+									</p>
+								</div>
+							</div>
+							<div className="space-y-3">
+								<div>
+									<p className="text-xs font-semibold">Key points</p>
+									<ul className="mt-1 list-disc space-y-1 pl-4 text-xs text-muted-foreground">
+										{tutorResponse.keyPoints.map((point) => (
+											<li key={point}>{point}</li>
+										))}
+									</ul>
+								</div>
+								<div>
+									<p className="text-xs font-semibold">Try next</p>
+									<ul className="mt-1 list-disc space-y-1 pl-4 text-xs text-muted-foreground">
+										{tutorResponse.followUpQuestions.map((question) => (
+											<li key={question}>{question}</li>
+										))}
+									</ul>
+								</div>
+							</div>
+						</div>
+					)}
+				</CardContent>
+			</Card>
 			<Card className="rounded-xl border bg-card py-0 shadow-sm">
 				<CardContent className="p-5">
 					<form
