@@ -3,7 +3,7 @@ import { generateObject } from "ai";
 import prisma from "#/lib/prisma-client";
 import { requireCurrentUser } from "#/lib/server-auth";
 import { generatedStudyPlan, studyPlanRequest } from "../validation";
-import { getAiModel } from "./provider";
+import { getAiModel, getAiModelIds } from "./provider";
 
 export const generateStudyPlan = createServerFn({ method: "POST" })
 	.validator(studyPlanRequest)
@@ -41,32 +41,45 @@ export const generateStudyPlan = createServerFn({ method: "POST" })
 			}),
 		]);
 
-		const result = await generateObject({
-			model: getAiModel(),
-			schema: generatedStudyPlan,
-			temperature: 0.4,
-			system:
-				"You are a practical academic study planner. Create achievable schedules, avoid overloading students, and use only the provided subjects and exams. Return exactly the requested structured plan.",
-			prompt: JSON.stringify({
-				request: {
-					days: data.days,
-					focus:
-						data.focus ?? "Balance upcoming exams and unfinished coursework",
-				},
-				student: {
-					name: user.name,
-					program: profile?.program,
-					semester: profile?.semester,
-					weeklyHours: profile?.weeklyHours,
-					targetGpa: profile?.targetGpa,
-				},
-				subjects,
-				upcomingExams: exams.map((exam) => ({
-					...exam,
-					examDate: exam.examDate.toISOString(),
-				})),
-			}),
+		const prompt = JSON.stringify({
+			request: {
+				days: data.days,
+				focus: data.focus ?? "Balance upcoming exams and unfinished coursework",
+			},
+			student: {
+				name: user.name,
+				program: profile?.program,
+				semester: profile?.semester,
+				weeklyHours: profile?.weeklyHours,
+				targetGpa: profile?.targetGpa,
+			},
+			subjects,
+			upcomingExams: exams.map((exam) => ({
+				...exam,
+				examDate: exam.examDate.toISOString(),
+			})),
 		});
 
-		return result.object;
+		let lastError: unknown;
+		for (const modelId of getAiModelIds()) {
+			try {
+				const result = await generateObject({
+					model: getAiModel(modelId),
+					schema: generatedStudyPlan,
+					temperature: 0.4,
+					system:
+						"You are a practical academic study planner. Create achievable schedules, avoid overloading students, and use only the provided subjects and exams. Return exactly the requested structured plan.",
+					prompt,
+				});
+				return result.object;
+			} catch (error) {
+				lastError = error;
+			}
+		}
+
+		throw new Error(
+			lastError instanceof Error
+				? `All AI models are currently unavailable: ${lastError.message}`
+				: "All AI models are currently unavailable. Please retry shortly.",
+		);
 	});
