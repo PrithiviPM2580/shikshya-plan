@@ -8,19 +8,30 @@ type TaskListItem = {
 	createdAt: Date;
 };
 
+type TaskFilterOptions = {
+	now?: Date;
+	showCompletedTasks?: boolean;
+};
+
 const priorityRank = { HIGH: 0, MEDIUM: 1, LOW: 2 } as const;
 
 export function filterAndSortTasks<T extends TaskListItem>(
 	tasks: readonly T[],
 	filter: TaskFilter,
 	sort: TaskSort,
-	now = new Date(),
+	options: TaskFilterOptions = {},
 ): T[] {
+	const now = options.now ?? new Date();
+	const showCompletedTasks = options.showCompletedTasks ?? true;
 	const dueSoonEnd = new Date(now);
 	dueSoonEnd.setDate(dueSoonEnd.getDate() + 7);
 
 	return [...tasks]
 		.filter((task) => {
+			if (task.completed && filter !== "completed" && !showCompletedTasks) {
+				return false;
+			}
+
 			switch (filter) {
 				case "due-soon":
 					return (

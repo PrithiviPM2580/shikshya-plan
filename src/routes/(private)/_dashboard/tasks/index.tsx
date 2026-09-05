@@ -48,16 +48,17 @@ function TasksPage() {
 	const [isSaving, setIsSaving] = useState(false);
 
 	const visibleTasks = filterAndSortTasks(
-		tasks.filter(
-			(task) =>
-				(taskFilter !== "all" ||
-					profile.profile?.showCompletedTasks !== false) &&
-				`${task.title} ${task.description ?? ""} ${task.subject?.name ?? ""}`
-					.toLowerCase()
-					.includes(search.toLowerCase()),
+		tasks.filter((task) =>
+			`${task.title} ${task.description ?? ""} ${task.subject?.name ?? ""}`
+				.toLowerCase()
+				.includes(search.toLowerCase()),
 		),
 		taskFilter,
 		taskSort,
+		{
+			now: new Date(),
+			showCompletedTasks: profile.profile?.showCompletedTasks !== false,
+		},
 	);
 	const completedCount = tasks.filter((task) => task.completed).length;
 
