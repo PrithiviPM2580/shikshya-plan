@@ -1,5 +1,14 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { BookOpen, Check, Pause, Play, RotateCcw, Square } from "lucide-react";
+import {
+	BookOpen,
+	Check,
+	Pause,
+	Play,
+	RotateCcw,
+	Square,
+	Volume2,
+	VolumeX,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "#/components/ui/badge";
@@ -40,6 +49,11 @@ function PomodoroPage() {
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const [running, setRunning] = useState(false);
 	const [saving, setSaving] = useState(false);
+	const [phase, setPhase] = useState<"focus" | "break">("focus");
+	const [cycle, setCycle] = useState(1);
+	const [breakMinutes, setBreakMinutes] = useState(5);
+	const [autoStartNext, setAutoStartNext] = useState(true);
+	const [atmosphere, setAtmosphere] = useState<"off" | "brown-noise">("off");
 	const today = new Date().toDateString();
 	const todaySessions = sessions.filter(
 		(session) => new Date(session.startedAt).toDateString() === today,
@@ -56,12 +70,42 @@ function PomodoroPage() {
 	}, [running]);
 
 	useEffect(() => {
-		if (running && remaining === 0 && activeId) void finish();
-	}, [remaining, running, activeId]);
+		if (running && remaining === 0) void completePhase();
+	}, [remaining, running]);
+
+	useEffect(() => {
+		if (atmosphere !== "brown-noise") return;
+		const context = new AudioContext();
+		const buffer = context.createBuffer(
+			1,
+			context.sampleRate * 2,
+			context.sampleRate,
+		);
+		const output = buffer.getChannelData(0);
+		let last = 0;
+		for (let index = 0; index < output.length; index += 1) {
+			const white = Math.random() * 2 - 1;
+			last = last * 0.98 + white * 0.02;
+			output[index] = last * 0.35;
+		}
+		const source = context.createBufferSource();
+		const gain = context.createGain();
+		source.buffer = buffer;
+		source.loop = true;
+		gain.gain.value = 0.08;
+		source.connect(gain).connect(context.destination);
+		source.start();
+		return () => {
+			source.stop();
+			void context.close();
+		};
+	}, [atmosphere]);
 
 	function reset() {
 		setRunning(false);
 		setActiveId(null);
+		setPhase("focus");
+		setCycle(1);
 		setRemaining(minutes * 60);
 	}
 	function changeMinutes(value: number) {
@@ -69,6 +113,10 @@ function PomodoroPage() {
 		if (!running) setRemaining(value * 60);
 	}
 	async function begin() {
+		if (phase === "break") return;
+		await startFocusSession();
+	}
+	async function startFocusSession() {
 		setSaving(true);
 		try {
 			const session = await startPomodoro({
@@ -79,6 +127,7 @@ function PomodoroPage() {
 				},
 			});
 			setActiveId(session.id);
+			setPhase("focus");
 			setRemaining(minutes * 60);
 			setRunning(true);
 			toast.success("Focus session started");
@@ -90,17 +139,45 @@ function PomodoroPage() {
 			setSaving(false);
 		}
 	}
-	async function finish() {
+	async function completePhase() {
+		if (phase === "break") {
+			setCycle((value) => (value >= 4 ? 1 : value + 1));
+			setPhase("focus");
+			setRemaining(minutes * 60);
+			if (autoStartNext) await startFocusSession();
+			else setRunning(false);
+			return;
+		}
 		if (!activeId) return;
 		setRunning(false);
 		try {
 			await completePomodoro({ data: { id: activeId } });
 			setActiveId(null);
 			await router.invalidate();
-			toast.success("Focus session completed");
+			setPhase("break");
+			setRemaining(breakMinutes * 60);
+			setRunning(true);
+			toast.success("Focus session completed. Break started.");
 		} catch (error) {
 			toast.error(
 				error instanceof Error ? error.message : "Unable to complete session",
+			);
+		}
+	}
+	async function finish() {
+		if (!activeId) return;
+		setRunning(false);
+		try {
+			await completePomodoro({ data: { id: activeId } });
+			setActiveId(null);
+			setPhase("focus");
+			setCycle(1);
+			setRemaining(minutes * 60);
+			await router.invalidate();
+			toast.success("Focus session ended");
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to end session",
 			);
 		}
 	}
@@ -118,7 +195,11 @@ function PomodoroPage() {
 							</p>
 							<p className="mt-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
 								<span className="mr-1 inline-block size-1.5 rounded-full bg-primary" />
-								{running ? "Focusing" : "Ready"}
+								{phase === "break"
+									? "On break"
+									: running
+										? "Focusing"
+										: "Ready"}
 							</p>
 						</div>
 					</div>
@@ -146,7 +227,7 @@ function PomodoroPage() {
 								size="icon-lg"
 								className="size-14 rounded-full"
 								onClick={begin}
-								disabled={saving || remaining === 0}
+								disabled={saving || remaining === 0 || phase === "break"}
 								aria-label="Start timer"
 							>
 								<Play className="size-6" />
@@ -171,6 +252,19 @@ function PomodoroPage() {
 								max="120"
 								value={minutes}
 								onChange={(event) => changeMinutes(Number(event.target.value))}
+								disabled={running || phase === "break"}
+							/>
+						</label>
+						<label className="space-y-1 text-sm">
+							<span className="font-medium">Break minutes</span>
+							<Input
+								type="number"
+								min="1"
+								max="30"
+								value={breakMinutes}
+								onChange={(event) =>
+									setBreakMinutes(Number(event.target.value))
+								}
 								disabled={running}
 							/>
 						</label>
@@ -199,6 +293,35 @@ function PomodoroPage() {
 								))}
 							</select>
 						</label>
+						<div className="flex flex-wrap items-center gap-3 text-sm sm:col-span-3">
+							<label className="flex items-center gap-2">
+								<input
+									type="checkbox"
+									checked={autoStartNext}
+									onChange={(event) => setAutoStartNext(event.target.checked)}
+								/>
+								Auto-start next focus session
+							</label>
+							<span className="flex items-center gap-2">
+								{atmosphere === "brown-noise" ? (
+									<Volume2 className="size-4" />
+								) : (
+									<VolumeX className="size-4" />
+								)}
+								Atmosphere
+								<select
+									value={atmosphere}
+									onChange={(event) =>
+										setAtmosphere(event.target.value as typeof atmosphere)
+									}
+									className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+								>
+									<option value="off">Off</option>
+									<option value="brown-noise">Brown noise</option>
+								</select>
+							</span>
+							<span className="text-muted-foreground">Cycle {cycle} of 4</span>
+						</div>
 					</div>
 				</section>
 				<aside>
