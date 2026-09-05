@@ -10,6 +10,21 @@ cloudinary.config({
 	api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+const avatarFolder = "shikshya-plan/avatars";
+const avatarPublicId = (userId: string) => `${avatarFolder}/${userId}`;
+
+function isManagedAvatar(url: string | null | undefined) {
+	return url?.includes(`/image/upload/`) && url.includes(`/${avatarFolder}/`);
+}
+
+function isCloudinaryConfigured() {
+	return Boolean(
+		process.env.CLOUDINARY_CLOUD_NAME &&
+			process.env.CLOUDINARY_API_KEY &&
+			process.env.CLOUDINARY_API_SECRET,
+	);
+}
+
 export const uploadAvatar = createServerFn({ method: "POST" })
 	.validator(avatarUploadInput)
 	.handler(async ({ data }) => {
@@ -23,7 +38,7 @@ export const uploadAvatar = createServerFn({ method: "POST" })
 		}
 
 		const result = await cloudinary.uploader.upload(data.dataUrl, {
-			folder: "shikshya-plan/avatars",
+			folder: avatarFolder,
 			public_id: user.id,
 			overwrite: true,
 			resource_type: "image",
@@ -82,6 +97,10 @@ export const updateProfile = createServerFn({ method: "POST" })
 	.validator(profileInput)
 	.handler(async ({ data }) => {
 		const user = await requireCurrentUser();
+		const currentProfile = await prisma.profile.findUnique({
+			where: { userId: user.id },
+			select: { avatarUrl: true },
+		});
 		const [updatedUser, profile] = await prisma.$transaction([
 			prisma.user.update({
 				where: { id: user.id },
@@ -116,5 +135,16 @@ export const updateProfile = createServerFn({ method: "POST" })
 				},
 			}),
 		]);
+		if (
+			currentProfile?.avatarUrl &&
+			!data.avatarUrl &&
+			isManagedAvatar(currentProfile.avatarUrl) &&
+			isCloudinaryConfigured()
+		) {
+			await cloudinary.uploader.destroy(avatarPublicId(user.id), {
+				resource_type: "image",
+				invalidate: true,
+			});
+		}
 		return { user: updatedUser, profile };
 	});
