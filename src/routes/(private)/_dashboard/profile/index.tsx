@@ -187,8 +187,16 @@ function RouteComponent() {
 			<Card className="overflow-hidden rounded-xl border bg-card py-0 shadow-sm">
 				<CardContent className="grid gap-6 p-5 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-center lg:p-7">
 					<div className="flex items-center gap-4 lg:border-r lg:border-border/60 lg:pr-6">
-						<div className="flex size-20 shrink-0 items-center justify-center rounded-full bg-primary text-2xl font-bold text-primary-foreground ring-4 ring-primary/10">
-							{initials}
+						<div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary text-2xl font-bold text-primary-foreground ring-4 ring-primary/10">
+							{avatarUrl ? (
+								<img
+									src={avatarUrl}
+									alt={`${displayName} profile avatar`}
+									className="size-full object-cover"
+								/>
+							) : (
+								initials
+							)}
 						</div>
 						<div>
 							<p className="text-sm font-bold">{displayName}</p>
