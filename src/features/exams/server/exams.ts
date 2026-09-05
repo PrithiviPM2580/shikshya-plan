@@ -3,6 +3,7 @@ import { z } from "zod";
 import prisma from "#/lib/prisma-client";
 import { requireCurrentUser } from "#/lib/server-auth";
 import { examIdSchema, examInput, updateExamInput } from "../validation";
+import { getExamReadinessForEntity } from "./readiness";
 
 const examInclude = {
 	subject: { select: { id: true, name: true, color: true } },
@@ -10,11 +11,23 @@ const examInclude = {
 
 export const getExams = createServerFn({ method: "GET" }).handler(async () => {
 	const user = await requireCurrentUser();
-	return prisma.exam.findMany({
+	const exams = await prisma.exam.findMany({
 		where: { userId: user.id },
 		include: examInclude,
 		orderBy: [{ completed: "asc" }, { examDate: "asc" }],
 	});
+
+	return Promise.all(
+		exams.map(async (exam) => ({
+			...exam,
+			readinessPercentage: await getExamReadinessForEntity({
+				userId: user.id,
+				subjectId: exam.subjectId,
+				examDate: exam.examDate,
+				manualReadiness: exam.readinessPercentage,
+			}),
+		})),
+	);
 });
 
 async function validateSubject(userId: string, subjectId: string | null) {
@@ -30,8 +43,14 @@ export const createExam = createServerFn({ method: "POST" })
 	.handler(async ({ data }) => {
 		const user = await requireCurrentUser();
 		await validateSubject(user.id, data.subjectId);
+		const readinessPercentage = await getExamReadinessForEntity({
+			userId: user.id,
+			subjectId: data.subjectId,
+			examDate: data.examDate,
+			manualReadiness: Number(data.readinessPercentage),
+		});
 		return prisma.exam.create({
-			data: { ...data, userId: user.id },
+			data: { ...data, readinessPercentage, userId: user.id },
 			include: examInclude,
 		});
 	});
@@ -42,9 +61,15 @@ export const updateExam = createServerFn({ method: "POST" })
 		const user = await requireCurrentUser();
 		const { id, ...exam } = data;
 		await validateSubject(user.id, exam.subjectId);
+		const readinessPercentage = await getExamReadinessForEntity({
+			userId: user.id,
+			subjectId: exam.subjectId,
+			examDate: exam.examDate,
+			manualReadiness: Number(exam.readinessPercentage),
+		});
 		return prisma.exam.updateMany({
 			where: { id, userId: user.id },
-			data: exam,
+			data: { ...exam, readinessPercentage },
 		});
 	});
 

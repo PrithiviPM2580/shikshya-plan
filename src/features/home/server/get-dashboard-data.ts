@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 import { auth } from "#/lib/auth";
 import prisma from "#/lib/prisma-client";
+import { getExamReadinessForEntity } from "#/features/exams/server/readiness";
 
 export const getDashboardData = createServerFn({ method: "GET" }).handler(
 	async () => {
@@ -86,7 +87,13 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(
 					completed: false,
 					examDate: { gte: now },
 				},
-				include: { subject: { select: { name: true } } },
+				select: {
+					id: true,
+					title: true,
+					examDate: true,
+					readinessPercentage: true,
+					subject: { select: { name: true } },
+				},
 				orderBy: { examDate: "asc" },
 				take: 3,
 			}),
@@ -97,9 +104,20 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(
 				take: 3,
 			}),
 		]);
+		const upcomingExamsWithReadiness = await Promise.all(
+			upcomingExams.map(async (exam) => ({
+				...exam,
+				readinessPercentage: await getExamReadinessForEntity({
+					userId: session.user.id,
+					subjectId: exam.subjectId,
+					examDate: exam.examDate,
+					manualReadiness: exam.readinessPercentage,
+				}),
+			})),
+		);
 		const examReadiness = upcomingExams.length
 			? Math.round(
-					upcomingExams.reduce(
+					upcomingExamsWithReadiness.reduce(
 						(total, exam) => total + exam.readinessPercentage,
 						0,
 					) / upcomingExams.length,
@@ -129,7 +147,7 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(
 			todaySessions,
 			studyData,
 			goals,
-			upcomingExams,
+			upcomingExams: upcomingExamsWithReadiness,
 			recentActivity,
 		};
 	},

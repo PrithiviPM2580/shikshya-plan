@@ -110,16 +110,6 @@ The core application is working. Remaining work, in priority order:
 - Add confirmation dialogs before deleting subjects, tasks, goals, plans, exams, and sessions.
 - Add password reset flow.
 
-11. **Testing**
-
-- Add tests for:
-  - Onboarding persistence
-  - Task CRUD
-  - Session completion and study logs
-  - Exam/goal progress
-  - Profile/avatar updates
-  - Authorization ownership checks
-
 12. **Production cleanup**
 
 - Replace remaining static text such as Scholar Pro billing details.
