@@ -1,0 +1,75 @@
+SHIKSHYA PLAN
+SUPERVISOR FEATURE VERIFICATION SHEET
+
+Project: AI-Powered Study Planning and Academic Productivity Platform
+Student Name(s): ______________________________________________
+Institution / Course: __________________________________________
+Supervisor Name: ______________________________________________
+
+The following project features have been implemented for review and supervisor verification.
+
+1. User Authentication and Protected Access
+   Students can sign up, sign in, reset passwords, and access protected dashboard routes securely.
+   Supervisor Initials/Signature: ____________________   Date: ______________
+   Remarks: ______________________________________________________________
+
+2. Student Onboarding and Profile Management
+   Students can complete onboarding and manage academic profile information, preferences, and profile details.
+   Supervisor Initials/Signature: ____________________   Date: ______________
+   Remarks: ______________________________________________________________
+
+3. Subject Management
+   Students can create, view, edit, and delete subjects used across plans, tasks, sessions, exams, and analytics.
+   Supervisor Initials/Signature: ____________________   Date: ______________
+   Remarks: ______________________________________________________________
+
+4. Study Plan and Session Management
+   Students can create study plans, assign subjects, schedule study sessions, set durations, and mark sessions complete.
+   Supervisor Initials/Signature: ____________________   Date: ______________
+   Remarks: ______________________________________________________________
+
+5. Task Management with Filtering and Pagination
+   Students can create, update, complete, delete, filter, sort, and paginate academic tasks.
+   Supervisor Initials/Signature: ____________________   Date: ______________
+   Remarks: ______________________________________________________________
+
+6. Exam and Goal Tracking
+   Students can record exams, syllabi, exam dates, readiness, academic goals, deadlines, and progress.
+   Supervisor Initials/Signature: ____________________   Date: ______________
+   Remarks: ______________________________________________________________
+
+7. Analytics and Progress Monitoring
+   The system tracks study logs, subject distribution, task completion, Pomodoro activity, study consistency, and progress trends.
+   Supervisor Initials/Signature: ____________________   Date: ______________
+   Remarks: ______________________________________________________________
+
+8. AI Study Coach Features
+   The system provides AI study-plan generation, task breakdown, exam-readiness insights, AI tutoring, and quiz generation.
+   Supervisor Initials/Signature: ____________________   Date: ______________
+   Remarks: ______________________________________________________________
+
+9. Intelligent Task and Schedule Assistance
+   Students can create tasks using natural language, receive missed-schedule recovery plans, and obtain AI-generated analytics summaries.
+   Supervisor Initials/Signature: ____________________   Date: ______________
+   Remarks: ______________________________________________________________
+
+10. Notifications, Settings, and Responsive User Interface
+    Students can manage reminder preferences, use browser notifications, change application settings, and access the responsive dashboard on different screen sizes.
+    Supervisor Initials/Signature: ____________________   Date: ______________
+    Remarks: ______________________________________________________________
+
+
+OVERALL SUPERVISOR EVALUATION
+
+The implemented features were reviewed and demonstrated:
+
+[  ] Satisfactory       [  ] Requires Modification       [  ] Not Yet Verified
+
+Overall Remarks:
+________________________________________________________________________
+________________________________________________________________________
+________________________________________________________________________
+
+Supervisor Name: ______________________________________________
+Supervisor Signature: _________________________________________
+Date: ________________________________________________________
