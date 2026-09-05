@@ -44,6 +44,15 @@ function RouteComponent() {
 	const [theme, setThemeValue] = useState(
 		profileData.profile?.theme ?? "SYSTEM",
 	);
+	const [linkedinUrl, setLinkedinUrl] = useState(
+		profileData.profile?.linkedinUrl ?? "",
+	);
+	const [githubUrl, setGithubUrl] = useState(
+		profileData.profile?.githubUrl ?? "",
+	);
+	const [websiteUrl, setWebsiteUrl] = useState(
+		profileData.profile?.websiteUrl ?? "",
+	);
 	const [avatarUrl] = useState(
 		profileData.profile?.avatarUrl ?? profileData.user.image ?? null,
 	);
@@ -64,6 +73,9 @@ function RouteComponent() {
 					name,
 					theme,
 					avatarUrl,
+					linkedinUrl: linkedinUrl || null,
+					githubUrl: githubUrl || null,
+					websiteUrl: websiteUrl || null,
 					pomodoroLength: profileData.profile?.pomodoroLength ?? 25,
 					studyView:
 						profileData.profile?.studyView === "calendar" ||
@@ -115,7 +127,7 @@ function RouteComponent() {
 			{editing && (
 				<form
 					onSubmit={saveProfile}
-					className="grid gap-3 rounded-xl border bg-card p-4 sm:grid-cols-[1fr_180px_auto]"
+					className="grid gap-3 rounded-xl border bg-card p-4 sm:grid-cols-2"
 				>
 					<label className="space-y-1 text-sm">
 						<span className="font-medium">Display name</span>
@@ -142,6 +154,33 @@ function RouteComponent() {
 					<Button type="submit" disabled={saving}>
 						{saving ? "Saving..." : "Save"}
 					</Button>
+					<label className="space-y-1 text-sm">
+						<span className="font-medium">LinkedIn URL</span>
+						<Input
+							value={linkedinUrl}
+							onChange={(event) => setLinkedinUrl(event.target.value)}
+							placeholder="https://linkedin.com/in/you"
+							type="url"
+						/>
+					</label>
+					<label className="space-y-1 text-sm">
+						<span className="font-medium">GitHub URL</span>
+						<Input
+							value={githubUrl}
+							onChange={(event) => setGithubUrl(event.target.value)}
+							placeholder="https://github.com/you"
+							type="url"
+						/>
+					</label>
+					<label className="space-y-1 text-sm sm:col-span-2">
+						<span className="font-medium">Personal website URL</span>
+						<Input
+							value={websiteUrl}
+							onChange={(event) => setWebsiteUrl(event.target.value)}
+							placeholder="https://your-site.com"
+							type="url"
+						/>
+					</label>
 				</form>
 			)}
 
@@ -338,25 +377,38 @@ function RouteComponent() {
 						</CardHeader>
 						<CardContent className="space-y-2 px-4 pb-5">
 							{[
-								["LinkedIn", "https://www.linkedin.com", "LinkedIn"],
-								["GitHub", "https://github.com", "GitHub"],
-								["Personal site", "https://example.com", "Personal site"],
-							].map(([name, url, label]) => (
-								<a
-									key={name}
-									href={url}
-									target="_blank"
-									rel="noreferrer"
-									className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-xs shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground"
-								>
-									<span className="flex items-center gap-2">
-										<Code2 className="size-3.5 text-primary" />
-										{name}
-										<span className="text-muted-foreground">{label}</span>
-									</span>
-									<ExternalLink className="size-3" />
-								</a>
-							))}
+								["LinkedIn", profileData.profile?.linkedinUrl],
+								["GitHub", profileData.profile?.githubUrl],
+								["Personal site", profileData.profile?.websiteUrl],
+							].map(([name, url]) =>
+								url ? (
+									<a
+										key={name}
+										href={url}
+										target="_blank"
+										rel="noreferrer"
+										className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-xs shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground"
+									>
+										<span className="flex min-w-0 items-center gap-2">
+											<Code2 className="size-3.5 shrink-0 text-primary" />
+											{name}
+											<span className="truncate text-muted-foreground">
+												{url}
+											</span>
+										</span>
+										<ExternalLink className="size-3 shrink-0" />
+									</a>
+								) : null,
+							)}
+							{![
+								profileData.profile?.linkedinUrl,
+								profileData.profile?.githubUrl,
+								profileData.profile?.websiteUrl,
+							].some(Boolean) && (
+								<p className="text-xs text-muted-foreground">
+									No connections added yet.
+								</p>
+							)}
 						</CardContent>
 					</Card>
 				</aside>

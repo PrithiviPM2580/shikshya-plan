@@ -108,6 +108,9 @@ model Profile {
   semester           String?
   weeklyHours        Int?
   targetGpa          Float?
+  linkedinUrl        String?
+  githubUrl          String?
+  websiteUrl         String?
   theme              ThemeMode @default(SYSTEM)
   pomodoroLength     Int       @default(25)
   studyView          String    @default("weekly")
