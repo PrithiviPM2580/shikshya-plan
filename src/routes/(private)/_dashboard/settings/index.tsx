@@ -28,7 +28,11 @@ import {
 } from "#/components/ui/card.tsx";
 import { Input } from "#/components/ui/input.tsx";
 import { Switch } from "#/components/ui/switch.tsx";
-import { getProfile, updateProfile } from "#/features/profile/server/profile";
+import {
+	getProfile,
+	updateProfile,
+	uploadAvatar,
+} from "#/features/profile/server/profile";
 import { authClient } from "#/lib/auth-client";
 
 export const Route = createFileRoute("/(private)/_dashboard/settings/")({
@@ -57,6 +61,7 @@ function RouteComponent() {
 	);
 	const [reminders, setReminders] = useState(true);
 	const [saving, setSaving] = useState(false);
+	const [avatarUploading, setAvatarUploading] = useState(false);
 	const [pomodoroLength, setPomodoroLength] = useState("25");
 	const [studyView, setStudyView] = useState("weekly");
 	const [showCompleted, setShowCompleted] = useState(true);
@@ -91,17 +96,34 @@ function RouteComponent() {
 		}
 	}
 
-	function handleAvatar(event: React.ChangeEvent<HTMLInputElement>) {
+	async function handleAvatar(event: React.ChangeEvent<HTMLInputElement>) {
 		const file = event.target.files?.[0];
 		if (!file) return;
 		if (!file.type.startsWith("image/") || file.size > 5_000_000) {
 			toast.error("Choose an image smaller than 5 MB");
 			return;
 		}
-		const reader = new FileReader();
-		reader.onload = () =>
-			setAvatarUrl(typeof reader.result === "string" ? reader.result : null);
-		reader.readAsDataURL(file);
+		setAvatarUploading(true);
+		try {
+			const dataUrl = await new Promise<string>((resolve, reject) => {
+				const reader = new FileReader();
+				reader.onload = () =>
+					typeof reader.result === "string"
+						? resolve(reader.result)
+						: reject(new Error("Unable to read image"));
+				reader.onerror = () => reject(new Error("Unable to read image"));
+				reader.readAsDataURL(file);
+			});
+			const result = await uploadAvatar({ data: { dataUrl } });
+			setAvatarUrl(result.secureUrl);
+			toast.success("Avatar uploaded. Save changes to keep it.");
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to upload avatar",
+			);
+		} finally {
+			setAvatarUploading(false);
+		}
 	}
 
 	function goToSection(section: string) {
@@ -229,6 +251,7 @@ function RouteComponent() {
 									<div className="mt-2 flex gap-2">
 										<label className="inline-flex h-8 cursor-pointer items-center rounded-md border border-input bg-background px-3 text-xs shadow-xs hover:bg-accent">
 											Change avatar
+											{avatarUploading && "Uploading..."}
 											<input
 												type="file"
 												accept="image/png,image/jpeg,image/webp"

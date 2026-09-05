@@ -1,7 +1,45 @@
 import { createServerFn } from "@tanstack/react-start";
+import { v2 as cloudinary } from "cloudinary";
 import prisma from "#/lib/prisma-client";
 import { requireCurrentUser } from "#/lib/server-auth";
-import { profileInput } from "../validation";
+import { avatarUploadInput, profileInput } from "../validation";
+
+cloudinary.config({
+	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+export const uploadAvatar = createServerFn({ method: "POST" })
+	.validator(avatarUploadInput)
+	.handler(async ({ data }) => {
+		const user = await requireCurrentUser();
+		if (
+			!process.env.CLOUDINARY_CLOUD_NAME ||
+			!process.env.CLOUDINARY_API_KEY ||
+			!process.env.CLOUDINARY_API_SECRET
+		) {
+			throw new Error("Cloudinary is not configured");
+		}
+
+		const result = await cloudinary.uploader.upload(data.dataUrl, {
+			folder: "shikshya-plan/avatars",
+			public_id: user.id,
+			overwrite: true,
+			resource_type: "image",
+			transformation: [
+				{
+					width: 512,
+					height: 512,
+					crop: "limit",
+					quality: "auto",
+					fetch_format: "auto",
+				},
+			],
+		});
+
+		return { secureUrl: result.secure_url };
+	});
 
 export const getProfile = createServerFn({ method: "GET" }).handler(
 	async () => {
