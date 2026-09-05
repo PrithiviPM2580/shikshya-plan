@@ -1,13 +1,25 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Check, Clock3, Flag } from "lucide-react";
-import { useState } from "react";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { ArrowLeft, ArrowRight, Check, Clock3, Flag, Plus } from "lucide-react";
+import { type FormEvent, useState } from "react";
+import { toast } from "sonner";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
+import { Input } from "#/components/ui/input";
 import { getCalendarData } from "#/features/calendar/server/calendar";
+import { createExam } from "#/features/exams/server/exams";
+import { getSessionOptions } from "#/features/sessions/server/options";
+import { createSession } from "#/features/sessions/server/sessions";
+import { createTask } from "#/features/tasks/server/tasks";
 
 export const Route = createFileRoute("/(private)/_dashboard/calendar/")({
-	loader: () => getCalendarData(),
+	loader: async () => {
+		const [calendar, options] = await Promise.all([
+			getCalendarData(),
+			getSessionOptions(),
+		]);
+		return { ...calendar, options };
+	},
 	component: CalendarPage,
 });
 
@@ -22,8 +34,20 @@ type CalendarEvent = {
 
 function CalendarPage() {
 	const data = Route.useLoaderData();
+	const router = useRouter();
 	const [month, setMonth] = useState(() => new Date());
 	const [selectedDate, setSelectedDate] = useState(() => new Date());
+	const [eventOpen, setEventOpen] = useState(false);
+	const [eventType, setEventType] = useState<"task" | "session" | "exam">(
+		"task",
+	);
+	const [title, setTitle] = useState("");
+	const [eventDate, setEventDate] = useState("");
+	const [subjectId, setSubjectId] = useState("");
+	const [priority, setPriority] = useState<"LOW" | "MEDIUM" | "HIGH">("MEDIUM");
+	const [durationMin, setDurationMin] = useState("30");
+	const [syllabus, setSyllabus] = useState("");
+	const [saving, setSaving] = useState(false);
 	const events: CalendarEvent[] = [
 		...data.tasks.map((task) => ({
 			id: task.id,
@@ -73,6 +97,73 @@ function CalendarPage() {
 	}
 	const isToday = (date: Date) => dateKey(date) === dateKey(new Date());
 
+	function openEventForm() {
+		const date = new Date(selectedDate);
+		date.setHours(9, 0, 0, 0);
+		setEventDate(toDateTimeLocal(date));
+		setEventOpen(true);
+	}
+
+	function resetEventForm() {
+		setEventOpen(false);
+		setTitle("");
+		setSubjectId("");
+		setPriority("MEDIUM");
+		setDurationMin("30");
+		setSyllabus("");
+	}
+
+	async function submitEvent(event: FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		setSaving(true);
+		try {
+			const date = new Date(eventDate);
+			if (eventType === "task") {
+				await createTask({
+					data: {
+						title,
+						description: "",
+						subjectId: subjectId || null,
+						priority,
+						dueDate: date,
+					},
+				});
+			} else if (eventType === "session") {
+				await createSession({
+					data: {
+						title,
+						subjectId: subjectId || null,
+						planId: null,
+						scheduledDate: date,
+						durationMin: Number(durationMin),
+						notes: "",
+					},
+				});
+			} else {
+				await createExam({
+					data: {
+						title,
+						subjectId: subjectId || null,
+						examDate: date,
+						syllabus,
+						readinessPercentage: 0,
+					},
+				});
+			}
+			resetEventForm();
+			await router.invalidate();
+			toast.success(
+				`${eventType[0].toUpperCase()}${eventType.slice(1)} created`,
+			);
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to create event",
+			);
+		} finally {
+			setSaving(false);
+		}
+	}
+
 	return (
 		<div className="w-full space-y-5">
 			<section className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between">
@@ -87,8 +178,115 @@ function CalendarPage() {
 						Tasks, sessions, and exams in one view.
 					</p>
 				</div>
-				<Button onClick={() => setSelectedDate(new Date())}>Today</Button>
+				<div className="flex gap-2">
+					<Button variant="outline" onClick={() => setSelectedDate(new Date())}>
+						Today
+					</Button>
+					<Button onClick={openEventForm}>
+						<Plus /> New Event
+					</Button>
+				</div>
 			</section>
+			{eventOpen && (
+				<form
+					onSubmit={submitEvent}
+					className="grid gap-3 rounded-xl border bg-card p-4 md:grid-cols-2"
+				>
+					<label className="space-y-1 text-sm">
+						<span className="font-medium">Event type</span>
+						<select
+							value={eventType}
+							onChange={(event) =>
+								setEventType(event.target.value as typeof eventType)
+							}
+							className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+						>
+							<option value="task">Task</option>
+							<option value="session">Study session</option>
+							<option value="exam">Exam</option>
+						</select>
+					</label>
+					<label className="space-y-1 text-sm">
+						<span className="font-medium">Title</span>
+						<Input
+							required
+							value={title}
+							onChange={(event) => setTitle(event.target.value)}
+							placeholder="What is scheduled?"
+						/>
+					</label>
+					<label className="space-y-1 text-sm">
+						<span className="font-medium">Date and time</span>
+						<Input
+							required
+							type="datetime-local"
+							value={eventDate}
+							onChange={(event) => setEventDate(event.target.value)}
+						/>
+					</label>
+					<label className="space-y-1 text-sm">
+						<span className="font-medium">Subject</span>
+						<select
+							value={subjectId}
+							onChange={(event) => setSubjectId(event.target.value)}
+							className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+						>
+							<option value="">No subject</option>
+							{data.options.subjects.map((subject) => (
+								<option key={subject.id} value={subject.id}>
+									{subject.name}
+								</option>
+							))}
+						</select>
+					</label>
+					{eventType === "task" && (
+						<label className="space-y-1 text-sm">
+							<span className="font-medium">Priority</span>
+							<select
+								value={priority}
+								onChange={(event) =>
+									setPriority(event.target.value as typeof priority)
+								}
+								className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+							>
+								<option value="LOW">Low</option>
+								<option value="MEDIUM">Medium</option>
+								<option value="HIGH">High</option>
+							</select>
+						</label>
+					)}
+					{eventType === "session" && (
+						<label className="space-y-1 text-sm">
+							<span className="font-medium">Duration (minutes)</span>
+							<Input
+								required
+								type="number"
+								min="1"
+								max="720"
+								value={durationMin}
+								onChange={(event) => setDurationMin(event.target.value)}
+							/>
+						</label>
+					)}
+					{eventType === "exam" && (
+						<label className="space-y-1 text-sm">
+							<span className="font-medium">Syllabus or topics</span>
+							<Input
+								value={syllabus}
+								onChange={(event) => setSyllabus(event.target.value)}
+							/>
+						</label>
+					)}
+					<div className="flex gap-2 md:col-span-2">
+						<Button type="submit" disabled={saving}>
+							{saving ? "Creating..." : "Create Event"}
+						</Button>
+						<Button type="button" variant="outline" onClick={resetEventForm}>
+							Cancel
+						</Button>
+					</div>
+				</form>
+			)}
 			<div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_280px]">
 				<Card className="overflow-hidden rounded-xl border bg-card py-0 shadow-sm">
 					<CardHeader className="flex-row items-center justify-between border-b border-border/60 px-5 py-4">
@@ -233,4 +431,9 @@ function CalendarPage() {
 			</div>
 		</div>
 	);
+}
+
+function toDateTimeLocal(date: Date) {
+	const offset = date.getTimezoneOffset();
+	return new Date(date.getTime() - offset * 60_000).toISOString().slice(0, 16);
 }
