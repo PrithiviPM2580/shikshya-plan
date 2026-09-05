@@ -20,6 +20,7 @@
     "ui:add": "bunx --bun shadcn@latest add"
   },
   "dependencies": {
+    "@ai-sdk/react": "^4.0.96",
     "@base-ui/react": "^1.6.0",
     "@better-auth/prisma-adapter": "^1.7.2",
     "@hookform/resolvers": "^5.4.2",

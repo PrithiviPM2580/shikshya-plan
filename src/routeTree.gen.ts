@@ -14,6 +14,7 @@ import { Route as publicIndexRouteImport } from './routes/(public)/index'
 import { Route as publicAuthRouteRouteImport } from './routes/(public)/_auth/route'
 import { Route as publicOnboardingIndexRouteImport } from './routes/(public)/onboarding/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as privateDashboardAiIndexRouteImport } from './routes/(private)/_dashboard/ai/index'
 import { Route as privateDashboardAnalyticsIndexRouteImport } from './routes/(private)/_dashboard/analytics/index'
 import { Route as privateDashboardCalendarIndexRouteImport } from './routes/(private)/_dashboard/calendar/index'
 import { Route as privateDashboardDashboardIndexRouteImport } from './routes/(private)/_dashboard/dashboard/index'
@@ -56,6 +57,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
+} as any)
+const privateDashboardAiIndexRoute = privateDashboardAiIndexRouteImport.update({
+  id: '/ai/',
+  path: '/ai/',
+  getParentRoute: () => privateDashboardRouteRoute,
 } as any)
 const privateDashboardAnalyticsIndexRoute =
   privateDashboardAnalyticsIndexRouteImport.update({
@@ -174,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/': typeof publicIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/onboarding/': typeof publicOnboardingIndexRoute
+  '/ai/': typeof privateDashboardAiIndexRoute
   '/analytics/': typeof privateDashboardAnalyticsIndexRoute
   '/calendar/': typeof privateDashboardCalendarIndexRoute
   '/dashboard/': typeof privateDashboardDashboardIndexRoute
@@ -198,6 +205,7 @@ export interface FileRoutesByTo {
   '/': typeof publicIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/onboarding': typeof publicOnboardingIndexRoute
+  '/ai': typeof privateDashboardAiIndexRoute
   '/analytics': typeof privateDashboardAnalyticsIndexRoute
   '/calendar': typeof privateDashboardCalendarIndexRoute
   '/dashboard': typeof privateDashboardDashboardIndexRoute
@@ -225,6 +233,7 @@ export interface FileRoutesById {
   '/(public)/': typeof publicIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/(public)/onboarding/': typeof publicOnboardingIndexRoute
+  '/(private)/_dashboard/ai/': typeof privateDashboardAiIndexRoute
   '/(private)/_dashboard/analytics/': typeof privateDashboardAnalyticsIndexRoute
   '/(private)/_dashboard/calendar/': typeof privateDashboardCalendarIndexRoute
   '/(private)/_dashboard/dashboard/': typeof privateDashboardDashboardIndexRoute
@@ -251,6 +260,7 @@ export interface FileRouteTypes {
     | '/'
     | '/api/auth/$'
     | '/onboarding/'
+    | '/ai/'
     | '/analytics/'
     | '/calendar/'
     | '/dashboard/'
@@ -275,6 +285,7 @@ export interface FileRouteTypes {
     | '/'
     | '/api/auth/$'
     | '/onboarding'
+    | '/ai'
     | '/analytics'
     | '/calendar'
     | '/dashboard'
@@ -301,6 +312,7 @@ export interface FileRouteTypes {
     | '/(public)/'
     | '/api/auth/$'
     | '/(public)/onboarding/'
+    | '/(private)/_dashboard/ai/'
     | '/(private)/_dashboard/analytics/'
     | '/(private)/_dashboard/calendar/'
     | '/(private)/_dashboard/dashboard/'
@@ -366,6 +378,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/(private)/_dashboard/ai/': {
+      id: '/(private)/_dashboard/ai/'
+      path: '/ai'
+      fullPath: '/ai/'
+      preLoaderRoute: typeof privateDashboardAiIndexRouteImport
+      parentRoute: typeof privateDashboardRouteRoute
     }
     '/(private)/_dashboard/analytics/': {
       id: '/(private)/_dashboard/analytics/'
@@ -504,6 +523,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface privateDashboardRouteRouteChildren {
+  privateDashboardAiIndexRoute: typeof privateDashboardAiIndexRoute
   privateDashboardAnalyticsIndexRoute: typeof privateDashboardAnalyticsIndexRoute
   privateDashboardCalendarIndexRoute: typeof privateDashboardCalendarIndexRoute
   privateDashboardDashboardIndexRoute: typeof privateDashboardDashboardIndexRoute
@@ -522,6 +542,7 @@ interface privateDashboardRouteRouteChildren {
 }
 
 const privateDashboardRouteRouteChildren: privateDashboardRouteRouteChildren = {
+  privateDashboardAiIndexRoute: privateDashboardAiIndexRoute,
   privateDashboardAnalyticsIndexRoute: privateDashboardAnalyticsIndexRoute,
   privateDashboardCalendarIndexRoute: privateDashboardCalendarIndexRoute,
   privateDashboardDashboardIndexRoute: privateDashboardDashboardIndexRoute,

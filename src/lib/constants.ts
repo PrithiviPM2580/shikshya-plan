@@ -1,6 +1,7 @@
 import { linkOptions } from "@tanstack/react-router";
 import {
 	BookOpen,
+	Brain,
 	Calendar,
 	CheckSquare,
 	ClipboardCheck,
@@ -13,6 +14,25 @@ import {
 	TrendingUp,
 	User,
 } from "lucide-react";
+
+export const AI_MODELS = [
+	"inclusionai/ling-3.0-flash-sante:free",
+	"inclusionai/ling-3.0-flash-fin:free",
+	"dots-studio/dots-3-note-preview:free",
+	"liquid/lfm-2.5-2.6b:free",
+	"nvidia/nemotron-3.5-lightning:free",
+	"thinkingmachines/inkling-small:free",
+	"poolside/laguna-s-2.1:free",
+	"cohere/north-mini-code:free",
+	"nvidia/nemotron-3.5-content-safety:free",
+	"nvidia/nemotron-3-ultra-550b-a55b:free",
+	"minimax/minimax-m3:free",
+	"google/gemma-4-26b-a4b-it:free",
+	"google/gemma-4-31b-it:free",
+	"nvidia/nemotron-3-super-120b-a12b:free",
+] as const;
+
+export const DEFAULT_AI_MODEL = "google/gemma-4-31b-it:free";
 
 export const navbarLinkOptions = linkOptions([
 	{
@@ -73,6 +93,11 @@ export const primarySidebarItems = linkOptions([
 ]);
 
 export const secondarySidebarItems = linkOptions([
+	{
+		to: "/ai",
+		label: "AI Study Coach",
+		icon: Brain,
+	},
 	{
 		to: "/exams",
 		label: "Exams",
