@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -37,14 +36,14 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
-   studyLogs StudyLog[]
-  goals Goal[]
-  exams Exam[]
-  tasks Task[]
-  studySessions StudySession[]
-  studyPlans StudyPlan[]
-  subjects Subject[]
-  profiles Profile[]
+  studyLogs        StudyLog[]
+  goals            Goal[]
+  exams            Exam[]
+  tasks            Task[]
+  studySessions    StudySession[]
+  studyPlans       StudyPlan[]
+  subjects         Subject[]
+  profiles         Profile[]
   pomodoroSessions PomodoroSession[]
 
   @@unique([email])
@@ -101,33 +100,36 @@ model Verification {
   @@map("verification")
 }
 
-
 model Profile {
-  userId    String    @id
-  name      String?
-  avatarUrl String?
-  theme     ThemeMode @default(SYSTEM)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  userId             String    @id
+  name               String?
+  avatarUrl          String?
+  theme              ThemeMode @default(SYSTEM)
+  pomodoroLength     Int       @default(25)
+  studyView          String    @default("weekly")
+  showCompletedTasks Boolean   @default(true)
+  reminders          Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Subject {
-  id          String    @id @default(uuid()) @db.Uuid
+  id          String   @id @default(uuid()) @db.Uuid
   userId      String
   name        String
-  color       String    @default("#4F46E5")
+  color       String   @default("#4F46E5")
   description String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  studyPlans   PlanSubject[]
-  studySessions StudySession[]
-  tasks        Task[]
-  exams        Exam[]
-  studyLogs    StudyLog[]
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studyPlans       PlanSubject[]
+  studySessions    StudySession[]
+  tasks            Task[]
+  exams            Exam[]
+  studyLogs        StudyLog[]
   pomodoroSessions PomodoroSession[]
 
   @@index([userId])
@@ -145,7 +147,7 @@ model StudyPlan {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
-  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   subjects PlanSubject[]
   sessions StudySession[]
 
@@ -165,21 +167,21 @@ model PlanSubject {
 }
 
 model StudySession {
-  id            String    @id @default(uuid()) @db.Uuid
+  id            String   @id @default(uuid()) @db.Uuid
   userId        String
-  planId        String?   @db.Uuid
-  subjectId     String?   @db.Uuid
+  planId        String?  @db.Uuid
+  subjectId     String?  @db.Uuid
   title         String
-  scheduledDate DateTime  @default(now())
-  durationMin   Int       @default(30)
-  completed     Boolean   @default(false)
+  scheduledDate DateTime @default(now())
+  durationMin   Int      @default(30)
+  completed     Boolean  @default(false)
   notes         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   plan    StudyPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
-  subject Subject?  @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  subject Subject?   @relation(fields: [subjectId], references: [id], onDelete: SetNull)
   tasks   Task[]
   logs    StudyLog[]
 
@@ -199,23 +201,24 @@ model Task {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
-  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   session StudySession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
-  subject Subject?     @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  subject Subject?      @relation(fields: [subjectId], references: [id], onDelete: SetNull)
 
   @@index([userId, dueDate])
 }
 
 model Exam {
-  id        String    @id @default(uuid()) @db.Uuid
-  userId    String
-  subjectId String?   @db.Uuid
-  title     String
-  examDate  DateTime
-  syllabus  String?
-  completed Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id                  String   @id @default(uuid()) @db.Uuid
+  userId              String
+  subjectId           String?  @db.Uuid
+  title               String
+  examDate            DateTime
+  syllabus            String?
+  readinessPercentage Int      @default(0)
+  completed           Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
@@ -238,16 +241,16 @@ model Goal {
 }
 
 model StudyLog {
-  id        String    @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
   userId    String
-  sessionId String? @db.Uuid
-  subjectId String? @db.Uuid
+  sessionId String?  @db.Uuid
+  subjectId String?  @db.Uuid
   minutes   Int
-  loggedAt  DateTime  @default(now())
+  loggedAt  DateTime @default(now())
 
-  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   session StudySession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
-  subject Subject?     @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  subject Subject?      @relation(fields: [subjectId], references: [id], onDelete: SetNull)
 
   @@index([userId, loggedAt])
 }

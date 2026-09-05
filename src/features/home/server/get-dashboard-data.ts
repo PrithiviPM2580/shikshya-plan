@@ -97,6 +97,14 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(
 				take: 3,
 			}),
 		]);
+		const examReadiness = upcomingExams.length
+			? Math.round(
+					upcomingExams.reduce(
+						(total, exam) => total + exam.readinessPercentage,
+						0,
+					) / upcomingExams.length,
+				)
+			: 0;
 
 		const studyData = Array.from({ length: 7 }, (_, index) => {
 			const date = new Date(weekStart);
@@ -115,6 +123,7 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(
 			tasksDone,
 			taskCount,
 			examCount,
+			examReadiness,
 			plan,
 			todayTasks,
 			todaySessions,

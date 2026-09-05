@@ -16,7 +16,7 @@ import {
 	SlidersHorizontal,
 	Timer,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useTheme } from "#/components/theme-provider";
 import { Button } from "#/components/ui/button.tsx";
@@ -42,6 +42,7 @@ export const Route = createFileRoute("/(private)/_dashboard/settings/")({
 
 function RouteComponent() {
 	const profileData = Route.useLoaderData();
+	const persistedStudyView = profileData.profile?.studyView;
 	const router = useRouter();
 	const navigate = useNavigate();
 	const { setTheme } = useTheme();
@@ -59,32 +60,40 @@ function RouteComponent() {
 	const [theme, setThemeValue] = useState(
 		profileData.profile?.theme ?? "SYSTEM",
 	);
-	const [reminders, setReminders] = useState(true);
+	const [reminders, setReminders] = useState(
+		profileData.profile?.reminders ?? true,
+	);
 	const [saving, setSaving] = useState(false);
 	const [avatarUploading, setAvatarUploading] = useState(false);
-	const [pomodoroLength, setPomodoroLength] = useState("25");
-	const [studyView, setStudyView] = useState("weekly");
-	const [showCompleted, setShowCompleted] = useState(true);
-
-	useEffect(() => {
-		setReminders(localStorage.getItem("study-reminders") !== "off");
-		setPomodoroLength(localStorage.getItem("pomodoro-length") ?? "25");
-		setStudyView(localStorage.getItem("study-view") ?? "weekly");
-		setShowCompleted(localStorage.getItem("show-completed-tasks") !== "off");
-	}, []);
+	const [pomodoroLength, setPomodoroLength] = useState(
+		String(profileData.profile?.pomodoroLength ?? 25),
+	);
+	const [studyView, setStudyView] = useState<"daily" | "weekly" | "monthly">(
+		persistedStudyView === "daily" ||
+			persistedStudyView === "monthly" ||
+			persistedStudyView === "weekly"
+			? persistedStudyView
+			: "weekly",
+	);
+	const [showCompleted, setShowCompleted] = useState(
+		profileData.profile?.showCompletedTasks ?? true,
+	);
 
 	async function saveSettings() {
 		setSaving(true);
 		try {
-			await updateProfile({ data: { name, theme, avatarUrl } });
+			await updateProfile({
+				data: {
+					name,
+					theme,
+					avatarUrl,
+					pomodoroLength,
+					studyView,
+					showCompletedTasks: showCompleted,
+					reminders,
+				},
+			});
 			setTheme(theme.toLowerCase() as "system" | "light" | "dark");
-			localStorage.setItem("study-reminders", reminders ? "on" : "off");
-			localStorage.setItem("pomodoro-length", pomodoroLength);
-			localStorage.setItem("study-view", studyView);
-			localStorage.setItem(
-				"show-completed-tasks",
-				showCompleted ? "on" : "off",
-			);
 			await router.invalidate();
 			toast.success("Settings saved");
 		} catch (error) {
@@ -370,7 +379,9 @@ function RouteComponent() {
 								</span>
 								<select
 									value={studyView}
-									onChange={(event) => setStudyView(event.target.value)}
+									onChange={(event) =>
+										setStudyView(event.target.value as typeof studyView)
+									}
 									className="h-8 rounded-md border border-input bg-background px-2 text-xs"
 								>
 									<option value="weekly">Weekly plan</option>

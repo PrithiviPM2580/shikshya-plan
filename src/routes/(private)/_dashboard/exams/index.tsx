@@ -6,6 +6,7 @@ import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
+import { Progress } from "#/components/ui/progress";
 import {
 	createExam,
 	deleteExam,
@@ -32,6 +33,7 @@ function ExamsPage() {
 	const [subjectId, setSubjectId] = useState("");
 	const [examDate, setExamDate] = useState("");
 	const [syllabus, setSyllabus] = useState("");
+	const [readinessPercentage, setReadinessPercentage] = useState("0");
 	const [saving, setSaving] = useState(false);
 	const upcoming = exams.filter(
 		(exam) => !exam.completed && new Date(exam.examDate) >= new Date(),
@@ -45,6 +47,7 @@ function ExamsPage() {
 		setSubjectId("");
 		setExamDate("");
 		setSyllabus("");
+		setReadinessPercentage("0");
 	}
 	function edit(exam: (typeof exams)[number]) {
 		setOpen(true);
@@ -53,6 +56,7 @@ function ExamsPage() {
 		setSubjectId(exam.subjectId ?? "");
 		setExamDate(new Date(exam.examDate).toISOString().slice(0, 16));
 		setSyllabus(exam.syllabus ?? "");
+		setReadinessPercentage(String(exam.readinessPercentage));
 	}
 	async function submit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -63,6 +67,7 @@ function ExamsPage() {
 				subjectId: subjectId || null,
 				examDate: new Date(examDate),
 				syllabus,
+				readinessPercentage: Number(readinessPercentage),
 			};
 			if (editingId) {
 				await updateExam({ data: { id: editingId, ...data } });
@@ -198,6 +203,16 @@ function ExamsPage() {
 							onChange={(event) => setSyllabus(event.target.value)}
 						/>
 					</label>
+					<label className="space-y-1 text-sm">
+						<span className="font-medium">Readiness percentage</span>
+						<Input
+							type="number"
+							min="0"
+							max="100"
+							value={readinessPercentage}
+							onChange={(event) => setReadinessPercentage(event.target.value)}
+						/>
+					</label>
 					<div className="flex gap-2">
 						<Button type="submit" disabled={saving}>
 							{saving ? "Saving..." : editingId ? "Save Exam" : "Schedule Exam"}
@@ -246,6 +261,16 @@ function ExamsPage() {
 										{exam.syllabus}
 									</p>
 								)}
+								<div className="mt-3 max-w-sm">
+									<div className="mb-1 flex justify-between text-[11px] text-muted-foreground">
+										<span>Readiness</span>
+										<span>{exam.readinessPercentage}%</span>
+									</div>
+									<Progress
+										value={exam.readinessPercentage}
+										className="h-1.5"
+									/>
+								</div>
 							</div>
 							<div className="flex gap-1">
 								<Button

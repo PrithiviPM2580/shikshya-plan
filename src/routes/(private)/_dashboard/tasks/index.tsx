@@ -14,7 +14,13 @@ import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
 import { Progress } from "#/components/ui/progress";
+import { getProfile } from "#/features/profile/server/profile";
 import { getSubjects } from "#/features/subjects/server/subjects";
+import {
+	filterAndSortTasks,
+	type TaskFilter,
+	type TaskSort,
+} from "#/features/tasks/filtering";
 import {
 	createTask,
 	deleteTask,
@@ -27,14 +33,17 @@ export const Route = createFileRoute("/(private)/_dashboard/tasks/")({
 	loader: async () => ({
 		tasks: await getTasks(),
 		subjects: await getSubjects(),
+		profile: await getProfile(),
 	}),
 	component: TasksPage,
 });
 
 function TasksPage() {
-	const { tasks, subjects } = Route.useLoaderData();
+	const { tasks, subjects, profile } = Route.useLoaderData();
 	const router = useRouter();
 	const [search, setSearch] = useState("");
+	const [taskFilter, setTaskFilter] = useState<TaskFilter>("all");
+	const [taskSort, setTaskSort] = useState<TaskSort>("due-date");
 	const [formOpen, setFormOpen] = useState(false);
 	const [editingId, setEditingId] = useState<string | null>(null);
 	const [title, setTitle] = useState("");
@@ -44,10 +53,17 @@ function TasksPage() {
 	const [dueDate, setDueDate] = useState("");
 	const [isSaving, setIsSaving] = useState(false);
 
-	const visibleTasks = tasks.filter((task) =>
-		`${task.title} ${task.description ?? ""} ${task.subject?.name ?? ""}`
-			.toLowerCase()
-			.includes(search.toLowerCase()),
+	const visibleTasks = filterAndSortTasks(
+		tasks.filter(
+			(task) =>
+				(taskFilter !== "all" ||
+					profile.profile?.showCompletedTasks !== false) &&
+				`${task.title} ${task.description ?? ""} ${task.subject?.name ?? ""}`
+					.toLowerCase()
+					.includes(search.toLowerCase()),
+		),
+		taskFilter,
+		taskSort,
 	);
 	const completedCount = tasks.filter((task) => task.completed).length;
 
@@ -211,11 +227,48 @@ function TasksPage() {
 				</form>
 			)}
 
-			<div className="flex items-center justify-between text-sm text-muted-foreground">
-				<span>
-					{completedCount} of {tasks.length} tasks completed
-				</span>
-				<span>{visibleTasks.length} shown</span>
+			<div className="flex flex-col gap-3 border-y py-3 sm:flex-row sm:items-center sm:justify-between">
+				<div
+					className="flex flex-wrap gap-1"
+					role="group"
+					aria-label="Task filters"
+				>
+					{(
+						[
+							["all", "All"],
+							["due-soon", "Due Soon"],
+							["high-priority", "High Priority"],
+							["completed", "Completed"],
+						] as const
+					).map(([value, label]) => (
+						<Button
+							key={value}
+							variant={taskFilter === value ? "secondary" : "ghost"}
+							size="sm"
+							onClick={() => setTaskFilter(value)}
+						>
+							{label}
+						</Button>
+					))}
+				</div>
+				<div className="flex items-center gap-3 text-sm text-muted-foreground">
+					<span>
+						{completedCount} of {tasks.length} completed
+					</span>
+					<label className="flex items-center gap-2">
+						<span className="sr-only">Sort tasks</span>
+						<select
+							value={taskSort}
+							onChange={(event) => setTaskSort(event.target.value as TaskSort)}
+							className="h-8 rounded-md border border-input bg-background px-2 text-xs text-foreground"
+						>
+							<option value="due-date">Due date</option>
+							<option value="priority">Priority</option>
+							<option value="created-date">Creation date</option>
+						</select>
+					</label>
+					<span>{visibleTasks.length} shown</span>
+				</div>
 			</div>
 			<Progress
 				value={tasks.length ? (completedCount / tasks.length) * 100 : 0}

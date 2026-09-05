@@ -5,6 +5,7 @@ export const examInput = z.object({
 	subjectId: z.string().uuid().nullable(),
 	examDate: z.coerce.date(),
 	syllabus: z.string().trim().max(2000).optional(),
+	readinessPercentage: z.coerce.number().int().min(0).max(100).default(0),
 });
 
 export const updateExamInput = examInput.extend({ id: z.string().uuid() });

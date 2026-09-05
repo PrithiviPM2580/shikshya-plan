@@ -143,9 +143,9 @@ function RouteComponent() {
 					icon={LineChart}
 				/>
 				<StatCard
-					title="Exams"
-					value={String(dashboard.examCount)}
-					note="Upcoming exams"
+					title="Exam readiness"
+					value={`${dashboard.examReadiness}%`}
+					note={`${dashboard.examCount} upcoming exam${dashboard.examCount === 1 ? "" : "s"}`}
 					icon={CircleAlert}
 					tone="red"
 				/>

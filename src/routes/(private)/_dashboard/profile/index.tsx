@@ -59,7 +59,21 @@ function RouteComponent() {
 		event.preventDefault();
 		setSaving(true);
 		try {
-			await updateProfile({ data: { name, theme, avatarUrl } });
+			await updateProfile({
+				data: {
+					name,
+					theme,
+					avatarUrl,
+					pomodoroLength: profileData.profile?.pomodoroLength ?? 25,
+					studyView:
+						profileData.profile?.studyView === "daily" ||
+						profileData.profile?.studyView === "monthly"
+							? profileData.profile.studyView
+							: "weekly",
+					showCompletedTasks: profileData.profile?.showCompletedTasks ?? true,
+					reminders: profileData.profile?.reminders ?? true,
+				},
+			});
 			setTheme(theme.toLowerCase() as "system" | "light" | "dark");
 			setEditing(false);
 			await router.invalidate();

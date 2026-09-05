@@ -12,20 +12,29 @@ import {
 	getPomodoroSessions,
 	startPomodoro,
 } from "#/features/pomodoro/server/pomodoro";
+import { getProfile } from "#/features/profile/server/profile";
 
 export const Route = createFileRoute("/(private)/_dashboard/pomodoro/")({
-	loader: async () => ({
-		sessions: await getPomodoroSessions(),
-		subjects: await getPomodoroOptions(),
-	}),
+	loader: async () => {
+		const [sessions, subjects, profileData] = await Promise.all([
+			getPomodoroSessions(),
+			getPomodoroOptions(),
+			getProfile(),
+		]);
+		return {
+			sessions,
+			subjects,
+			pomodoroLength: profileData.profile?.pomodoroLength ?? 25,
+		};
+	},
 	component: PomodoroPage,
 });
 
 function PomodoroPage() {
-	const { sessions, subjects } = Route.useLoaderData();
+	const { sessions, subjects, pomodoroLength } = Route.useLoaderData();
 	const router = useRouter();
-	const [minutes, setMinutes] = useState(25);
-	const [remaining, setRemaining] = useState(25 * 60);
+	const [minutes, setMinutes] = useState(pomodoroLength);
+	const [remaining, setRemaining] = useState(pomodoroLength * 60);
 	const [title, setTitle] = useState("");
 	const [subjectId, setSubjectId] = useState("");
 	const [activeId, setActiveId] = useState<string | null>(null);
