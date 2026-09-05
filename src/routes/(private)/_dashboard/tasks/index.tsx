@@ -6,6 +6,13 @@ import ConfirmDeleteButton from "#/components/shared/confirm-delete-button";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
+import {
+	Pagination,
+	PaginationContent,
+	PaginationItem,
+	PaginationNext,
+	PaginationPrevious,
+} from "#/components/ui/pagination";
 import { Input } from "#/components/ui/input";
 import { Progress } from "#/components/ui/progress";
 import { getProfile } from "#/features/profile/server/profile";
@@ -38,6 +45,7 @@ function TasksPage() {
 	const [search, setSearch] = useState("");
 	const [taskFilter, setTaskFilter] = useState<TaskFilter>("all");
 	const [taskSort, setTaskSort] = useState<TaskSort>("due-date");
+	const [page, setPage] = useState(1);
 	const [formOpen, setFormOpen] = useState(false);
 	const [editingId, setEditingId] = useState<string | null>(null);
 	const [title, setTitle] = useState("");
@@ -61,6 +69,26 @@ function TasksPage() {
 		},
 	);
 	const completedCount = tasks.filter((task) => task.completed).length;
+	const pageSize = 8;
+	const pageCount = Math.max(1, Math.ceil(visibleTasks.length / pageSize));
+	const currentPage = Math.min(page, pageCount);
+	const paginatedTasks = visibleTasks.slice(
+		(currentPage - 1) * pageSize,
+		currentPage * pageSize,
+	);
+
+	function changeSearch(value: string) {
+		setSearch(value);
+		setPage(1);
+	}
+	function changeFilter(value: TaskFilter) {
+		setTaskFilter(value);
+		setPage(1);
+	}
+	function changeSort(value: TaskSort) {
+		setTaskSort(value);
+		setPage(1);
+	}
 
 	function resetForm() {
 		setFormOpen(false);
@@ -151,7 +179,7 @@ function TasksPage() {
 						<Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
 						<Input
 							value={search}
-							onChange={(event) => setSearch(event.target.value)}
+							onChange={(event) => changeSearch(event.target.value)}
 							placeholder="Search tasks..."
 							className="pl-9"
 						/>
@@ -240,7 +268,7 @@ function TasksPage() {
 							key={value}
 							variant={taskFilter === value ? "secondary" : "ghost"}
 							size="sm"
-							onClick={() => setTaskFilter(value)}
+								onClick={() => changeFilter(value)}
 						>
 							{label}
 						</Button>
@@ -254,7 +282,7 @@ function TasksPage() {
 						<span className="sr-only">Sort tasks</span>
 						<select
 							value={taskSort}
-							onChange={(event) => setTaskSort(event.target.value as TaskSort)}
+							onChange={(event) => changeSort(event.target.value as TaskSort)}
 							className="h-8 rounded-md border border-input bg-background px-2 text-xs text-foreground"
 						>
 							<option value="due-date">Due date</option>
@@ -262,7 +290,9 @@ function TasksPage() {
 							<option value="created-date">Creation date</option>
 						</select>
 					</label>
-					<span>{visibleTasks.length} shown</span>
+						<span>
+							{visibleTasks.length} shown · Page {currentPage} of {pageCount}
+						</span>
 				</div>
 			</div>
 			<Progress
@@ -271,7 +301,7 @@ function TasksPage() {
 			/>
 
 			<section className="grid gap-4 sm:grid-cols-2">
-				{visibleTasks.map((task) => (
+				{paginatedTasks.map((task) => (
 					<Card
 						key={task.id}
 						className={`rounded-xl border bg-card py-0 shadow-sm ${task.completed ? "opacity-70" : ""}`}
@@ -340,6 +370,37 @@ function TasksPage() {
 					</p>
 				)}
 			</section>
+			{pageCount > 1 && (
+				<Pagination>
+					<PaginationContent>
+						<PaginationItem>
+							<PaginationPrevious
+								href="#tasks"
+								aria-disabled={currentPage === 1}
+								onClick={(event) => {
+									event.preventDefault();
+									if (currentPage > 1) setPage(currentPage - 1);
+								}}
+							/>
+						</PaginationItem>
+						<PaginationItem>
+							<span className="px-3 text-xs text-muted-foreground">
+								{currentPage} / {pageCount}
+							</span>
+						</PaginationItem>
+						<PaginationItem>
+							<PaginationNext
+								href="#tasks"
+								aria-disabled={currentPage === pageCount}
+								onClick={(event) => {
+									event.preventDefault();
+									if (currentPage < pageCount) setPage(currentPage + 1);
+								}}
+							/>
+						</PaginationItem>
+					</PaginationContent>
+				</Pagination>
+			)}
 		</div>
 	);
 }
