@@ -7,6 +7,13 @@ import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
+import {
+	Pagination,
+	PaginationContent,
+	PaginationItem,
+	PaginationNext,
+	PaginationPrevious,
+} from "#/components/ui/pagination";
 import { getSessionOptions } from "#/features/sessions/server/options";
 import {
 	completeSession,
@@ -38,7 +45,15 @@ function SessionsPage() {
 	const [durationMin, setDurationMin] = useState(30);
 	const [notes, setNotes] = useState("");
 	const [isSaving, setIsSaving] = useState(false);
+	const [page, setPage] = useState(1);
 	const completed = sessions.filter((session) => session.completed);
+	const pageSize = 8;
+	const pageCount = Math.max(1, Math.ceil(sessions.length / pageSize));
+	const currentPage = Math.min(page, pageCount);
+	const paginatedSessions = sessions.slice(
+		(currentPage - 1) * pageSize,
+		currentPage * pageSize,
+	);
 	const today = new Date().toDateString();
 	const todayMinutes = completed
 		.filter(
@@ -221,7 +236,7 @@ function SessionsPage() {
 				</form>
 			)}
 			<section className="space-y-3">
-				{sessions.map((session) => (
+				{paginatedSessions.map((session) => (
 					<Card
 						key={session.id}
 						className={`rounded-xl border bg-card py-0 shadow-sm ${session.completed ? "opacity-70" : ""}`}
@@ -287,6 +302,37 @@ function SessionsPage() {
 					</p>
 				)}
 			</section>
+			{pageCount > 1 && (
+				<Pagination>
+					<PaginationContent>
+						<PaginationItem>
+							<PaginationPrevious
+								href="#sessions"
+								aria-disabled={currentPage === 1}
+								onClick={(event) => {
+									event.preventDefault();
+									if (currentPage > 1) setPage(currentPage - 1);
+								}}
+							/>
+						</PaginationItem>
+						<PaginationItem>
+							<span className="px-3 text-xs text-muted-foreground">
+								{currentPage} / {pageCount}
+							</span>
+						</PaginationItem>
+						<PaginationItem>
+							<PaginationNext
+								href="#sessions"
+								aria-disabled={currentPage === pageCount}
+								onClick={(event) => {
+									event.preventDefault();
+									if (currentPage < pageCount) setPage(currentPage + 1);
+								}}
+							/>
+						</PaginationItem>
+					</PaginationContent>
+				</Pagination>
+			)}
 		</div>
 	);
 }

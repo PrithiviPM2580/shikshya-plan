@@ -196,6 +196,7 @@ model StudySession {
   logs    StudyLog[]
 
   @@index([userId, scheduledDate])
+  @@index([userId, completed, scheduledDate])
 }
 
 model Task {
@@ -216,6 +217,7 @@ model Task {
   subject Subject?      @relation(fields: [subjectId], references: [id], onDelete: SetNull)
 
   @@index([userId, dueDate])
+  @@index([userId, completed, dueDate])
 }
 
 model Exam {
@@ -234,6 +236,7 @@ model Exam {
   subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
 
   @@index([userId, examDate])
+  @@index([userId, completed, examDate])
 }
 
 model Goal {
@@ -263,6 +266,7 @@ model StudyLog {
   subject Subject?      @relation(fields: [subjectId], references: [id], onDelete: SetNull)
 
   @@index([userId, loggedAt])
+  @@index([userId, subjectId, loggedAt])
 }
 
 model PomodoroSession {
@@ -279,4 +283,6 @@ model PomodoroSession {
 
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+
+  @@index([userId, startedAt])
 }
