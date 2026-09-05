@@ -6,20 +6,30 @@ import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
+import { generateExamInsight } from "#/features/ai/server/exam-insight";
 import {
 	generateStudyPlan,
 	saveGeneratedStudyPlan,
 } from "#/features/ai/server/study-plan";
-import type { GeneratedStudyPlan } from "#/features/ai/validation";
+import { generateTaskBreakdown } from "#/features/ai/server/task-breakdown";
+import type {
+	GeneratedExamInsight,
+	GeneratedStudyPlan,
+	GeneratedTaskBreakdown,
+} from "#/features/ai/validation";
+import { getExams } from "#/features/exams/server/exams";
 import { getSubjects } from "#/features/subjects/server/subjects";
 
 export const Route = createFileRoute("/(private)/_dashboard/ai/")({
-	loader: () => getSubjects(),
+	loader: async () => {
+		const [subjects, exams] = await Promise.all([getSubjects(), getExams()]);
+		return { subjects, exams };
+	},
 	component: AiPage,
 });
 
 function AiPage() {
-	const subjects = Route.useLoaderData();
+	const { subjects, exams } = Route.useLoaderData();
 	const [focus, setFocus] = useState("");
 	const [days, setDays] = useState("7");
 	const [plan, setPlan] = useState<GeneratedStudyPlan | null>(null);
@@ -27,6 +37,19 @@ function AiPage() {
 	const [saving, setSaving] = useState(false);
 	const [subjectId, setSubjectId] = useState("");
 	const [selectedTaskKeys, setSelectedTaskKeys] = useState<string[]>([]);
+	const [breakdownGoal, setBreakdownGoal] = useState("");
+	const [breakdown, setBreakdown] = useState<GeneratedTaskBreakdown | null>(
+		null,
+	);
+	const [breakdownLoading, setBreakdownLoading] = useState(false);
+	const [selectedBreakdownTasks, setSelectedBreakdownTasks] = useState<
+		number[]
+	>([]);
+	const [examId, setExamId] = useState("");
+	const [examInsight, setExamInsight] = useState<GeneratedExamInsight | null>(
+		null,
+	);
+	const [examInsightLoading, setExamInsightLoading] = useState(false);
 
 	async function createPlan(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -91,6 +114,76 @@ function AiPage() {
 		}
 	}
 
+	async function createBreakdown(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		setBreakdownLoading(true);
+		try {
+			const result = await generateTaskBreakdown({
+				data: { goal: breakdownGoal, subjectId: subjectId || null },
+			});
+			setBreakdown(result);
+			setSelectedBreakdownTasks(result.tasks.map((_, index) => index));
+			toast.success("AI task breakdown generated");
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to break down goal",
+			);
+		} finally {
+			setBreakdownLoading(false);
+		}
+	}
+
+	async function saveBreakdownTasks() {
+		if (!breakdown || selectedBreakdownTasks.length === 0) return;
+		const plan: GeneratedStudyPlan = {
+			title: breakdown.goal,
+			overview: breakdown.overview,
+			days: [
+				{
+					day: "Today",
+					focus: breakdown.goal,
+					tasks: breakdown.tasks,
+				},
+			],
+		};
+		setSaving(true);
+		try {
+			const result = await saveGeneratedStudyPlan({
+				data: {
+					plan,
+					selectedTaskKeys: selectedBreakdownTasks.map((index) => `0-${index}`),
+					subjectId: subjectId || null,
+				},
+			});
+			toast.success(
+				`${result.count} task${result.count === 1 ? "" : "s"} saved`,
+			);
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to save tasks",
+			);
+		} finally {
+			setSaving(false);
+		}
+	}
+
+	async function createExamInsight(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		if (!examId) return;
+		setExamInsightLoading(true);
+		try {
+			const result = await generateExamInsight({ data: { examId } });
+			setExamInsight(result);
+			toast.success("Exam insight generated");
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to analyze exam",
+			);
+		} finally {
+			setExamInsightLoading(false);
+		}
+	}
+
 	return (
 		<div className="w-full space-y-5">
 			<section className="border-b border-border pb-5">
@@ -137,6 +230,153 @@ function AiPage() {
 							{loading ? "Planning..." : "Generate plan"}
 						</Button>
 					</form>
+				</CardContent>
+			</Card>
+			<Card className="rounded-xl border bg-card py-0 shadow-sm">
+				<CardHeader className="px-5 pb-2 pt-5">
+					<CardTitle className="text-sm">Exam readiness insight</CardTitle>
+					<p className="text-xs text-muted-foreground">
+						Get targeted advice from your current readiness and study activity.
+					</p>
+				</CardHeader>
+				<CardContent className="space-y-4 px-5 pb-5">
+					<form
+						onSubmit={createExamInsight}
+						className="flex flex-col gap-3 sm:flex-row"
+					>
+						<select
+							value={examId}
+							onChange={(event) => setExamId(event.target.value)}
+							className="h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm"
+							required
+						>
+							<option value="">Choose an upcoming exam</option>
+							{exams
+								.filter((exam) => !exam.completed)
+								.map((exam) => (
+									<option key={exam.id} value={exam.id}>
+										{exam.title}
+									</option>
+								))}
+						</select>
+						<Button
+							type="submit"
+							disabled={examInsightLoading || exams.length === 0}
+						>
+							{examInsightLoading ? (
+								<Loader2 className="animate-spin" />
+							) : (
+								<Brain />
+							)}
+							{examInsightLoading ? "Analyzing..." : "Analyze exam"}
+						</Button>
+					</form>
+					{examInsight && (
+						<div className="space-y-3 rounded-lg bg-muted/50 p-4">
+							<div className="flex items-center gap-2 text-xs">
+								<Badge
+									variant={
+										examInsight.priority === "HIGH" ? "destructive" : "outline"
+									}
+								>
+									{examInsight.priority} priority
+								</Badge>
+								<span className="text-muted-foreground">
+									{examInsight.readiness}% ready · {examInsight.daysRemaining}{" "}
+									days left
+								</span>
+							</div>
+							<p className="text-sm font-medium">
+								{examInsight.readinessSummary}
+							</p>
+							<div className="grid gap-3 sm:grid-cols-2">
+								<div>
+									<p className="text-xs font-semibold">Next actions</p>
+									<ul className="mt-1 list-disc pl-4 text-xs text-muted-foreground">
+										{examInsight.nextActions.map((action) => (
+											<li key={action}>{action}</li>
+										))}
+									</ul>
+								</div>
+								<div>
+									<p className="text-xs font-semibold">Focus topics</p>
+									<ul className="mt-1 list-disc pl-4 text-xs text-muted-foreground">
+										{examInsight.focusTopics.map((topic) => (
+											<li key={topic}>{topic}</li>
+										))}
+									</ul>
+								</div>
+							</div>
+						</div>
+					)}
+				</CardContent>
+			</Card>
+			<Card className="rounded-xl border bg-card py-0 shadow-sm">
+				<CardHeader className="px-5 pb-2 pt-5">
+					<CardTitle className="text-sm">Break down a large goal</CardTitle>
+					<p className="text-xs text-muted-foreground">
+						Turn one assignment or exam goal into smaller tasks.
+					</p>
+				</CardHeader>
+				<CardContent className="space-y-4 px-5 pb-5">
+					<form
+						onSubmit={createBreakdown}
+						className="flex flex-col gap-3 sm:flex-row"
+					>
+						<Input
+							required
+							value={breakdownGoal}
+							onChange={(event) => setBreakdownGoal(event.target.value)}
+							placeholder="e.g. Finish my database systems assignment"
+						/>
+						<Button type="submit" disabled={breakdownLoading}>
+							{breakdownLoading ? (
+								<Loader2 className="animate-spin" />
+							) : (
+								<Brain />
+							)}
+							{breakdownLoading ? "Breaking down..." : "Break it down"}
+						</Button>
+					</form>
+					{breakdown && (
+						<div className="space-y-3 rounded-lg bg-muted/50 p-3">
+							<p className="text-xs text-muted-foreground">
+								{breakdown.overview}
+							</p>
+							{breakdown.tasks.map((task, index) => (
+								<label
+									key={`${task.title}-${index}`}
+									className="flex items-center gap-3 rounded-md bg-background p-3"
+								>
+									<input
+										type="checkbox"
+										checked={selectedBreakdownTasks.includes(index)}
+										onChange={() =>
+											setSelectedBreakdownTasks((current) =>
+												current.includes(index)
+													? current.filter((item) => item !== index)
+													: [...current, index],
+											)
+										}
+									/>
+									<span className="min-w-0 flex-1 text-xs font-semibold">
+										{task.title}
+									</span>
+									<span className="text-[11px] text-muted-foreground">
+										{task.durationMinutes}m
+									</span>
+								</label>
+							))}
+							<Button
+								onClick={saveBreakdownTasks}
+								disabled={saving || selectedBreakdownTasks.length === 0}
+							>
+								{saving
+									? "Saving..."
+									: `Save ${selectedBreakdownTasks.length} tasks`}
+							</Button>
+						</div>
+					)}
 				</CardContent>
 			</Card>
 
