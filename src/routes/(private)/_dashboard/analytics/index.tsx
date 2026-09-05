@@ -312,10 +312,9 @@ function RouteComponent() {
 								Goal Completion Forecast
 							</CardTitle>
 							<p className="mt-2 text-xs leading-5 text-muted-foreground">
-								Based on your current study trajectory and focus scores, you are
-								on track to meet your semester goals. Maintaining this pace will
-								likely result in an estimated GPA of{" "}
-								<span className="font-semibold text-primary">3.8</span>.
+								Your current study pace is based on your logged sessions and weekly
+								target. Keep building consistent study time to move toward your
+								academic goals.
 							</p>
 						</div>
 					</div>
@@ -324,17 +323,24 @@ function RouteComponent() {
 							<p className="text-[10px] uppercase text-muted-foreground">
 								Current status
 							</p>
-							<p className="mt-1 text-xl font-semibold">Ahead of Schedule</p>
+							<p className="mt-1 text-xl font-semibold">
+								{analytics.paceStatus}
+							</p>
 						</div>
 						<div className="rounded-lg bg-muted/60 p-3">
 							<p className="text-[10px] uppercase text-muted-foreground">
 								Recommended action
 							</p>
 							<p className="mt-1 text-xs font-semibold">
-								Increase Physics focus time by 10%
+								{analytics.focusRecommendation}
 							</p>
 						</div>
 					</div>
+					{analytics.targetGpa !== null && (
+						<p className="mt-3 text-xs text-muted-foreground">
+							Target GPA: {analytics.targetGpa.toFixed(1)} · Weekly target: {analytics.weeklyTargetHours} hours
+						</p>
+					)}
 				</CardContent>
 			</Card>
 		</div>

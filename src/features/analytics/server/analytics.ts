@@ -21,7 +21,7 @@ export const getAnalytics = createServerFn({ method: "GET" })
 						? 30
 						: 7;
 		start.setDate(start.getDate() - days + 1);
-		const [logs, pomodoros, tasks, subjects] = await Promise.all([
+		const [logs, pomodoros, tasks, subjects, profile] = await Promise.all([
 			prisma.studyLog.findMany({
 				where: { userId: user.id, loggedAt: { gte: start } },
 				include: { subject: { select: { name: true } } },
@@ -37,6 +37,10 @@ export const getAnalytics = createServerFn({ method: "GET" })
 			prisma.subject.findMany({
 				where: { userId: user.id },
 				select: { name: true },
+			}),
+			prisma.profile.findUnique({
+				where: { userId: user.id },
+				select: { weeklyHours: true, targetGpa: true },
 			}),
 		]);
 		const consistency = Array.from({ length: days }, (_, index) => {
@@ -92,6 +96,19 @@ export const getAnalytics = createServerFn({ method: "GET" })
 		for (let index = consistency.length - 1; index >= 0; index -= 1)
 			if (consistency[index].hours > 0) streak += 1;
 			else break;
+		const targetHours = profile?.weeklyHours ?? 0;
+		const expectedHours = targetHours ? (targetHours / 7) * days : 0;
+		const paceRatio = expectedHours ? totalMinutes / 60 / expectedHours : 0;
+		const paceStatus = !targetHours
+			? "Set a weekly study target"
+			: paceRatio >= 1.1
+				? "Ahead of schedule"
+				: paceRatio >= 0.75
+					? "On track"
+					: "Needs attention";
+		const focusRecommendation = subjectDistribution.length
+			? `Increase ${subjectDistribution[subjectDistribution.length - 1].name} focus time by 10%`
+			: "Log a study session to unlock subject recommendations";
 		return {
 			consistency,
 			subjectDistribution,
@@ -112,5 +129,9 @@ export const getAnalytics = createServerFn({ method: "GET" })
 				: 0,
 			streak,
 			subjectCount: subjects.length,
+			targetGpa: profile?.targetGpa ?? null,
+			weeklyTargetHours: targetHours,
+			paceStatus,
+			focusRecommendation,
 		};
 	});
