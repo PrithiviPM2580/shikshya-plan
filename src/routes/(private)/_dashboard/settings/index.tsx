@@ -529,17 +529,17 @@ function RouteComponent() {
 						<Card className="rounded-xl border bg-primary/10 py-0 shadow-sm">
 							<CardContent className="p-5">
 								<p className="text-xs font-semibold text-primary">
-									Scholar Pro
+									Study workspace
 								</p>
 								<p className="mt-1 text-xs text-muted-foreground">
-									Billed annually · Next cycle: Oct 14, 2026
+									Your study tools, plans, and progress in one place.
 								</p>
 								<Button
 									className="mt-4"
 									size="sm"
 									onClick={() => navigate({ to: "/plans" })}
 								>
-									Manage plan
+									Manage study plans
 								</Button>
 							</CardContent>
 						</Card>
