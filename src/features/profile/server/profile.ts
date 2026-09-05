@@ -1,17 +1,20 @@
 import { createServerFn } from "@tanstack/react-start";
-import { v2 as cloudinary } from "cloudinary";
 import prisma from "#/lib/prisma-client";
 import { requireCurrentUser } from "#/lib/server-auth";
 import { avatarUploadInput, profileInput } from "../validation";
 
-cloudinary.config({
-	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-	api_key: process.env.CLOUDINARY_API_KEY,
-	api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
 const avatarFolder = "shikshya-plan/avatars";
 const avatarPublicId = (userId: string) => `${avatarFolder}/${userId}`;
+
+async function getCloudinary() {
+	const { v2: cloudinary } = await import("cloudinary");
+	cloudinary.config({
+		cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+		api_key: process.env.CLOUDINARY_API_KEY,
+		api_secret: process.env.CLOUDINARY_API_SECRET,
+	});
+	return cloudinary;
+}
 
 function isManagedAvatar(url: string | null | undefined) {
 	return url?.includes(`/image/upload/`) && url.includes(`/${avatarFolder}/`);
@@ -37,6 +40,7 @@ export const uploadAvatar = createServerFn({ method: "POST" })
 			throw new Error("Cloudinary is not configured");
 		}
 
+		const cloudinary = await getCloudinary();
 		const result = await cloudinary.uploader.upload(data.dataUrl, {
 			folder: avatarFolder,
 			public_id: user.id,
@@ -147,6 +151,7 @@ export const updateProfile = createServerFn({ method: "POST" })
 			isManagedAvatar(currentProfile.avatarUrl) &&
 			isCloudinaryConfigured()
 		) {
+			const cloudinary = await getCloudinary();
 			await cloudinary.uploader.destroy(avatarPublicId(user.id), {
 				resource_type: "image",
 				invalidate: true,
