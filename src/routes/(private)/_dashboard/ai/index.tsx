@@ -7,6 +7,7 @@ import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
 import { generateExamInsight } from "#/features/ai/server/exam-insight";
+import { generateQuiz } from "#/features/ai/server/quiz";
 import {
 	generateStudyPlan,
 	saveGeneratedStudyPlan,
@@ -14,6 +15,7 @@ import {
 import { generateTaskBreakdown } from "#/features/ai/server/task-breakdown";
 import type {
 	GeneratedExamInsight,
+	GeneratedQuiz,
 	GeneratedStudyPlan,
 	GeneratedTaskBreakdown,
 } from "#/features/ai/validation";
@@ -45,6 +47,10 @@ function AiPage() {
 	const [selectedBreakdownTasks, setSelectedBreakdownTasks] = useState<
 		number[]
 	>([]);
+	const [quizTopic, setQuizTopic] = useState("");
+	const [quiz, setQuiz] = useState<GeneratedQuiz | null>(null);
+	const [quizLoading, setQuizLoading] = useState(false);
+	const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
 	const [examId, setExamId] = useState("");
 	const [examInsight, setExamInsight] = useState<GeneratedExamInsight | null>(
 		null,
@@ -184,6 +190,25 @@ function AiPage() {
 		}
 	}
 
+	async function createQuiz(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		setQuizLoading(true);
+		try {
+			const result = await generateQuiz({
+				data: { topic: quizTopic, questionCount: 5 },
+			});
+			setQuiz(result);
+			setQuizAnswers({});
+			toast.success("Practice quiz generated");
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to generate quiz",
+			);
+		} finally {
+			setQuizLoading(false);
+		}
+	}
+
 	return (
 		<div className="w-full space-y-5">
 			<section className="border-b border-border pb-5">
@@ -307,6 +332,72 @@ function AiPage() {
 									</ul>
 								</div>
 							</div>
+						</div>
+					)}
+				</CardContent>
+			</Card>
+			<Card className="rounded-xl border bg-card py-0 shadow-sm">
+				<CardHeader className="px-5 pb-2 pt-5">
+					<CardTitle className="text-sm">Practice quiz</CardTitle>
+					<p className="text-xs text-muted-foreground">
+						Generate multiple-choice questions for active revision.
+					</p>
+				</CardHeader>
+				<CardContent className="space-y-4 px-5 pb-5">
+					<form
+						onSubmit={createQuiz}
+						className="flex flex-col gap-3 sm:flex-row"
+					>
+						<Input
+							required
+							value={quizTopic}
+							onChange={(event) => setQuizTopic(event.target.value)}
+							placeholder="e.g. Database normalization"
+						/>
+						<Button type="submit" disabled={quizLoading}>
+							{quizLoading ? <Loader2 className="animate-spin" /> : <Brain />}
+							{quizLoading ? "Creating..." : "Create quiz"}
+						</Button>
+					</form>
+					{quiz && (
+						<div className="space-y-4 rounded-lg bg-muted/50 p-4">
+							<h2 className="text-sm font-bold">{quiz.title}</h2>
+							{quiz.questions.map((item, questionIndex) => {
+								const answer = quizAnswers[questionIndex];
+								const answered = answer !== undefined;
+								return (
+									<div
+										key={item.question}
+										className="space-y-2 rounded-lg bg-background p-3"
+									>
+										<p className="text-xs font-semibold">
+											{questionIndex + 1}. {item.question}
+										</p>
+										<div className="grid gap-2 sm:grid-cols-2">
+											{item.options.map((option, optionIndex) => (
+												<button
+													key={option}
+													type="button"
+													onClick={() =>
+														setQuizAnswers((current) => ({
+															...current,
+															[questionIndex]: optionIndex,
+														}))
+													}
+													className={`rounded-md border p-2 text-left text-xs ${answered && optionIndex === item.correctOption ? "border-primary bg-primary/10" : answered && optionIndex === answer ? "border-destructive bg-destructive/10" : "border-border hover:border-primary"}`}
+												>
+													{option}
+												</button>
+											))}
+										</div>
+										{answered && (
+											<p className="text-[11px] text-muted-foreground">
+												{item.explanation}
+											</p>
+										)}
+									</div>
+								);
+							})}
 						</div>
 					)}
 				</CardContent>

@@ -63,7 +63,27 @@ export const generatedExamInsight = z.object({
 	focusTopics: z.array(z.string()).min(1).max(6),
 });
 
+export const quizRequest = z.object({
+	topic: z.string().trim().min(3).max(300),
+	questionCount: z.coerce.number().int().min(3).max(10).default(5),
+});
+
+export const generatedQuiz = z.object({
+	title: z.string(),
+	questions: z
+		.array(
+			z.object({
+				question: z.string(),
+				options: z.array(z.string()).length(4),
+				correctOption: z.number().int().min(0).max(3),
+				explanation: z.string(),
+			}),
+		)
+		.min(3),
+});
+
 export type GeneratedTaskBreakdown = z.infer<typeof generatedTaskBreakdown>;
 export type GeneratedExamInsight = z.infer<typeof generatedExamInsight>;
+export type GeneratedQuiz = z.infer<typeof generatedQuiz>;
 
 export type GeneratedStudyPlan = z.infer<typeof generatedStudyPlan>;
