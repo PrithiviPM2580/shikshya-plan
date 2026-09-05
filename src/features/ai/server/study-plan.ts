@@ -68,7 +68,7 @@ export const generateStudyPlan = createServerFn({ method: "POST" })
 					schema: generatedStudyPlan,
 					temperature: 0.4,
 					system:
-						"You are a practical academic study planner. Create achievable schedules, avoid overloading students, and use only the provided subjects and exams. Return exactly the requested structured plan.",
+						"You are a practical academic study planner. Create achievable schedules, avoid overloading students, and use only the provided subjects and exams. You must return a non-empty days array. Create one day entry for each requested day and at least one task inside every day. Return exactly the requested structured plan.",
 					prompt,
 				});
 				return result.object;

@@ -104,6 +104,12 @@ function AiPage() {
 							</p>
 						</CardContent>
 					</Card>
+					<div>
+						<h2 className="text-sm font-bold">Generated schedule</h2>
+						<p className="mt-1 text-xs text-muted-foreground">
+							Your overview is above. The daily study tasks are listed below.
+						</p>
+					</div>
 					<div className="grid gap-4 lg:grid-cols-2">
 						{plan.days.map((day) => (
 							<Card

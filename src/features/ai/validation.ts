@@ -8,19 +8,23 @@ export const studyPlanRequest = z.object({
 export const generatedStudyPlan = z.object({
 	title: z.string(),
 	overview: z.string(),
-	days: z.array(
-		z.object({
-			day: z.string(),
-			focus: z.string(),
-			tasks: z.array(
-				z.object({
-					title: z.string(),
-					durationMinutes: z.number().int().min(15).max(240),
-					priority: z.enum(["LOW", "MEDIUM", "HIGH"]),
-				}),
-			),
-		}),
-	),
+	days: z
+		.array(
+			z.object({
+				day: z.string(),
+				focus: z.string(),
+				tasks: z
+					.array(
+						z.object({
+							title: z.string(),
+							durationMinutes: z.number().int().min(15).max(240),
+							priority: z.enum(["LOW", "MEDIUM", "HIGH"]),
+						}),
+					)
+					.min(1),
+			}),
+		)
+		.min(1),
 });
 
 export type GeneratedStudyPlan = z.infer<typeof generatedStudyPlan>;
