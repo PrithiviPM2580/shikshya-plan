@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import {
 	Bell,
 	BookOpen,
@@ -12,6 +12,9 @@ import {
 	SlidersHorizontal,
 	Timer,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useTheme } from "#/components/theme-provider";
 import { Button } from "#/components/ui/button.tsx";
 import {
 	Card,
@@ -21,12 +24,100 @@ import {
 } from "#/components/ui/card.tsx";
 import { Input } from "#/components/ui/input.tsx";
 import { Switch } from "#/components/ui/switch.tsx";
+import { getProfile, updateProfile } from "#/features/profile/server/profile";
+import { authClient } from "#/lib/auth-client";
 
 export const Route = createFileRoute("/(private)/_dashboard/settings/")({
+	loader: () => getProfile(),
 	component: RouteComponent,
 });
 
 function RouteComponent() {
+	const profileData = Route.useLoaderData();
+	const router = useRouter();
+	const { setTheme } = useTheme();
+	const [name, setName] = useState(
+		profileData.profile?.name ?? profileData.user.name,
+	);
+	const [avatarUrl, setAvatarUrl] = useState(
+		profileData.profile?.avatarUrl ?? profileData.user.image ?? null,
+	);
+	const [passwordOpen, setPasswordOpen] = useState(false);
+	const [currentPassword, setCurrentPassword] = useState("");
+	const [newPassword, setNewPassword] = useState("");
+	const [confirmPassword, setConfirmPassword] = useState("");
+	const [activeSection, setActiveSection] = useState("account");
+	const [theme, setThemeValue] = useState(
+		profileData.profile?.theme ?? "SYSTEM",
+	);
+	const [reminders, setReminders] = useState(true);
+	const [saving, setSaving] = useState(false);
+
+	useEffect(() => {
+		setReminders(localStorage.getItem("study-reminders") !== "off");
+	}, []);
+
+	async function saveSettings() {
+		setSaving(true);
+		try {
+			await updateProfile({ data: { name, theme, avatarUrl } });
+			setTheme(theme.toLowerCase() as "system" | "light" | "dark");
+			localStorage.setItem("study-reminders", reminders ? "on" : "off");
+			await router.invalidate();
+			toast.success("Settings saved");
+		} catch (error) {
+			toast.error(
+				error instanceof Error ? error.message : "Unable to save settings",
+			);
+		} finally {
+			setSaving(false);
+		}
+	}
+
+	function handleAvatar(event: React.ChangeEvent<HTMLInputElement>) {
+		const file = event.target.files?.[0];
+		if (!file) return;
+		if (!file.type.startsWith("image/") || file.size > 5_000_000) {
+			toast.error("Choose an image smaller than 5 MB");
+			return;
+		}
+		const reader = new FileReader();
+		reader.onload = () =>
+			setAvatarUrl(typeof reader.result === "string" ? reader.result : null);
+		reader.readAsDataURL(file);
+	}
+
+	function goToSection(section: string) {
+		setActiveSection(section);
+		document
+			.getElementById(section)
+			?.scrollIntoView({ behavior: "smooth", block: "start" });
+	}
+
+	async function changePassword(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		if (newPassword !== confirmPassword) {
+			toast.error("New passwords do not match");
+			return;
+		}
+		await authClient.changePassword({
+			newPassword,
+			currentPassword,
+			revokeOtherSessions: true,
+			fetchOptions: {
+				onSuccess: () => {
+					toast.success("Password changed");
+					setPasswordOpen(false);
+					setCurrentPassword("");
+					setNewPassword("");
+					setConfirmPassword("");
+				},
+				onError: (context) => {
+					toast.error(context.error.message);
+				},
+			},
+		});
+	}
 	const navigation = [
 		[CircleUserRound, "Account & Profile"],
 		[SlidersHorizontal, "Study Preferences"],
@@ -58,8 +149,30 @@ function RouteComponent() {
 						return (
 							<Button
 								key={label as string}
-								variant={index === 0 ? "default" : "ghost"}
-								className={`w-full justify-start gap-3 ${index === 0 ? "" : "text-muted-foreground"}`}
+								variant={
+									activeSection ===
+									[
+										"account",
+										"preferences",
+										"notifications",
+										"appearance",
+										"privacy",
+									][index]
+										? "default"
+										: "ghost"
+								}
+								onClick={() =>
+									goToSection(
+										[
+											"account",
+											"preferences",
+											"notifications",
+											"appearance",
+											"privacy",
+										][index],
+									)
+								}
+								className="w-full justify-start gap-3"
 							>
 								<NavigationIcon className="size-4" />
 								{label as string}
@@ -69,7 +182,10 @@ function RouteComponent() {
 					})}
 				</nav>
 				<main className="space-y-5">
-					<Card className="rounded-xl border bg-card py-0 shadow-sm">
+					<Card
+						id="account"
+						className="scroll-mt-5 rounded-xl border bg-card py-0 shadow-sm"
+					>
 						<CardHeader className="border-b border-border/60 px-5 py-4">
 							<CardTitle className="text-sm">Profile information</CardTitle>
 							<p className="text-xs text-muted-foreground">
@@ -78,22 +194,42 @@ function RouteComponent() {
 						</CardHeader>
 						<CardContent className="space-y-6 p-5">
 							<div className="flex flex-wrap items-center gap-4">
-								<div className="flex size-16 items-center justify-center rounded-full bg-primary text-xl font-bold text-primary-foreground ring-4 ring-primary/10">
-									AM
+								<div className="flex size-16 items-center justify-center overflow-hidden rounded-full bg-primary text-xl font-bold text-primary-foreground ring-4 ring-primary/10">
+									{avatarUrl ? (
+										<img
+											src={avatarUrl}
+											alt="Profile avatar"
+											className="size-full object-cover"
+										/>
+									) : (
+										name
+											.split(" ")
+											.map((part) => part[0])
+											.join("")
+											.slice(0, 2)
+											.toUpperCase()
+									)}
 								</div>
 								<div>
-									<p className="text-sm font-semibold">Alex Mercer</p>
+									<p className="text-sm font-semibold">{name}</p>
 									<p className="mt-1 text-xs text-muted-foreground">
-										Junoir · Computer Science & Chemistry
+										{profileData.user.email}
 									</p>
 									<div className="mt-2 flex gap-2">
-										<Button variant="outline" size="sm">
+										<label className="inline-flex h-8 cursor-pointer items-center rounded-md border border-input bg-background px-3 text-xs shadow-xs hover:bg-accent">
 											Change avatar
-										</Button>
+											<input
+												type="file"
+												accept="image/png,image/jpeg,image/webp"
+												className="sr-only"
+												onChange={handleAvatar}
+											/>
+										</label>
 										<Button
 											variant="ghost"
 											size="sm"
 											className="text-destructive"
+											onClick={() => setAvatarUrl(null)}
 										>
 											Remove
 										</Button>
@@ -106,7 +242,11 @@ function RouteComponent() {
 									className="space-y-2 text-xs font-medium text-muted-foreground"
 								>
 									FULL NAME
-									<Input id="full-name" defaultValue="Alex Mercer" />
+									<Input
+										id="full-name"
+										value={name}
+										onChange={(event) => setName(event.target.value)}
+									/>
 								</label>
 								<label
 									htmlFor="email"
@@ -116,8 +256,28 @@ function RouteComponent() {
 									<Input
 										id="email"
 										type="email"
-										defaultValue="alex@example.edu"
+										value={profileData.user.email}
+										readOnly
 									/>
+								</label>
+								<label
+									htmlFor="theme"
+									id="appearance"
+									className="space-y-2 text-xs font-medium text-muted-foreground"
+								>
+									THEME
+									<select
+										id="theme"
+										value={theme}
+										onChange={(event) =>
+											setThemeValue(event.target.value as typeof theme)
+										}
+										className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm font-normal text-foreground"
+									>
+										<option value="SYSTEM">System</option>
+										<option value="LIGHT">Light</option>
+										<option value="DARK">Dark</option>
+									</select>
 								</label>
 							</div>
 							<div className="grid gap-4 sm:grid-cols-2">
@@ -126,10 +286,7 @@ function RouteComponent() {
 									className="space-y-2 text-xs font-medium text-muted-foreground"
 								>
 									PROGRAM
-									<Input
-										id="major"
-										defaultValue="Computer Science & Chemistry"
-									/>
+									<Input id="major" value="Use your Subjects page" readOnly />
 								</label>
 								<label
 									htmlFor="timezone"
@@ -138,14 +295,18 @@ function RouteComponent() {
 									TIME ZONE
 									<Input
 										id="timezone"
-										defaultValue="Asia/Kathmandu (GMT+5:45)"
+										value={Intl.DateTimeFormat().resolvedOptions().timeZone}
+										readOnly
 									/>
 								</label>
 							</div>
 						</CardContent>
 					</Card>
 
-					<Card className="rounded-xl border bg-card py-0 shadow-sm">
+					<Card
+						id="preferences"
+						className="scroll-mt-5 rounded-xl border bg-card py-0 shadow-sm"
+					>
 						<CardHeader className="px-5 pb-3 pt-5">
 							<CardTitle className="text-sm">Study preferences</CardTitle>
 							<p className="text-xs text-muted-foreground">
@@ -171,7 +332,10 @@ function RouteComponent() {
 									</div>
 								);
 							})}
-							<div className="flex items-center gap-3 rounded-lg bg-muted/60 p-3">
+							<div
+								id="notifications"
+								className="scroll-mt-5 flex items-center gap-3 rounded-lg bg-muted/60 p-3"
+							>
 								<Bell className="size-4 text-primary" />
 								<div className="flex-1">
 									<p className="text-xs font-medium">Daily study reminder</p>
@@ -179,7 +343,7 @@ function RouteComponent() {
 										Notify me at 8:00 AM
 									</p>
 								</div>
-								<Switch defaultChecked />
+								<Switch checked={reminders} onCheckedChange={setReminders} />
 							</div>
 						</CardContent>
 					</Card>
@@ -198,7 +362,10 @@ function RouteComponent() {
 								</Button>
 							</CardContent>
 						</Card>
-						<Card className="rounded-xl border bg-card py-0 shadow-sm">
+						<Card
+							id="privacy"
+							className="scroll-mt-5 rounded-xl border bg-card py-0 shadow-sm"
+						>
 							<CardContent className="p-5">
 								<div className="flex items-center gap-2">
 									<LockKeyhole className="size-4 text-primary" />
@@ -207,14 +374,53 @@ function RouteComponent() {
 								<p className="mt-2 text-xs text-muted-foreground">
 									Your password was updated 2 months ago.
 								</p>
-								<Button variant="outline" size="sm" className="mt-4">
+								<Button
+									variant="outline"
+									size="sm"
+									className="mt-4"
+									onClick={() => setPasswordOpen((value) => !value)}
+								>
 									Change password
 								</Button>
+								{passwordOpen && (
+									<form onSubmit={changePassword} className="mt-4 space-y-2">
+										<Input
+											required
+											type="password"
+											value={currentPassword}
+											onChange={(event) =>
+												setCurrentPassword(event.target.value)
+											}
+											placeholder="Current password"
+										/>
+										<Input
+											required
+											minLength={8}
+											type="password"
+											value={newPassword}
+											onChange={(event) => setNewPassword(event.target.value)}
+											placeholder="New password (8+ characters)"
+										/>
+										<Input
+											required
+											minLength={8}
+											type="password"
+											value={confirmPassword}
+											onChange={(event) =>
+												setConfirmPassword(event.target.value)
+											}
+											placeholder="Confirm new password"
+										/>
+										<Button type="submit" size="sm">
+											Update password
+										</Button>
+									</form>
+								)}
 							</CardContent>
 						</Card>
 					</div>
 					<div className="flex justify-end">
-						<Button>
+						<Button onClick={saveSettings} disabled={saving}>
 							<Save /> Save changes
 						</Button>
 					</div>

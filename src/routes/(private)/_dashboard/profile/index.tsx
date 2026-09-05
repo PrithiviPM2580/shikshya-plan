@@ -44,6 +44,9 @@ function RouteComponent() {
 	const [theme, setThemeValue] = useState(
 		profileData.profile?.theme ?? "SYSTEM",
 	);
+	const [avatarUrl] = useState(
+		profileData.profile?.avatarUrl ?? profileData.user.image ?? null,
+	);
 	const [saving, setSaving] = useState(false);
 	const displayName = profileData.profile?.name ?? profileData.user.name;
 	const initials = displayName
@@ -56,7 +59,7 @@ function RouteComponent() {
 		event.preventDefault();
 		setSaving(true);
 		try {
-			await updateProfile({ data: { name, theme } });
+			await updateProfile({ data: { name, theme, avatarUrl } });
 			setTheme(theme.toLowerCase() as "system" | "light" | "dark");
 			setEditing(false);
 			await router.invalidate();

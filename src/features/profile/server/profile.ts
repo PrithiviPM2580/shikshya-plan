@@ -45,11 +45,23 @@ export const updateProfile = createServerFn({ method: "POST" })
 	.handler(async ({ data }) => {
 		const user = await requireCurrentUser();
 		const [updatedUser, profile] = await prisma.$transaction([
-			prisma.user.update({ where: { id: user.id }, data: { name: data.name } }),
+			prisma.user.update({
+				where: { id: user.id },
+				data: { name: data.name, image: data.avatarUrl },
+			}),
 			prisma.profile.upsert({
 				where: { userId: user.id },
-				create: { userId: user.id, name: data.name, theme: data.theme },
-				update: { name: data.name, theme: data.theme },
+				create: {
+					userId: user.id,
+					name: data.name,
+					theme: data.theme,
+					avatarUrl: data.avatarUrl,
+				},
+				update: {
+					name: data.name,
+					theme: data.theme,
+					avatarUrl: data.avatarUrl,
+				},
 			}),
 		]);
 		return { user: updatedUser, profile };
