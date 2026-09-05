@@ -12,7 +12,13 @@ const config = defineConfig({
 		devtools(),
 		tailwindcss(),
 		tanstackStart(),
-		netlify(),
+		netlify({
+			dev: {
+				edgeFunctions: {
+					enabled: false,
+				},
+			},
+		}),
 		viteReact(),
 		babel({ presets: [reactCompilerPreset()] }),
 	],
