@@ -65,56 +65,51 @@ The actual meaning:
 
 The core application is working. Remaining work, in priority order:
 
-1. **Task filters and sorting**
-   - All, Due Soon, High Priority, Completed
-   - Sort by due date, priority, and creation date
+AI can add the most value in these areas:
 
-2. **Database-backed settings**
-   - Move Pomodoro length, study view, completed-task visibility, and reminders from `localStorage` into `Profile`.
+1. **AI Study Plan Generator**
+   - User enters subjects, exam dates, available hours, and goals.
+   - AI creates a realistic daily/weekly study plan.
+   - Best first AI feature for this project.
 
-3. **Exam readiness**
-   - Add readiness percentage.
-   - Track syllabus topics or preparation tasks.
-   - Show readiness on Exams and Dashboard.
+2. **Task Breakdown**
+   - Convert “Prepare for Physics exam” into smaller tasks:
+     - Review chapters
+     - Create notes
+     - Solve practice questions
+     - Take mock test
 
-4. **Notifications**
-   - Persist notification preferences.
-   - Add browser reminders for upcoming exams, tasks, and sessions.
+3. **AI Exam Readiness Insights**
+   - Analyze tasks, study logs, and exam date.
+   - Explain why readiness is low or high.
+   - Recommend exactly what to study next.
 
-5. **Avatar improvements**
-   - Add Cloudinary image deletion when avatar is removed or replaced.
-   - Optionally add crop/compression before upload.
+4. **AI Tutor**
+   - Ask questions about a subject.
+   - Get explanations, examples, summaries, and quiz questions.
 
-6. **Calendar event creation**
-   - The calendar displays events, but “New Event” is not yet implemented.
-   - Add task/session/exam creation from the calendar.
+5. **Automatic Quiz Generator**
+   - Generate quizzes from syllabus topics or user-provided notes.
+   - Track incorrect answers and recommend revision.
 
-7. **Pomodoro improvements**
-   - Apply saved Pomodoro length from Settings.
-   - Implement atmosphere/audio controls.
-   - Add break cycles and automatic next session.
+6. **Smart Schedule Adjustment**
+   - If the user misses sessions, AI automatically reschedules unfinished work.
+   - Avoids overloading the user.
 
-8. **Profile data model**
-   - Store onboarding details explicitly:
-     - Program
-     - Semester
-     - Weekly study hours
-     - Target GPA
-   - Currently some information is embedded in plan/goal text.
+7. **Study Analytics Summary**
+   - Convert analytics into plain-language feedback:
+     - “You study consistently in the evening.”
+     - “You are spending less time on Mathematics than other subjects.”
 
-9. **Connections**
-   - Store LinkedIn, GitHub, and personal website URLs per user instead of using generic links.
+8. **Natural Language Task Creation**
+   - User writes: “Remind me to finish chapter 3 physics tomorrow evening.”
+   - AI extracts the task, date, priority, and subject.
 
-10. **Security and destructive actions**
+**Recommended implementation order:**
 
-- Add confirmation dialogs before deleting subjects, tasks, goals, plans, exams, and sessions.
-- Add password reset flow.
+1. AI Study Plan Generator
+2. Task Breakdown
+3. Exam Readiness Insights
+4. AI Tutor and quiz generation
 
-12. **Production cleanup**
-
-- Replace remaining static text such as Scholar Pro billing details.
-- Add pagination for tasks, sessions, logs, and analytics.
-- Improve error boundaries and loading states.
-- Add database indexes for frequently queried dates and statuses.
-
-The best next implementation should be **Task filters and sorting**, followed by **database-backed settings** and **exam readiness**.
+The best next feature is the **AI Study Plan Generator**, because your project already has subjects, plans, sessions, tasks, exams, goals, and weekly study preferences. It can connect to the existing database without requiring a major redesign.
