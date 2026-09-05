@@ -32,8 +32,21 @@ export const completeOnboarding = createServerFn({ method: "POST" })
 		return prisma.$transaction(async (tx) => {
 			const profile = await tx.profile.upsert({
 				where: { userId: session.user.id },
-				create: { userId: session.user.id, name: session.user.name },
-				update: { name: session.user.name },
+				create: {
+					userId: session.user.id,
+					name: session.user.name,
+					program: data.programName,
+					semester: data.semester,
+					weeklyHours: data.weeklyHours,
+					targetGpa: data.targetGpa,
+				},
+				update: {
+					name: session.user.name,
+					program: data.programName,
+					semester: data.semester,
+					weeklyHours: data.weeklyHours,
+					targetGpa: data.targetGpa,
+				},
 				select: { userId: true },
 			});
 

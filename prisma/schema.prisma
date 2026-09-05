@@ -104,6 +104,10 @@ model Profile {
   userId             String    @id
   name               String?
   avatarUrl          String?
+  program            String?
+  semester           String?
+  weeklyHours        Int?
+  targetGpa          Float?
   theme              ThemeMode @default(SYSTEM)
   pomodoroLength     Int       @default(25)
   studyView          String    @default("weekly")

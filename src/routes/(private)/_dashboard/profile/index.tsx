@@ -200,6 +200,40 @@ function RouteComponent() {
 
 			<div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
 				<main className="space-y-5">
+					<Card className="rounded-xl border bg-card py-0 shadow-sm">
+						<CardHeader className="px-5 pb-2 pt-5">
+							<CardTitle className="flex items-center gap-2 text-sm">
+								<GraduationCap className="size-4 text-primary" /> Academic
+								details
+							</CardTitle>
+						</CardHeader>
+						<CardContent className="grid gap-3 px-5 pb-5 sm:grid-cols-2">
+							<AcademicDetail
+								label="Program"
+								value={profileData.profile?.program}
+							/>
+							<AcademicDetail
+								label="Semester"
+								value={profileData.profile?.semester}
+							/>
+							<AcademicDetail
+								label="Weekly study target"
+								value={
+									profileData.profile?.weeklyHours == null
+										? undefined
+										: `${profileData.profile.weeklyHours} hours`
+								}
+							/>
+							<AcademicDetail
+								label="Target GPA"
+								value={
+									profileData.profile?.targetGpa == null
+										? undefined
+										: profileData.profile.targetGpa.toFixed(1)
+								}
+							/>
+						</CardContent>
+					</Card>
 					<Card className="rounded-xl border bg-primary/5 py-0 shadow-sm">
 						<CardHeader className="px-5 pb-2 pt-5">
 							<CardTitle className="flex items-center gap-2 text-sm">
@@ -327,6 +361,23 @@ function RouteComponent() {
 					</Card>
 				</aside>
 			</div>
+		</div>
+	);
+}
+
+function AcademicDetail({
+	label,
+	value,
+}: {
+	label: string;
+	value: string | null | undefined;
+}) {
+	return (
+		<div className="rounded-lg bg-muted/60 p-3">
+			<p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+				{label}
+			</p>
+			<p className="mt-1 text-sm font-semibold">{value ?? "Not set"}</p>
 		</div>
 	);
 }
