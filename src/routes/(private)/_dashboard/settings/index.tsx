@@ -49,6 +49,16 @@ function RouteComponent() {
 	const [name, setName] = useState(
 		profileData.profile?.name ?? profileData.user.name,
 	);
+	const [program, setProgram] = useState(profileData.profile?.program ?? "");
+	const [semester, setSemester] = useState(
+		profileData.profile?.semester ?? "",
+	);
+	const [weeklyHours, setWeeklyHours] = useState(
+		String(profileData.profile?.weeklyHours ?? ""),
+	);
+	const [targetGpa, setTargetGpa] = useState(
+		String(profileData.profile?.targetGpa ?? ""),
+	);
 	const [avatarUrl, setAvatarUrl] = useState(
 		profileData.profile?.avatarUrl ?? profileData.user.image ?? null,
 	);
@@ -96,6 +106,10 @@ function RouteComponent() {
 			await updateProfile({
 				data: {
 					name,
+					program: program || null,
+					semester: semester || null,
+					weeklyHours: weeklyHours === "" ? null : Number(weeklyHours),
+					targetGpa: targetGpa === "" ? null : Number(targetGpa),
 					theme,
 					avatarUrl,
 					pomodoroLength,
@@ -356,7 +370,24 @@ function RouteComponent() {
 									className="space-y-2 text-xs font-medium text-muted-foreground"
 								>
 									PROGRAM
-									<Input id="major" value="Use your Subjects page" readOnly />
+									<Input
+										id="major"
+										value={program}
+										onChange={(event) => setProgram(event.target.value)}
+										placeholder="e.g. BCA"
+									/>
+								</label>
+								<label
+									htmlFor="semester"
+									className="space-y-2 text-xs font-medium text-muted-foreground"
+								>
+									SEMESTER
+									<Input
+										id="semester"
+										value={semester}
+										onChange={(event) => setSemester(event.target.value)}
+										placeholder="e.g. Semester 4"
+									/>
 								</label>
 								<label
 									htmlFor="timezone"
@@ -367,6 +398,33 @@ function RouteComponent() {
 										id="timezone"
 										value={Intl.DateTimeFormat().resolvedOptions().timeZone}
 										readOnly
+									/>
+								</label>
+								<label
+									className="space-y-2 text-xs font-medium text-muted-foreground"
+								>
+									WEEKLY STUDY HOURS
+									<Input
+										type="number"
+										min="0"
+										max="168"
+										value={weeklyHours}
+										onChange={(event) => setWeeklyHours(event.target.value)}
+										placeholder="15"
+									/>
+								</label>
+								<label
+									className="space-y-2 text-xs font-medium text-muted-foreground"
+								>
+									TARGET GPA
+									<Input
+										type="number"
+										min="0"
+										max="4"
+										step="0.1"
+										value={targetGpa}
+										onChange={(event) => setTargetGpa(event.target.value)}
+										placeholder="3.8"
 									/>
 								</label>
 							</div>

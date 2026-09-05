@@ -115,6 +115,10 @@ export const updateProfile = createServerFn({ method: "POST" })
 				create: {
 					userId: user.id,
 					name: data.name,
+					program: data.program,
+					semester: data.semester,
+					weeklyHours: data.weeklyHours,
+					targetGpa: data.targetGpa,
 					theme: data.theme,
 					avatarUrl: data.avatarUrl,
 					linkedinUrl: data.linkedinUrl,
@@ -130,6 +134,10 @@ export const updateProfile = createServerFn({ method: "POST" })
 				},
 				update: {
 					name: data.name,
+					program: data.program,
+					semester: data.semester,
+					weeklyHours: data.weeklyHours,
+					targetGpa: data.targetGpa,
 					theme: data.theme,
 					avatarUrl: data.avatarUrl,
 					linkedinUrl: data.linkedinUrl,
