@@ -1,7 +1,8 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { Check, Pencil, Plus, Target, Trash2 } from "lucide-react";
+import { Check, Pencil, Plus, Target } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
+import ConfirmDeleteButton from "#/components/shared/confirm-delete-button";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
@@ -240,14 +241,10 @@ function GoalsPage() {
 										>
 											<Pencil />
 										</Button>
-										<Button
-											variant="ghost"
-											size="icon-sm"
-											onClick={() => remove(goal.id)}
-											aria-label={`Delete ${goal.title}`}
-										>
-											<Trash2 />
-										</Button>
+										<ConfirmDeleteButton
+											itemLabel={goal.title}
+											onConfirm={() => remove(goal.id)}
+										/>
 									</div>
 								</div>
 								<h2

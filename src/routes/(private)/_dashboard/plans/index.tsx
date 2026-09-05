@@ -1,7 +1,8 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { Archive, BookOpen, Check, Pencil, Plus, Trash2 } from "lucide-react";
+import { Archive, BookOpen, Check, Pencil, Plus } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
+import ConfirmDeleteButton from "#/components/shared/confirm-delete-button";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
@@ -257,14 +258,10 @@ function PlansPage() {
 										>
 											<Archive />
 										</Button>
-										<Button
-											variant="ghost"
-											size="icon-sm"
-											onClick={() => remove(plan.id)}
-											aria-label={`Delete ${plan.title}`}
-										>
-											<Trash2 />
-										</Button>
+										<ConfirmDeleteButton
+											itemLabel={plan.title}
+											onConfirm={() => remove(plan.id)}
+										/>
 									</div>
 								</div>
 								<h2 className="mt-3 text-sm font-bold">{plan.title}</h2>

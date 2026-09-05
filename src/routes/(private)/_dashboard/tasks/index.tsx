@@ -1,14 +1,8 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import {
-	CalendarDays,
-	Check,
-	Pencil,
-	Plus,
-	Search,
-	Trash2,
-} from "lucide-react";
+import { CalendarDays, Check, Pencil, Plus, Search } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
+import ConfirmDeleteButton from "#/components/shared/confirm-delete-button";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
@@ -322,14 +316,10 @@ function TasksPage() {
 									>
 										<Pencil />
 									</Button>
-									<Button
-										variant="ghost"
-										size="icon-sm"
-										onClick={() => handleDelete(task.id)}
-										aria-label={`Delete ${task.title}`}
-									>
-										<Trash2 />
-									</Button>
+									<ConfirmDeleteButton
+										itemLabel={task.title}
+										onConfirm={() => handleDelete(task.id)}
+									/>
 								</div>
 							</div>
 							<div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">

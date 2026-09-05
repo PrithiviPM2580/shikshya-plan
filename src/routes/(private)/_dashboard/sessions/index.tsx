@@ -1,7 +1,8 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { BookOpen, Check, Pencil, Plus, Trash2 } from "lucide-react";
+import { BookOpen, Check, Pencil, Plus } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
+import ConfirmDeleteButton from "#/components/shared/confirm-delete-button";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
@@ -272,14 +273,10 @@ function SessionsPage() {
 								>
 									<Pencil />
 								</Button>
-								<Button
-									size="icon-sm"
-									variant="ghost"
-									onClick={() => remove(session.id)}
-									aria-label={`Delete ${session.title}`}
-								>
-									<Trash2 />
-								</Button>
+								<ConfirmDeleteButton
+									itemLabel={session.title}
+									onConfirm={() => remove(session.id)}
+								/>
 							</div>
 						</CardContent>
 					</Card>

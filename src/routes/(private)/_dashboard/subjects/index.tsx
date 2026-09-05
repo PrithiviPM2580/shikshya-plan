@@ -1,14 +1,8 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import {
-	BookOpen,
-	CheckCircle2,
-	Pencil,
-	Plus,
-	Search,
-	Trash2,
-} from "lucide-react";
+import { BookOpen, CheckCircle2, Pencil, Plus, Search } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import ConfirmDeleteButton from "#/components/shared/confirm-delete-button";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
@@ -168,14 +162,10 @@ function SubjectsPage() {
 									>
 										<Pencil />
 									</Button>
-									<Button
-										variant="ghost"
-										size="icon-sm"
-										aria-label={`Delete ${subject.name}`}
-										onClick={() => handleDelete(subject.id)}
-									>
-										<Trash2 />
-									</Button>
+									<ConfirmDeleteButton
+										itemLabel={subject.name}
+										onConfirm={() => handleDelete(subject.id)}
+									/>
 								</div>
 							</div>
 							<div className="mt-4 min-h-14">

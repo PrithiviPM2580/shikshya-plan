@@ -1,7 +1,8 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { CalendarDays, Check, Pencil, Plus, Trash2 } from "lucide-react";
+import { CalendarDays, Check, Pencil, Plus } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
+import ConfirmDeleteButton from "#/components/shared/confirm-delete-button";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
@@ -281,14 +282,10 @@ function ExamsPage() {
 								>
 									<Pencil />
 								</Button>
-								<Button
-									variant="ghost"
-									size="icon-sm"
-									onClick={() => remove(exam.id)}
-									aria-label={`Delete ${exam.title}`}
-								>
-									<Trash2 />
-								</Button>
+								<ConfirmDeleteButton
+									itemLabel={exam.title}
+									onConfirm={() => remove(exam.id)}
+								/>
 							</div>
 						</CardContent>
 					</Card>
