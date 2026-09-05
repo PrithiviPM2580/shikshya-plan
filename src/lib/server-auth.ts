@@ -43,3 +43,38 @@ export const getOnboardingStatus = createServerFn({ method: "GET" }).handler(
 		return { user: session.user, isComplete: profile !== null };
 	},
 );
+
+export const getShellData = createServerFn({ method: "GET" }).handler(
+	async () => {
+		const user = await requireCurrentUser();
+		const start = new Date();
+		start.setHours(0, 0, 0, 0);
+		const end = new Date(start);
+		end.setDate(end.getDate() + 1);
+		const [tasks, goal, profile] = await Promise.all([
+			prisma.task.findMany({
+				where: { userId: user.id, dueDate: { gte: start, lt: end } },
+				select: { completed: true },
+			}),
+			prisma.goal.findFirst({
+				where: { userId: user.id, completed: false },
+				orderBy: { createdAt: "desc" },
+				select: { title: true, progress: true, target: true },
+			}),
+			prisma.profile.findUnique({
+				where: { userId: user.id },
+				select: { avatarUrl: true },
+			}),
+		]);
+		return {
+			user: {
+				name: profile ? (profile.avatarUrl ? user.name : user.name) : user.name,
+				email: user.email,
+				avatar: profile?.avatarUrl ?? user.image ?? "",
+			},
+			tasksDone: tasks.filter((task) => task.completed).length,
+			taskCount: tasks.length,
+			goal,
+		};
+	},
+);

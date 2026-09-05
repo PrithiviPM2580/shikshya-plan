@@ -10,7 +10,6 @@ import {
 	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuItem,
-	SidebarSeparator,
 } from "#/components/ui/sidebar.tsx";
 import {
 	metaSidebarItems,
@@ -30,15 +29,16 @@ export type SidebarItem = {
 	};
 };
 
-export default function DashboardSidebar() {
-	const data = {
-		user: {
-			name: "shadcn",
-			email: "m@example.com",
-			avatar: "/avatars/shadcn.jpg",
-		},
+export default function DashboardSidebar({
+	shellData,
+}: {
+	shellData: {
+		user: { name: string; email: string; avatar: string };
+		tasksDone: number;
+		taskCount: number;
+		goal: { title: string; progress: number; target: number } | null;
 	};
-
+}) {
 	const renderGroup = (label: string, items: readonly SidebarItem[]) => (
 		<SidebarGroup>
 			<SidebarGroupLabel>{label}</SidebarGroupLabel>
@@ -62,9 +62,9 @@ export default function DashboardSidebar() {
 
 									<span className="font-medium">{item.label}</span>
 
-									{item.label === "Tasks" && (
+									{item.label === "Tasks" && shellData.taskCount > 0 && (
 										<Badge variant="secondary" className="ml-auto">
-											4
+											{shellData.taskCount - shellData.tasksDone}
 										</Badge>
 									)}
 								</Link>
@@ -119,11 +119,21 @@ export default function DashboardSidebar() {
 								Today’s goal
 							</p>
 
-							<p className="mt-0.5 text-xs font-semibold">Finish 2 tasks</p>
+							<p className="mt-0.5 text-xs font-semibold">
+								{shellData.taskCount - shellData.tasksDone} tasks remaining
+							</p>
 						</div>
 
 						<span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
-							58%
+							{shellData.goal
+								? Math.min(
+										100,
+										Math.round(
+											(shellData.goal.progress / shellData.goal.target) * 100,
+										),
+									)
+								: 0}
+							%
 						</span>
 					</div>
 
@@ -133,7 +143,7 @@ export default function DashboardSidebar() {
 				</div>
 
 				{/* User */}
-				<NavUser user={data.user} />
+				<NavUser user={shellData.user} />
 			</SidebarFooter>
 		</Sidebar>
 	);

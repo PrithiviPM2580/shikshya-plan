@@ -8,9 +8,16 @@ import DashboardSidebar from "./dashboard-sidebar";
 export default function StudyShell({
 	children,
 	className,
+	shellData,
 }: {
 	children?: React.ReactNode;
 	className?: string;
+	shellData: {
+		user: { name: string; email: string; avatar: string };
+		tasksDone: number;
+		taskCount: number;
+		goal: { title: string; progress: number; target: number } | null;
+	};
 }) {
 	return (
 		<div
@@ -18,10 +25,10 @@ export default function StudyShell({
 		>
 			<SidebarProvider>
 				<div className="min-h-screen w-full bg-[var(--hero-a)]/10 md:flex md:min-h-screen">
-					<DashboardSidebar />
+					<DashboardSidebar shellData={shellData} />
 
 					<div className="flex min-h-screen flex-1 w-full flex-col min-w-0">
-						<DashboardHeader />
+						<DashboardHeader shellData={shellData} />
 						<SidebarInset className="flex-1 min-w-0 overflow-y-auto p-6">
 							{children ?? (
 								<div className="rounded-3xl border border-border bg-surface p-10 text-center shadow-sm">

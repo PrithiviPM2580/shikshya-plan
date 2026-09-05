@@ -1,7 +1,7 @@
 "use client";
 
 import { useNavigate } from "@tanstack/react-router";
-import { ChevronsUpDown, LogOutIcon } from "lucide-react";
+import { ChevronsUpDown, LogOutIcon, Settings, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { authClient } from "#/lib/auth-client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -26,6 +26,12 @@ export function NavUser({
 }) {
 	const { isMobile } = useSidebar();
 	const navigate = useNavigate();
+	const initials = user.name
+		.split(" ")
+		.map((part) => part[0])
+		.join("")
+		.slice(0, 2)
+		.toUpperCase();
 	async function handleLogout() {
 		await authClient.signOut({
 			fetchOptions: {
@@ -50,7 +56,7 @@ export function NavUser({
 					>
 						<Avatar className="h-8 w-8 rounded-lg grayscale">
 							<AvatarImage src={user.avatar} alt={user.name} />
-							<AvatarFallback className="rounded-lg">CN</AvatarFallback>
+							<AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
 						</Avatar>
 						<div className="grid flex-1 text-left text-sm leading-tight">
 							<span className="truncate font-medium">{user.name}</span>
@@ -71,7 +77,9 @@ export function NavUser({
 						<div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
 							<Avatar className="h-8 w-8 rounded-lg">
 								<AvatarImage src={user.avatar} alt={user.name} />
-								<AvatarFallback className="rounded-lg">CN</AvatarFallback>
+								<AvatarFallback className="rounded-lg">
+									{initials}
+								</AvatarFallback>
 							</Avatar>
 							<div className="grid flex-1 text-left text-sm leading-tight">
 								<span className="truncate font-medium">{user.name}</span>
@@ -81,6 +89,15 @@ export function NavUser({
 							</div>
 						</div>
 					</DropdownMenuLabel>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
+						<UserRound />
+						Profile
+					</DropdownMenuItem>
+					<DropdownMenuItem onClick={() => navigate({ to: "/settings" })}>
+						<Settings />
+						Settings
+					</DropdownMenuItem>
 					<DropdownMenuSeparator />
 
 					<DropdownMenuItem onClick={handleLogout}>

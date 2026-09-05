@@ -1,3 +1,4 @@
+import { useRouterState } from "@tanstack/react-router";
 import {
 	BellRing,
 	Goal,
@@ -18,8 +19,19 @@ import {
 import { ModeToggle } from "../mode-toggle";
 import SearchForm from "./search-form";
 
-export default function DashboardHeader() {
+export default function DashboardHeader({
+	shellData,
+}: {
+	shellData: { goal: { progress: number; target: number } | null };
+}) {
 	const { state, toggleSidebar, isMobile } = useSidebar();
+	const pathname = useRouterState({
+		select: (state) => state.location.pathname,
+	});
+	const pageName = pathname.split("/").filter(Boolean).at(-1) ?? "dashboard";
+	const label = pageName
+		.replaceAll("-", " ")
+		.replace(/\b\w/g, (character) => character.toUpperCase());
 	const [commandOpen, setCommandOpen] = useState<boolean>(false);
 	return (
 		<header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b px-4">
@@ -34,11 +46,11 @@ export default function DashboardHeader() {
 				<Breadcrumb className="hidden md:block">
 					<BreadcrumbList>
 						<BreadcrumbItem className="hidden md:block">
-							<BreadcrumbLink href="#">Build Your Application</BreadcrumbLink>
+							<BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
 						</BreadcrumbItem>
 						<BreadcrumbSeparator className="hidden md:block" />
 						<BreadcrumbItem>
-							<BreadcrumbPage>Data Fetching</BreadcrumbPage>
+							<BreadcrumbPage>{label}</BreadcrumbPage>
 						</BreadcrumbItem>
 					</BreadcrumbList>
 				</Breadcrumb>
@@ -54,7 +66,15 @@ export default function DashboardHeader() {
 							Daily Goal:
 						</span>
 						<span className="text-xs font-semibold text-primary dark:text-white">
-							85%
+							{shellData.goal
+								? Math.min(
+										100,
+										Math.round(
+											(shellData.goal.progress / shellData.goal.target) * 100,
+										),
+									)
+								: 0}
+							%
 						</span>
 					</div>
 

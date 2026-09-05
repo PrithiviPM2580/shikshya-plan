@@ -1,8 +1,9 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import StudyShell from "#/components/shared/study-shell";
-import { requireCurrentUser } from "#/lib/server-auth";
+import { getShellData, requireCurrentUser } from "#/lib/server-auth";
 
 export const Route = createFileRoute("/(private)/_dashboard")({
+	loader: () => getShellData(),
 	beforeLoad: async () => {
 		try {
 			await requireCurrentUser();
@@ -14,8 +15,9 @@ export const Route = createFileRoute("/(private)/_dashboard")({
 });
 
 function RouteComponent() {
+	const shellData = Route.useLoaderData();
 	return (
-		<StudyShell>
+		<StudyShell shellData={shellData}>
 			<Outlet />
 		</StudyShell>
 	);

@@ -1,13 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import {
-	Calculator,
-	Calendar,
-	CreditCard,
-	SearchIcon,
-	Settings,
-	Smile,
-	User,
-} from "lucide-react";
+import { Calculator, Calendar, SearchIcon, Settings, User } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import {
 	CommandDialog,
@@ -57,15 +49,15 @@ export default function SearchForm({
 					<CommandList>
 						<CommandEmpty>No results found.</CommandEmpty>
 
-						<CommandGroup heading="Suggestions">
+						<CommandGroup heading="Navigation">
 							<CommandItem onSelect={() => goTo("/calendar")}>
 								<Calendar />
 								Calendar
 							</CommandItem>
 
 							<CommandItem onSelect={() => goTo("/profile")}>
-								<Smile />
-								Search Emoji
+								<User />
+								Profile
 							</CommandItem>
 
 							<CommandItem disabled>
@@ -76,23 +68,17 @@ export default function SearchForm({
 
 						<CommandSeparator />
 
-						<CommandGroup heading="Settings">
+						<CommandGroup heading="Workspace">
 							<CommandItem onSelect={() => goTo("/settings")}>
-								<User />
-								Profile
+								<Settings />
+								Settings
 								<CommandShortcut>⌘P</CommandShortcut>
 							</CommandItem>
 
-							<CommandItem>
-								<CreditCard />
-								Billing
-								<CommandShortcut>⌘B</CommandShortcut>
-							</CommandItem>
-
-							<CommandItem>
-								<Settings />
-								Settings
-								<CommandShortcut>⌘S</CommandShortcut>
+							<CommandItem onSelect={() => setCommandOpen(false)}>
+								<Calculator />
+								Calculator
+								<CommandShortcut>⌘K</CommandShortcut>
 							</CommandItem>
 						</CommandGroup>
 					</CommandList>
