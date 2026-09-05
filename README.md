@@ -1,4 +1,4 @@
-Welcome to your new TanStack Start app! 
+Welcome to your new TanStack Start app!
 
 # Getting Started
 
@@ -7,6 +7,16 @@ To run this application:
 ```bash
 bun install
 bun --bun run dev
+```
+
+## Password Reset Email
+
+Password recovery uses Resend. Configure these server environment variables before
+enabling the reset flow in production:
+
+```bash
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL=Shikshya Plan <noreply@example.com>
 ```
 
 # Building For Production
@@ -42,13 +52,11 @@ If you prefer not to use Tailwind CSS:
 
 This project uses [Biome](https://biomejs.dev/) for linting and formatting. The following scripts are available:
 
-
 ```bash
 bun --bun run lint
 bun --bun run format
 bun --bun run check
 ```
-
 
 ## Shadcn
 
@@ -57,8 +65,6 @@ Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
 ```bash
 pnpm dlx shadcn@latest add button
 ```
-
-
 
 ## Routing
 
@@ -97,14 +103,14 @@ In the File Based Routing setup the layout is located in `src/routes/__root.tsx`
 Here is an example layout that includes a header:
 
 ```tsx
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
 
 export const Route = createRootRoute({
   head: () => ({
     meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'My App' },
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { title: "My App" },
     ],
   }),
   shellComponent: ({ children }) => (
@@ -124,7 +130,7 @@ export const Route = createRootRoute({
       </body>
     </html>
   ),
-})
+});
 ```
 
 More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
@@ -134,23 +140,23 @@ More information on layouts can be found in the [Layouts documentation](https://
 TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
 
 ```tsx
-import { createServerFn } from '@tanstack/react-start'
+import { createServerFn } from "@tanstack/react-start";
 
 const getServerTime = createServerFn({
-  method: 'GET',
+  method: "GET",
 }).handler(async () => {
-  return new Date().toISOString()
-})
+  return new Date().toISOString();
+});
 
 // Use in a component
 function MyComponent() {
-  const [time, setTime] = useState('')
-  
+  const [time, setTime] = useState("");
+
   useEffect(() => {
-    getServerTime().then(setTime)
-  }, [])
-  
-  return <div>Server time: {time}</div>
+    getServerTime().then(setTime);
+  }, []);
+
+  return <div>Server time: {time}</div>;
 }
 ```
 
@@ -159,16 +165,16 @@ function MyComponent() {
 You can create API routes by using the `server` property in your route definitions:
 
 ```tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { json } from '@tanstack/react-start'
+import { createFileRoute } from "@tanstack/react-router";
+import { json } from "@tanstack/react-start";
 
-export const Route = createFileRoute('/api/hello')({
+export const Route = createFileRoute("/api/hello")({
   server: {
     handlers: {
-      GET: () => json({ message: 'Hello, World!' }),
+      GET: () => json({ message: "Hello, World!" }),
     },
   },
-})
+});
 ```
 
 ## Data Fetching
@@ -178,25 +184,25 @@ There are multiple ways to fetch data in your application. You can use TanStack 
 For example:
 
 ```tsx
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/people')({
+export const Route = createFileRoute("/people")({
   loader: async () => {
-    const response = await fetch('https://swapi.dev/api/people')
-    return response.json()
+    const response = await fetch("https://swapi.dev/api/people");
+    return response.json();
   },
   component: PeopleComponent,
-})
+});
 
 function PeopleComponent() {
-  const data = Route.useLoaderData()
+  const data = Route.useLoaderData();
   return (
     <ul>
       {data.results.map((person) => (
         <li key={person.name}>{person.name}</li>
       ))}
     </ul>
-  )
+  );
 }
 ```
 
@@ -267,274 +273,270 @@ For TanStack Start specific documentation, visit [TanStack Start](https://tansta
 - Generate revision plans from actual subjects, sessions, tasks, plans, and exams
 - Avoid maintaining separate logic or duplicate data for analytics
 
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+provider = "prisma-client"
+output = "../src/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
+provider = "postgresql"
 }
 
-
 enum PlanStatus {
-  ACTIVE
-  COMPLETED
-  ARCHIVED
+ACTIVE
+COMPLETED
+ARCHIVED
 }
 
 enum TaskPriority {
-  LOW
-  MEDIUM
-  HIGH
+LOW
+MEDIUM
+HIGH
 }
 
 enum ThemeMode {
-  SYSTEM
-  LIGHT
-  DARK
+SYSTEM
+LIGHT
+DARK
 }
 
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
+id String @id
+name String
+email String
+emailVerified Boolean @default(false)
+image String?
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+sessions Session[]
+accounts Account[]
 
-  studyLogs StudyLog[]
-  goals Goal[]
-  exams Exam[]
-  tasks Task[]
-  studySessions StudySession[]
-  studyPlans StudyPlan[]
-  subjects Subject[]
-  profiles Profile[]
-  pomodoroSessions PomodoroSession[]
+studyLogs StudyLog[]
+goals Goal[]
+exams Exam[]
+tasks Task[]
+studySessions StudySession[]
+studyPlans StudyPlan[]
+subjects Subject[]
+profiles Profile[]
+pomodoroSessions PomodoroSession[]
 
-  @@unique([email])
-  @@map("user")
+@@unique([email])
+@@map("user")
 }
 
 model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+id String @id
+expiresAt DateTime
+token String
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+ipAddress String?
+userAgent String?
+userId String
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([token])
-  @@index([userId])
-  @@map("session")
+@@unique([token])
+@@index([userId])
+@@map("session")
 }
 
 model Account {
-  id                    String    @id
-  issuer                String
-  accountId             String
-  providerId            String
-  userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+id String @id
+issuer String
+accountId String
+providerId String
+userId String
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+accessToken String?
+refreshToken String?
+idToken String?
+accessTokenExpiresAt DateTime?
+refreshTokenExpiresAt DateTime?
+scope String?
+password String?
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
 
-  @@unique([issuer, accountId], map: "account_issuer_accountId_uidx")
-  @@index([userId])
-  @@map("account")
+@@unique([issuer, accountId], map: "account_issuer_accountId_uidx")
+@@index([userId])
+@@map("account")
 }
 
 model Verification {
-  id         String   @id
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+id String @id
+identifier String
+value String
+expiresAt DateTime
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
 
-  @@index([identifier])
-  @@map("verification")
+@@index([identifier])
+@@map("verification")
 }
 
-
-
 model Profile {
-  userId    String    @id
-  name      String?
-  avatarUrl String?
-  theme     ThemeMode @default(SYSTEM)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+userId String @id
+name String?
+avatarUrl String?
+theme ThemeMode @default(SYSTEM)
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Subject {
-  id          String    @id @default(uuid()) @db.Uuid
-  userId      String
-  name        String
-  color       String    @default("#4F46E5")
-  description String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+id String @id @default(uuid()) @db.Uuid
+userId String
+name String
+color String @default("#4F46E5")
+description String?
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
 
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  studyPlans   PlanSubject[]
-  studySessions StudySession[]
-  tasks        Task[]
-  exams        Exam[]
-  studyLogs    StudyLog[]
-  pomodoroSessions PomodoroSession[]
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+studyPlans PlanSubject[]
+studySessions StudySession[]
+tasks Task[]
+exams Exam[]
+studyLogs StudyLog[]
+pomodoroSessions PomodoroSession[]
 
-  @@index([userId])
+@@index([userId])
 }
 
 model StudyPlan {
-  id          String     @id @default(uuid()) @db.Uuid
-  userId      String
-  title       String
-  description String?
-  goal        String?
-  startDate   DateTime?  @db.Date
-  endDate     DateTime?  @db.Date
-  status      PlanStatus @default(ACTIVE)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+id String @id @default(uuid()) @db.Uuid
+userId String
+title String
+description String?
+goal String?
+startDate DateTime? @db.Date
+endDate DateTime? @db.Date
+status PlanStatus @default(ACTIVE)
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
 
-  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subjects PlanSubject[]
-  sessions StudySession[]
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+subjects PlanSubject[]
+sessions StudySession[]
 
-  @@index([userId])
+@@index([userId])
 }
 
 model PlanSubject {
-  planId    String @db.Uuid
-  subjectId String @db.Uuid
-  userId    String
+planId String @db.Uuid
+subjectId String @db.Uuid
+userId String
 
-  plan    StudyPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
-  subject Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+plan StudyPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
-  @@id([planId, subjectId])
-  @@index([userId])
+@@id([planId, subjectId])
+@@index([userId])
 }
 
 model StudySession {
-  id            String    @id @default(uuid()) @db.Uuid
-  userId        String
-  planId        String?   @db.Uuid
-  subjectId     String?   @db.Uuid
-  title         String
-  scheduledDate DateTime  @default(now())
-  durationMin   Int       @default(30)
-  completed     Boolean   @default(false)
-  notes         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+id String @id @default(uuid()) @db.Uuid
+userId String
+planId String? @db.Uuid
+subjectId String? @db.Uuid
+title String
+scheduledDate DateTime @default(now())
+durationMin Int @default(30)
+completed Boolean @default(false)
+notes String?
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
 
-  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan    StudyPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
-  subject Subject?  @relation(fields: [subjectId], references: [id], onDelete: SetNull)
-  tasks   Task[]
-  logs    StudyLog[]
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+plan StudyPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+tasks Task[]
+logs StudyLog[]
 
-  @@index([userId, scheduledDate])
+@@index([userId, scheduledDate])
 }
 
 model Task {
-  id          String       @id @default(uuid()) @db.Uuid
-  userId      String
-  sessionId   String?      @db.Uuid
-  subjectId   String?      @db.Uuid
-  title       String
-  description String?
-  priority    TaskPriority @default(MEDIUM)
-  dueDate     DateTime?
-  completed   Boolean      @default(false)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+id String @id @default(uuid()) @db.Uuid
+userId String
+sessionId String? @db.Uuid
+subjectId String? @db.Uuid
+title String
+description String?
+priority TaskPriority @default(MEDIUM)
+dueDate DateTime?
+completed Boolean @default(false)
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
 
-  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  session StudySession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
-  subject Subject?     @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+session StudySession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
 
-  @@index([userId, dueDate])
+@@index([userId, dueDate])
 }
 
 model Exam {
-  id        String    @id @default(uuid()) @db.Uuid
-  userId    String
-  subjectId String?   @db.Uuid
-  title     String
-  examDate  DateTime
-  syllabus  String?
-  completed Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+id String @id @default(uuid()) @db.Uuid
+userId String
+subjectId String? @db.Uuid
+title String
+examDate DateTime
+syllabus String?
+completed Boolean @default(false)
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
 
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
 
-  @@index([userId, examDate])
+@@index([userId, examDate])
 }
 
 model Goal {
-  id        String    @id @default(uuid()) @db.Uuid
-  userId    String
-  title     String
-  target    Int       @default(100)
-  progress  Int       @default(0)
-  deadline  DateTime? @db.Date
-  completed Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+id String @id @default(uuid()) @db.Uuid
+userId String
+title String
+target Int @default(100)
+progress Int @default(0)
+deadline DateTime? @db.Date
+completed Boolean @default(false)
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model StudyLog {
-  id        String    @id @default(uuid()) @db.Uuid
-  userId    String
-  sessionId String? @db.Uuid
-  subjectId String? @db.Uuid
-  minutes   Int
-  loggedAt  DateTime  @default(now())
+id String @id @default(uuid()) @db.Uuid
+userId String
+sessionId String? @db.Uuid
+subjectId String? @db.Uuid
+minutes Int
+loggedAt DateTime @default(now())
 
-  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  session StudySession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
-  subject Subject?     @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+session StudySession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
 
-  @@index([userId, loggedAt])
+@@index([userId, loggedAt])
 }
 
 model PomodoroSession {
-  id           String    @id @default(uuid()) @db.Uuid
-  userId       String
-  subjectId    String?   @db.Uuid
-  title        String?
-  focusMinutes Int       @default(25)
-  completed    Boolean   @default(false)
-  startedAt    DateTime  @default(now())
-  endedAt      DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+id String @id @default(uuid()) @db.Uuid
+userId String
+subjectId String? @db.Uuid
+title String?
+focusMinutes Int @default(25)
+completed Boolean @default(false)
+startedAt DateTime @default(now())
+endedAt DateTime?
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
 
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
 }

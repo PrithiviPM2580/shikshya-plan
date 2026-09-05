@@ -103,6 +103,14 @@ export default function SignInForm() {
 							);
 						}}
 					/>
+					<div className="-mt-3 text-right">
+						<Link
+							to="/forgot-password"
+							className="text-xs text-muted-foreground hover:text-primary hover:underline"
+						>
+							Forgot password?
+						</Link>
+					</div>
 					<Button type="submit" className="w-full" disabled={isPending}>
 						{isPending && <Loader2Icon className="size-8 animate-spin" />}
 						Sign In

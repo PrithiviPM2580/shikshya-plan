@@ -9,6 +9,32 @@ export const auth = betterAuth({
 	}),
 	emailAndPassword: {
 		enabled: true,
+		sendResetPassword: async ({ user, url }) => {
+			const apiKey = process.env.RESEND_API_KEY;
+			const from = process.env.RESEND_FROM_EMAIL;
+			if (!apiKey || !from) {
+				throw new Error(
+					"Password reset email is not configured. Set RESEND_API_KEY and RESEND_FROM_EMAIL.",
+				);
+			}
+
+			const response = await fetch("https://api.resend.com/emails", {
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${apiKey}`,
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					from,
+					to: [user.email],
+					subject: "Reset your Shikshya Plan password",
+					html: `<p>Hi ${user.name},</p><p>Use the link below to choose a new password. It expires in one hour.</p><p><a href="${url}">Reset your password</a></p>`,
+				}),
+			});
+			if (!response.ok) {
+				throw new Error("Unable to send password reset email");
+			}
+		},
 	},
 	socialProviders: {
 		github: {
