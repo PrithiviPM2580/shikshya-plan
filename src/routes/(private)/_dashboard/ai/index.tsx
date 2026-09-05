@@ -6,6 +6,7 @@ import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
+import { generateAnalyticsSummary } from "#/features/ai/server/analytics-summary";
 import { generateExamInsight } from "#/features/ai/server/exam-insight";
 import { generateQuiz } from "#/features/ai/server/quiz";
 import { generateScheduleAdjustment } from "#/features/ai/server/schedule-adjustment";
@@ -17,6 +18,7 @@ import {
 import { generateTaskBreakdown } from "#/features/ai/server/task-breakdown";
 import { askTutor } from "#/features/ai/server/tutor";
 import type {
+	GeneratedAnalyticsSummary,
 	GeneratedExamInsight,
 	GeneratedQuiz,
 	GeneratedScheduleAdjustment,
@@ -73,6 +75,10 @@ function AiPage() {
 		useState<GeneratedScheduleAdjustment | null>(null);
 	const [scheduleAdjustmentLoading, setScheduleAdjustmentLoading] =
 		useState(false);
+	const [analyticsDays, setAnalyticsDays] = useState("7");
+	const [analyticsSummary, setAnalyticsSummary] =
+		useState<GeneratedAnalyticsSummary | null>(null);
+	const [analyticsSummaryLoading, setAnalyticsSummaryLoading] = useState(false);
 
 	async function createPlan(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -287,6 +293,28 @@ function AiPage() {
 		}
 	}
 
+	async function createAnalyticsSummary(
+		event: React.FormEvent<HTMLFormElement>,
+	) {
+		event.preventDefault();
+		setAnalyticsSummaryLoading(true);
+		try {
+			const result = await generateAnalyticsSummary({
+				data: { days: Number(analyticsDays) },
+			});
+			setAnalyticsSummary(result);
+			toast.success("Study summary generated");
+		} catch (error) {
+			toast.error(
+				error instanceof Error
+					? error.message
+					: "Unable to summarize study analytics",
+			);
+		} finally {
+			setAnalyticsSummaryLoading(false);
+		}
+	}
+
 	return (
 		<div className="w-full space-y-5">
 			<section className="border-b border-border pb-5">
@@ -377,6 +405,73 @@ function AiPage() {
 										))}
 									</ul>
 								</div>
+							</div>
+						</div>
+					)}
+				</CardContent>
+			</Card>
+			<Card className="rounded-xl border bg-card py-0 shadow-sm">
+				<CardHeader className="px-5 pb-2 pt-5">
+					<CardTitle className="text-sm">AI study analytics summary</CardTitle>
+					<p className="text-xs text-muted-foreground">
+						Turn your recent study activity into patterns and practical next
+						steps.
+					</p>
+				</CardHeader>
+				<CardContent className="space-y-4 px-5 pb-5">
+					<form
+						onSubmit={createAnalyticsSummary}
+						className="flex flex-col gap-3 sm:flex-row sm:items-end"
+					>
+						<label className="space-y-2 text-xs font-medium">
+							Analysis period
+							<select
+								value={analyticsDays}
+								onChange={(event) => setAnalyticsDays(event.target.value)}
+								className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm sm:w-40"
+							>
+								<option value="7">Last 7 days</option>
+								<option value="15">Last 15 days</option>
+								<option value="30">Last 30 days</option>
+							</select>
+						</label>
+						<Button type="submit" disabled={analyticsSummaryLoading}>
+							{analyticsSummaryLoading ? (
+								<Loader2 className="animate-spin" />
+							) : (
+								<Brain />
+							)}
+							{analyticsSummaryLoading ? "Analyzing..." : "Analyze progress"}
+						</Button>
+					</form>
+					{analyticsSummary && (
+						<div className="grid gap-4 rounded-lg bg-muted/50 p-4 md:grid-cols-2">
+							<div className="space-y-3">
+								<div>
+									<p className="text-xs font-semibold">Summary</p>
+									<p className="mt-1 text-sm font-medium">
+										{analyticsSummary.headline}
+									</p>
+									<p className="mt-2 text-xs leading-5 text-muted-foreground">
+										{analyticsSummary.studyPattern}
+									</p>
+								</div>
+								<div>
+									<p className="text-xs font-semibold">What the data shows</p>
+									<ul className="mt-1 list-disc space-y-1 pl-4 text-xs text-muted-foreground">
+										{analyticsSummary.observations.map((observation) => (
+											<li key={observation}>{observation}</li>
+										))}
+									</ul>
+								</div>
+							</div>
+							<div>
+								<p className="text-xs font-semibold">Recommended next steps</p>
+								<ul className="mt-1 list-disc space-y-2 pl-4 text-xs text-muted-foreground">
+									{analyticsSummary.recommendations.map((recommendation) => (
+										<li key={recommendation}>{recommendation}</li>
+									))}
+								</ul>
 							</div>
 						</div>
 					)}
