@@ -1,6 +1,20 @@
 import { useNavigate } from "@tanstack/react-router";
-import { Calculator, Calendar, SearchIcon, Settings, User } from "lucide-react";
+import {
+	BookOpen,
+	Calendar,
+	CalendarClock,
+	ChartNoAxesCombined,
+	ClipboardCheck,
+	Goal,
+	ListTodo,
+	Play,
+	SearchIcon,
+	Settings,
+	Timer,
+	User,
+} from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
+import { useEffect } from "react";
 import {
 	CommandDialog,
 	CommandEmpty,
@@ -23,10 +37,37 @@ export default function SearchForm({
 	setCommandOpen,
 }: SearchButtonProps) {
 	const navigate = useNavigate();
-	function goTo(to: "/calendar" | "/profile" | "/settings") {
+	function goTo(
+		to:
+			| "/dashboard"
+			| "/subjects"
+			| "/plans"
+			| "/sessions"
+			| "/tasks"
+			| "/calendar"
+			| "/exams"
+			| "/goals"
+			| "/analytics"
+			| "/pomodoro"
+			| "/profile"
+			| "/settings"
+			| "/scheduler"
+			| "/revision-planner",
+	) {
 		setCommandOpen(false);
 		navigate({ to });
 	}
+
+	useEffect(() => {
+		function handleShortcut(event: KeyboardEvent) {
+			if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+				event.preventDefault();
+				setCommandOpen((open) => !open);
+			}
+		}
+		window.addEventListener("keydown", handleShortcut);
+		return () => window.removeEventListener("keydown", handleShortcut);
+	}, [setCommandOpen]);
 
 	return (
 		<>
@@ -49,36 +90,84 @@ export default function SearchForm({
 					<CommandList>
 						<CommandEmpty>No results found.</CommandEmpty>
 
-						<CommandGroup heading="Navigation">
+						<CommandGroup heading="Navigate">
+							<CommandItem onSelect={() => goTo("/dashboard")}>
+								<ChartNoAxesCombined />
+								Dashboard
+							</CommandItem>
+							<CommandItem onSelect={() => goTo("/subjects")}>
+								<BookOpen />
+								Subjects
+							</CommandItem>
+							<CommandItem onSelect={() => goTo("/plans")}>
+								<ListTodo />
+								Study Plans
+							</CommandItem>
+							<CommandItem onSelect={() => goTo("/sessions")}>
+								<Play />
+								Sessions
+							</CommandItem>
+							<CommandItem onSelect={() => goTo("/tasks")}>
+								<ClipboardCheck />
+								Tasks
+							</CommandItem>
 							<CommandItem onSelect={() => goTo("/calendar")}>
 								<Calendar />
 								Calendar
 							</CommandItem>
-
+							<CommandItem onSelect={() => goTo("/exams")}>
+								<ClipboardCheck />
+								Exams
+							</CommandItem>
+							<CommandItem onSelect={() => goTo("/goals")}>
+								<Goal />
+								Goals
+							</CommandItem>
+							<CommandItem onSelect={() => goTo("/analytics")}>
+								<ChartNoAxesCombined />
+								Analytics
+							</CommandItem>
+							<CommandItem onSelect={() => goTo("/pomodoro")}>
+								<Timer />
+								Pomodoro
+							</CommandItem>
+							<CommandItem onSelect={() => goTo("/scheduler")}>
+								<CalendarClock />
+								Scheduler
+							</CommandItem>
+							<CommandItem onSelect={() => goTo("/revision-planner")}>
+								<CalendarClock />
+								Revision Planner
+							</CommandItem>
 							<CommandItem onSelect={() => goTo("/profile")}>
 								<User />
 								Profile
-							</CommandItem>
-
-							<CommandItem disabled>
-								<Calculator />
-								Calculator
 							</CommandItem>
 						</CommandGroup>
 
 						<CommandSeparator />
 
-						<CommandGroup heading="Workspace">
+						<CommandGroup heading="Quick Actions">
 							<CommandItem onSelect={() => goTo("/settings")}>
 								<Settings />
 								Settings
-								<CommandShortcut>⌘P</CommandShortcut>
+								<CommandShortcut>⌘S</CommandShortcut>
 							</CommandItem>
-
-							<CommandItem onSelect={() => setCommandOpen(false)}>
-								<Calculator />
-								Calculator
-								<CommandShortcut>⌘K</CommandShortcut>
+							<CommandItem onSelect={() => goTo("/tasks")}>
+								<ClipboardCheck />
+								Create or manage tasks
+							</CommandItem>
+							<CommandItem onSelect={() => goTo("/sessions")}>
+								<Play />
+								Start a study session
+							</CommandItem>
+							<CommandItem onSelect={() => goTo("/goals")}>
+								<Goal />
+								Update goals
+							</CommandItem>
+							<CommandItem onSelect={() => goTo("/exams")}>
+								<Calendar />
+								Schedule an exam
 							</CommandItem>
 						</CommandGroup>
 					</CommandList>
