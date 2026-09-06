@@ -50,9 +50,7 @@ function RouteComponent() {
 		profileData.profile?.name ?? profileData.user.name,
 	);
 	const [program, setProgram] = useState(profileData.profile?.program ?? "");
-	const [semester, setSemester] = useState(
-		profileData.profile?.semester ?? "",
-	);
+	const [semester, setSemester] = useState(profileData.profile?.semester ?? "");
 	const [weeklyHours, setWeeklyHours] = useState(
 		String(profileData.profile?.weeklyHours ?? ""),
 	);
@@ -144,6 +142,25 @@ function RouteComponent() {
 				? "Browser reminders enabled"
 				: "Browser reminders were not enabled",
 		);
+	}
+
+	async function sendTestNotification() {
+		if (!("Notification" in window)) {
+			toast.error("This browser does not support notifications");
+			return;
+		}
+		const permission =
+			Notification.permission === "granted"
+				? "granted"
+				: await Notification.requestPermission();
+		if (permission !== "granted") {
+			toast.error("Allow browser notifications to run the test");
+			return;
+		}
+		new Notification("Shikshya Plan test reminder", {
+			body: "Browser notifications are working correctly.",
+		});
+		toast.success("Test notification sent");
 	}
 
 	async function handleAvatar(event: React.ChangeEvent<HTMLInputElement>) {
@@ -400,9 +417,7 @@ function RouteComponent() {
 										readOnly
 									/>
 								</label>
-								<label
-									className="space-y-2 text-xs font-medium text-muted-foreground"
-								>
+								<label className="space-y-2 text-xs font-medium text-muted-foreground">
 									WEEKLY STUDY HOURS
 									<Input
 										type="number"
@@ -413,9 +428,7 @@ function RouteComponent() {
 										placeholder="15"
 									/>
 								</label>
-								<label
-									className="space-y-2 text-xs font-medium text-muted-foreground"
-								>
+								<label className="space-y-2 text-xs font-medium text-muted-foreground">
 									TARGET GPA
 									<Input
 										type="number"
@@ -520,6 +533,14 @@ function RouteComponent() {
 									className="w-full"
 								>
 									Enable browser reminders
+								</Button>
+								<Button
+									variant="ghost"
+									size="sm"
+									onClick={sendTestNotification}
+									className="w-full"
+								>
+									Send test notification
 								</Button>
 							</div>
 						</CardContent>
