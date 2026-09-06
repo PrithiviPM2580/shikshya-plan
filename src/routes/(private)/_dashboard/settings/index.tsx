@@ -87,6 +87,7 @@ function RouteComponent() {
 			? "unsupported"
 			: Notification.permission,
 	);
+	const [notificationTested, setNotificationTested] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [avatarUploading, setAvatarUploading] = useState(false);
 	const [pomodoroLength, setPomodoroLength] = useState(
@@ -172,6 +173,7 @@ function RouteComponent() {
 		new Notification("Shikshya Plan test reminder", {
 			body: "Browser notifications are working correctly.",
 		});
+		setNotificationTested(true);
 		toast.success("Test notification sent");
 	}
 
@@ -539,6 +541,7 @@ function RouteComponent() {
 									onCheckedChange={setSessionReminders}
 								/>
 								<Button
+									type="button"
 									variant="outline"
 									size="sm"
 									onClick={enableBrowserNotifications}
@@ -550,6 +553,7 @@ function RouteComponent() {
 									Browser permission: <strong>{notificationStatus}</strong>
 								</p>
 								<Button
+									type="button"
 									variant="ghost"
 									size="sm"
 									onClick={sendTestNotification}
@@ -557,6 +561,12 @@ function RouteComponent() {
 								>
 									Send test notification
 								</Button>
+								{notificationTested && (
+									<p className="rounded-md bg-primary/10 p-2 text-center text-[11px] text-primary">
+										Test sent successfully. If no popup appeared, your browser
+										or Linux notification settings are hiding it.
+									</p>
+								)}
 							</div>
 						</CardContent>
 					</Card>
