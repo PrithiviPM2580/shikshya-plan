@@ -88,6 +88,9 @@ function RouteComponent() {
 			: Notification.permission,
 	);
 	const [notificationTested, setNotificationTested] = useState(false);
+	const [notificationTestError, setNotificationTestError] = useState<
+		string | null
+	>(null);
 	const [saving, setSaving] = useState(false);
 	const [avatarUploading, setAvatarUploading] = useState(false);
 	const [pomodoroLength, setPomodoroLength] = useState(
@@ -155,6 +158,7 @@ function RouteComponent() {
 	}
 
 	async function sendTestNotification() {
+		setNotificationTestError(null);
 		if (!("Notification" in window)) {
 			setNotificationStatus("unsupported");
 			toast.error("This browser does not support notifications");
@@ -170,11 +174,23 @@ function RouteComponent() {
 			return;
 		}
 		setNotificationStatus("granted");
-		new Notification("Shikshya Plan test reminder", {
-			body: "Browser notifications are working correctly.",
-		});
-		setNotificationTested(true);
-		toast.success("Test notification sent");
+		try {
+			const notification = new Notification("Shikshya Plan test reminder", {
+				body: "Browser notifications are working correctly.",
+			});
+			notification.onshow = () => setNotificationTested(true);
+			notification.onerror = () =>
+				setNotificationTestError(
+					"Brave accepted permission but could not display the notification.",
+				);
+			toast.success("Test notification sent to Brave");
+		} catch (error) {
+			setNotificationTestError(
+				error instanceof Error
+					? error.message
+					: "Unable to create the browser notification",
+			);
+		}
 	}
 
 	async function handleAvatar(event: React.ChangeEvent<HTMLInputElement>) {
@@ -563,8 +579,12 @@ function RouteComponent() {
 								</Button>
 								{notificationTested && (
 									<p className="rounded-md bg-primary/10 p-2 text-center text-[11px] text-primary">
-										Test sent successfully. If no popup appeared, your browser
-										or Linux notification settings are hiding it.
+										Brave displayed the test notification.
+									</p>
+								)}
+								{notificationTestError && (
+									<p className="rounded-md bg-destructive/10 p-2 text-center text-[11px] text-destructive">
+										{notificationTestError}
 									</p>
 								)}
 							</div>
