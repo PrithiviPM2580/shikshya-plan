@@ -13,7 +13,7 @@ export const Route = createFileRoute("/(public)/_auth/sign-in/")({
 });
 
 function SignIn() {
-	const naviate = useNavigate();
+	const navigate = useNavigate();
 	const [isPending, startTransition] = useTransition();
 	async function onSocial(provider: "google" | "github") {
 		startTransition(async () => {
@@ -24,10 +24,8 @@ function SignIn() {
 				},
 				{
 					onSuccess: () => {
-						toast.success(
-							`${provider.toUpperCase()} Account created successfully.`,
-						);
-						naviate({ to: "/dashboard" });
+						toast.success(`${provider.toUpperCase()} sign-in successful.`);
+						navigate({ to: "/dashboard" });
 					},
 					onError: ({ error }) => {
 						toast.error(error.message);
