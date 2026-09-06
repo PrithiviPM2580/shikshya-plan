@@ -84,7 +84,11 @@ function ResetPassword() {
 						autoComplete="new-password"
 					/>
 				</label>
-				<Button type="submit" className="w-full" disabled={pending || !token}>
+				<Button
+					type="submit"
+					className="w-full mt-2"
+					disabled={pending || !token}
+				>
 					{pending && <Loader2Icon className="size-4 animate-spin" />}
 					Update password
 				</Button>

@@ -51,7 +51,8 @@ function ForgotPassword() {
 			</div>
 			{submitted ? (
 				<div className="rounded-lg border bg-muted/40 p-4 text-sm text-muted-foreground">
-					If an account exists for that email, check your inbox for the reset link.
+					If an account exists for that email, check your inbox for the reset
+					link.
 				</div>
 			) : (
 				<form onSubmit={submit} className="space-y-4">
@@ -65,7 +66,7 @@ function ForgotPassword() {
 							placeholder="you@example.com"
 						/>
 					</label>
-					<Button type="submit" className="w-full" disabled={pending}>
+					<Button type="submit" className="w-full mt-2" disabled={pending}>
 						{pending && <Loader2Icon className="size-4 animate-spin" />}
 						Send reset link
 					</Button>
