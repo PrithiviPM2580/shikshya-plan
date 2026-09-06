@@ -19,6 +19,7 @@ export default function StudyShell({
 		taskCount: number;
 		goal: { title: string; progress: number; target: number } | null;
 		notificationPreferences: {
+			daily: boolean;
 			tasks: boolean;
 			exams: boolean;
 			sessions: boolean;
@@ -35,7 +36,7 @@ export default function StudyShell({
 			className={cn("min-h-screen bg-background text-foreground", className)}
 		>
 			<SidebarProvider>
-				<div className="min-h-screen w-full bg-[var(--hero-a)]/10 md:flex md:min-h-screen">
+				<div className="min-h-screen w-full bg-(--hero-a)/10 md:flex md:min-h-screen">
 					<NotificationReminders
 						preferences={shellData.notificationPreferences}
 						reminders={{
