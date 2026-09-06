@@ -80,6 +80,13 @@ function RouteComponent() {
 	const [sessionReminders, setSessionReminders] = useState(
 		profileData.profile?.sessionReminders ?? true,
 	);
+	const [notificationStatus, setNotificationStatus] = useState<
+		"granted" | "denied" | "default" | "unsupported"
+	>(() =>
+		typeof window === "undefined" || !("Notification" in window)
+			? "unsupported"
+			: Notification.permission,
+	);
 	const [saving, setSaving] = useState(false);
 	const [avatarUploading, setAvatarUploading] = useState(false);
 	const [pomodoroLength, setPomodoroLength] = useState(
@@ -133,10 +140,12 @@ function RouteComponent() {
 
 	async function enableBrowserNotifications() {
 		if (!("Notification" in window)) {
+			setNotificationStatus("unsupported");
 			toast.error("This browser does not support notifications");
 			return;
 		}
 		const permission = await Notification.requestPermission();
+		setNotificationStatus(permission);
 		toast[permission === "granted" ? "success" : "error"](
 			permission === "granted"
 				? "Browser reminders enabled"
@@ -146,6 +155,7 @@ function RouteComponent() {
 
 	async function sendTestNotification() {
 		if (!("Notification" in window)) {
+			setNotificationStatus("unsupported");
 			toast.error("This browser does not support notifications");
 			return;
 		}
@@ -154,9 +164,11 @@ function RouteComponent() {
 				? "granted"
 				: await Notification.requestPermission();
 		if (permission !== "granted") {
+			setNotificationStatus(permission);
 			toast.error("Allow browser notifications to run the test");
 			return;
 		}
+		setNotificationStatus("granted");
 		new Notification("Shikshya Plan test reminder", {
 			body: "Browser notifications are working correctly.",
 		});
@@ -534,6 +546,9 @@ function RouteComponent() {
 								>
 									Enable browser reminders
 								</Button>
+								<p className="text-center text-[11px] text-muted-foreground">
+									Browser permission: <strong>{notificationStatus}</strong>
+								</p>
 								<Button
 									variant="ghost"
 									size="sm"
