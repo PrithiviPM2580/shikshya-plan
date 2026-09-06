@@ -42,7 +42,7 @@ function SignIn() {
 			</p>
 			<div className="flex gap-2 w-full">
 				<Button
-					variant="custom"
+					variant="outline"
 					className="flex-1"
 					disabled={isPending}
 					onClick={() => onSocial("google")}
@@ -51,7 +51,7 @@ function SignIn() {
 					Sign in with Google
 				</Button>
 				<Button
-					variant="custom"
+					variant="outline"
 					className="flex-1"
 					disabled={isPending}
 					onClick={() => onSocial("github")}
