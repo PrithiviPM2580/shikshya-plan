@@ -20,7 +20,8 @@ type NotificationRemindersProps = {
 	};
 };
 
-const reminderLeadTime = 15 * 60 * 1000;
+const reminderLeadTime =
+	process.env.NODE_ENV === "development" ? 1 * 60 * 1000 : 15 * 60 * 1000;
 
 export default function NotificationReminders({
 	preferences,
