@@ -20,7 +20,7 @@ function SignUp() {
 			await authClient.signIn.social(
 				{
 					provider: provider,
-					callbackURL: "/",
+					callbackURL: "/onboarding",
 				},
 				{
 					onSuccess: () => {

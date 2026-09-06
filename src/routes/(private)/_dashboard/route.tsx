@@ -2,15 +2,17 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { DefaultCatchBoundary } from "#/components/default-catch-boundary";
 import StudyShell from "#/components/shared/study-shell";
 import { Spinner } from "#/components/ui/spinner";
-import { getShellData, requireCurrentUser } from "#/lib/server-auth";
+import { getOnboardingStatus, getShellData } from "#/lib/server-auth";
 
 export const Route = createFileRoute("/(private)/_dashboard")({
 	loader: () => getShellData(),
 	beforeLoad: async () => {
-		try {
-			await requireCurrentUser();
-		} catch {
+		const status = await getOnboardingStatus();
+		if (!status.user) {
 			throw redirect({ to: "/sign-in" });
+		}
+		if (!status.isComplete) {
+			throw redirect({ to: "/onboarding" });
 		}
 	},
 	errorComponent: DefaultCatchBoundary,

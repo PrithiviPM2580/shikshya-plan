@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "#/components/ui/button";
@@ -13,19 +13,21 @@ export const Route = createFileRoute("/(public)/_auth/sign-in/")({
 });
 
 function SignIn() {
+	const naviate = useNavigate();
 	const [isPending, startTransition] = useTransition();
 	async function onSocial(provider: "google" | "github") {
 		startTransition(async () => {
 			await authClient.signIn.social(
 				{
 					provider: provider,
-					callbackURL: "/",
+					callbackURL: "/dashboard",
 				},
 				{
 					onSuccess: () => {
 						toast.success(
 							`${provider.toUpperCase()} Account created successfully.`,
 						);
+						naviate({ to: "/dashboard" });
 					},
 					onError: ({ error }) => {
 						toast.error(error.message);
