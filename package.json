@@ -16,6 +16,7 @@
     "format": "biome check --write",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
+    "db:seed": "bun prisma/seed.ts",
     "db:studio": "prisma studio",
     "ui:add": "bunx --bun shadcn@latest add"
   },

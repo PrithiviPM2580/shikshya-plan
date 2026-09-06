@@ -36,10 +36,10 @@ export default function SignInForm() {
 					{
 						onSuccess: () => {
 							toast.success("Sign in successfully");
-							navigate({ to: "/" });
+							navigate({ to: "/dashboard" });
 						},
 						onError: ({ error }) => {
-							toast.error(error.message || "Failed to sign-up");
+							toast.error(error.message || "Failed to sign-in");
 						},
 					},
 				);
@@ -50,7 +50,7 @@ export default function SignInForm() {
 	return (
 		<div className="w-full flex flex-col gap-7">
 			<form
-				id="sign-up-form"
+				id="sign-in-form"
 				onSubmit={(e) => {
 					e.preventDefault();
 					form.handleSubmit();
